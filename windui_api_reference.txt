@@ -1,0 +1,965 @@
+========================================================================
+  THAM CHIEU API WINDUI - TOAN BO THU VIEN UI ROBLOX (v1.6.65+)
+  Nguon: https://footagesus.github.io/treehub-web/docs/windui
+  Github: https://github.com/Footagesus/WindUI
+  Biet: trang "Group" da bi deprecated - khong dung nua, dung HStack/VStack.
+========================================================================
+
+========================================================================
+PHAN 1: LOADSTRING (Tai thu vien)
+========================================================================
+
+--- 1.1. Phien ban dinh danh (Pinned - KHUYEN DUNG) ---
+Ban docs hien tai dung _version = "1.6.66". Script dang chay cua ban
+dung 1.6.65 - van dung duoc cach nay, chi can doi chuoi version:
+
+local _version = "1.6.65"  -- "1.6.66" theo docs hien tai
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/" .. _version .. "/main.lua"))()
+
+Ly do nen pin: update moi co the loi, nen dung phien ban cu dinh.
+
+--- 1.2. Phien ban moi nhat (Latest) ---
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+--- 1.3. Ban dist/main.lua tu repo (Unstable - khong on dinh) ---
+Co feature moi truoc release nhung co the co bug:
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+
+--- 1.4. Setup tuy chon (sau khi load) ---
+-- Hien thong bao thap hon (bo qua nut jump tren mobile):
+WindUI:SetNotificationLower(true)
+
+-- Dat font cho toan bo UI (danh sach font: https://create.roblox.com/store/fonts):
+WindUI:SetFont("rbxassetid://font-id-here")
+
+========================================================================
+PHAN 2: CAC HAM TOAN CUC TREN OBJECT WindUI
+========================================================================
+
+Tat ca ham toan cuc co dang WindUI:<TenHam>(...):
+
+  :CreateWindow(WindowConfig: table)      -> Tao cua so chinh, tra ve Window
+  :GetCurrentTheme()                      -> Lay theme hien tai
+  :GetThemes()                            -> Lay danh sach theme
+  :AddTheme(Theme: table)                 -> Them theme tuy chinh
+  :Gradient(Colors: table, Config: table) -> table (tao gradient, tra ve table)
+  :SetFont(FontId: string)                -> Dat font cho thu vien
+  :SetParent(Parent: Instance)            -> Dat parent cho UI
+  :SetLanguage(LanguageCode: string)      -> Dat ma ngon ngu
+  :Localization(Config: table)            -> Cau hinh dich ngon ngu
+  :Notify(NotificationConfig: table)      -> Hien thong bao tam thoi
+  :Popup(PopupConfig: table)              -> Tao cua popup doc lap
+  :SetNotificationLower(Lower: boolean)   -> Chong thong bao xuong duoi
+  :GetTransparency(): number              -> Lay do trong suot hien tai
+  :GetWindowSize(): UDim2                 -> Lay kich thuoc cua so
+  :ToggleAcrylic(Enabled: boolean)        -> Bat/tat hieu ung acrylic
+
+Vi du:
+WindUI:Notify({
+    Title = "Thanh cong",
+    Content = "Hoan tat thanh cong",
+    Duration = 3,
+})
+
+========================================================================
+PHAN 3: WINDOW (Cua so chinh)
+========================================================================
+
+--- 3.1. Tao Window ---
+local Window = WindUI:CreateWindow({
+    Title = "My Super Hub",   -- bat buoc: ten cua so
+    Icon = "door-open",       -- tuy chon: icon lucide / rbxassetid:// / URL
+    Author = "by .ftgs",      -- tuy chon: phu de cua so
+})
+
+--- 3.2. Bang cau hinh Window (WindowConfig) - DAY DU ---
+Title: string                    -- BAT BUOC. Ten hien thi tren cua so
+Icon: string                     -- Icon (Lucide, rbxassetid://, URL)
+Author: string                   -- Phu de / tac gia hien thi duoi Title
+Folder: string                   -- Ten thu muc luu config + trang thai mo/tat
+Size: UDim2                      -- Kich thuoc cua so
+MinSize: Vector2                 -- Kich thuoc toi thieu
+MaxSize: Vector2                 -- Kich thuoc toi da
+Position: UDim2                  -- Vi tri cua so
+Transparent: boolean             -- Cho phep trong suot
+Theme: string                    -- Ten theme (vd: "Dark")
+Resizable: boolean               -- Cho phep keo resize
+SideBarWidth: number             -- Do rong thanh ben (sidebar)
+HideSearchBar: boolean           -- An thanh tim kiem
+ScrollBarEnabled: boolean        -- Bat/tat thanh cuon
+BackgroundImageTransparency: number -- Do trong suot anh nen
+Background: string|table         -- Anh nen (chi dung URL raw HOAC rbxassetid://)
+ShadowTransparency: number       -- Do trong suot bong
+Radius: number                   -- Ban kinh bo tron
+ElementsRadius: number           -- Ban kinh bo tron cua cac phan tu
+TopBarButtonIconSize: number     -- Kich thuoc icon nut topbar
+ToggleKey: Enum.KeyCode          -- Phim bat/tat UI (vd: Enum.KeyCode.RightControl)
+Acrylic: boolean                 -- Hieu ung acrylic (blur)
+NewElements: boolean             -- Dung phong cach element moi
+IgnoreAlerts: boolean            -- Bo qua canh bao (alerts)
+HidePanelBackground: boolean     -- An nen cua panel
+AutoScale: boolean               -- Tu dong scale UI
+Topbar: table                    -- Cau hinh topbar
+Footer: table                    -- Cau hinh footer duoi cua so
+OpenButton: table                -- Cau hinh nut mo UI ngoai man hinh
+User: table                      -- Cau hinh khu vuc user/avata
+KeySystem: table                 -- Cau hinh he thong key (xem Phan 4)
+
+Canh bao (tu docs): Background chi hoat dong voi URL raw HOAC rbxassetid://IMAGE ID.
+KHONG dung duoc voi DECAL ID.
+
+--- 3.3. Cac method cua Window ---
+-- Tao element / quan ly tab:
+:Tab(TabConfig: table)            -> Tao tab moi
+:Section(SectionConfig: table)    -> Tao Tab Section (nhom tab trong sidebar)
+:SelectTab(Tab: table)            -> Chon/ hien thi mot tab (XEM LUU Y KET LUAN)
+:Tag(TagConfig: table)            -> Tao tag badge tren cua so
+:Dialog(DialogConfig: table)      -> Tao dialog modal
+:Divider()                        -> Them duong phan cach
+:CreateTopbarButton(Name: string, Icon: string, Callback: function,
+                    LayoutOrder: number?, IconThemed: boolean?,
+                    Color: Color3?, IconSize: number?)  -> Tao nut topbar tuy chinh
+:DisableTopbarButtons(Buttons: table) -> Tat cac nut topbar chi dinh
+:EditOpenButton(Config: table)    -> Chinh sua nut mo UI
+
+-- Doi noi dung hien thi:
+:SetTitle(Title: string)
+:SetAuthor(Author: string)
+:SetIcon(Icon: string)
+:SetIconSize(Size: number|UDim2)
+:SetSize(Size: UDim2)
+
+-- Cau hinh la:
+:SetToggleKey(KeyCode: Enum.KeyCode)
+:SetTheme(Theme: string)
+:SetBackgroundImage(ImageId: string)
+:SetBackgroundImageTransparency(Transparency: number)
+:SetBackgroundTransparency(Value: number)
+:SetUIScale(Scale: number)
+:GetUIScale(): number
+:SetPanelBackground(Visible: boolean)
+:IsResizable(Resizable: boolean)
+:ToggleTransparency(Enabled: boolean)
+:SetToTheCenter()
+
+-- Mo/tat/pha huy:
+:Toggle()      -- Bat/tat cua so
+:Open()        -- Mo cua so
+:Close()       -- Dong cua so
+:Destroy()     -- Pha huy toan bo UI
+:ToggleFullscreen() -- Bat/tat fullscreen
+
+-- Khoa element:
+:LockAll()          -- Khoa tat ca element
+:UnlockAll()        -- Mo khoa tat ca
+:GetLocked(): table -- Lay danh sach bi khoa
+:GetUnlocked(): table -- Lay danh sach chua khoa
+
+-- Su kien:
+:OnOpen(Callback: function)   -- Goi khi cua so mo
+:OnClose(Callback: function)  -- Goi khi cua so dong
+:OnDestroy(Callback: function)-- Goi khi UI bi pha huy
+
+Vi du day du nho:
+local Window = WindUI:CreateWindow({
+    Title = "My Super Hub",
+    Icon = "door-open",
+    Author = "by me",
+    Theme = "Dark",
+    Size = UDim2.fromOffset(550, 400),
+    MinSize = UDim2.fromOffset(450, 300),
+    ToggleKey = Enum.KeyCode.RightControl,
+    Folder = "MyHub",
+    AutoScale = true,
+})
+
+========================================================================
+PHAN 4: KEYSYSTEM (He thong nhap key)
+========================================================================
+
+KeySystem phai nam TRONG bang cau hinh cua CreateWindow (khong tach rieng).
+
+--- 4.1. Cau hinh KeySystem ---
+KeyValidator: function   -- BAT BUOC. Ham kiem tra key: function(key) return ... end
+Title: string?           -- Tieu de cua hop nhap key
+Note: string?            -- Ghi chu huong dan (vd: "Click Get Key de mo Discord")
+SaveKey: boolean?        -- Luu key da nhap de lan sau tu dong dung
+URL: string?             -- Link "Get Key" (vd: discord.gg/...)
+API: table?              -- Cau hinh API (neu co)
+Thumbnail: table?        -- Anh minh hoa: { Image = "rbxassetid://...", Title = "...", Width = 200 }
+
+--- 4.2. Vi du ---
+local Window = WindUI:CreateWindow({
+    Title = "Admin Panel",
+    Folder = "MyApp",
+    KeySystem = {
+        Title = "Premium Access",
+        Note = "Click 'Get Key' de mo Discord",
+        KeyValidator = function(key)
+            return key == "admin123"   -- hoac table.find(validKeys, key) ~= nil
+        end,
+        SaveKey = true,
+        URL = "https://discord.gg/yourserver",
+        Thumbnail = {
+            Image = "rbxassetid://your_image_id",
+            Title = "VIP Member",
+            Width = 200,
+        },
+    },
+})
+
+--- 4.3. Hanh vi SaveKey ---
+Khi SaveKey = true:
+1. Nguoi dung nhap key vao dialog
+2. Key duoc kiem tra boi KeyValidator
+3. Neu hop le, key duoc luu vao: [Folder]/[player.Name].key
+4. Lan chay sau, key da luu duoc tai tu dong va kiem tra lai
+
+Luu y: thuoc tinh Key (cu) da DEPRECATED - dung KeyValidator thay the.
+
+========================================================================
+PHAN 5: TAB (Trang) + TAB SECTION (Nhom tab)
+========================================================================
+
+--- 5.1. Tao Tab ---
+local Tab = Window:Tab({
+    Title = "Tab Title",   -- mac dinh: "Tab"
+    Icon = "bird",         -- tuy chon
+})
+
+--- 5.2. Tham so Tab ---
+Title: string                 -- "Tab"
+Desc: string?                 -- nil
+Icon: string?                 -- nil
+IconColor: Color3?            -- nil
+IconShape: string?            -- nil
+IconThemed: boolean?          -- false
+Locked: boolean?              -- false
+ShowTabTitle: boolean?        -- false
+Border: boolean?              -- false
+TabTitleAlign: string?        -- "Left"
+CustomEmptyPage: table?       -- { Icon = 'lucide:frown', IconSize = 48,
+                              --   Title = 'This tab is Empty', Desc = nil }
+
+Tham so CustomEmptyPage:
+  Icon: string?  -- mac dinh 'lucide:frown'
+  IconSize: number? -- 48
+  Title: string?    -- 'This tab is Empty'
+  Desc: string?     -- nil
+
+--- 5.3. Method cua Tab ---
+:Select()                        -- Chon/ hien thi tab nay
+:SetTitle(Title: string)         -- Doi ten tab
+:SetDesc(Description: string)    -- Doi mo ta tab
+:Lock()                          -- Khoa tab
+:Unlock()                        -- Mo khoa tab
+:ScrollToTheElement(1)           -- Cuon den element thu nhat (index)
+
+Goi y dung chung element (cac element duoc goi TRUC TIEP tren Tab):
+Tab:Button({...}) Tab:Toggle({...}) Tab:Slider({...}) Tab:Input({...})
+Tab:Dropdown({...}) Tab:Section({...}) Tab:Paragraph({...}) Tab:Tag({...})
+Tab:Divider() Tab:Space({...}) Tab:Image({...}) Tab:HStack() Tab:VStack()
+
+--- 5.4. Tab Section (nhom tab trong sidebar) ---
+local section = Window:Section({
+    Title = "Tab Section example",
+})
+section:Tab({ Title = "Tab 1" })
+section:Tab({ Title = "Tab 2" })
+
+Tham so Tab Section:
+Title: string          -- bat buoc (docs ghi: Section)
+Icon: string           -- nil
+IconThemed: boolean    -- nil
+Opened: boolean        -- false (mo rong ban dau)
+
+========================================================================
+PHAN 6: SECTION (Trong Tab - nhom collapsible element)
+========================================================================
+
+Luu y: "Section" tren Window la TAB SECTION (nhom tab).
+"Section" tren Tab la nhom collapsible chua cac element.
+
+local Section = Tab:Section({
+    Title = "General Settings",
+})
+Section:Button({ Title = "Button in Section" })
+Section:Toggle({ Title = "Toggle in Section" })
+
+--- Tham so ---
+Title: string                -- bat buoc
+Desc: string?                -- nil
+Icon: string?                -- nil
+IconColor: Color3?           -- nil
+TextSize: number?            -- 19
+TextXAlignment: string?      -- "Left" (hoac "Center")
+Box: boolean?                -- false
+BoxBorder: boolean?          -- false
+Opened: boolean?             -- true
+FontWeight: Enum.FontWeight? -- SemiBold
+DescFontWeight: Enum.FontWeight? -- Medium
+TextTransparency: number?    -- 0.05
+DescTextTransparency: number?-- 0.4
+
+--- Method ---
+:SetTitle(Title: string)
+:SetDesc(Description: string)
+:Open()
+:Close()
+:Destroy()
+
+========================================================================
+PHAN 7: MOI ELEMENT (Parameters + Methods + Vi du)
+========================================================================
+
+========================================================================
+7.1. BUTTON
+========================================================================
+Parameters:
+  Title: string          -- bat buoc
+  Desc: string?          -- nil
+  Icon: string?          -- nil
+  IconAlign: string?     -- "Right"
+  IconColor: Color3?     -- nil
+  Color: Color3?         -- nil
+  Locked: boolean?       -- false
+  LockedTitle: string?   -- nil
+  Justify: string?       -- "Between" (hoac "Center")
+  Flag: string?          -- nil (xem Configs)
+  Callback: function?    -- nil
+
+Methods:
+  :SetTitle(Title: string)
+  :SetDesc(Description: string)
+  :Lock()
+  :Unlock()
+  :Highlight()
+  :Destroy()
+
+Vi du:
+Tab:Button({
+    Title = "Save Settings",
+    Icon = "save",
+    IconAlign = "Left",
+    Callback = function()
+        print("Saved!")
+    end,
+})
+
+========================================================================
+7.2. TOGGLE (Bat/tat - co kieu Checkbox)
+========================================================================
+Parameters:
+  Title: string       -- bat buoc
+  Desc: string?       -- nil
+  Icon: string?       -- nil
+  Value: boolean?     -- false
+  Type: string?       -- "Toggle" (mac dinh) hoac "Checkbox"
+  Locked: boolean?    -- false
+  Flag: string?       -- nil
+  Callback: function? -- nil, nhan tham so state (boolean)
+
+Methods:
+  :SetTitle(Title: string)
+  :SetDesc(Description: string)
+  :Set(Value: boolean)
+  :Toggle()
+  :Lock()
+  :Unlock()
+  :Highlight()
+  :Destroy()
+
+Vi du (Toggle + Checkbox):
+Tab:Toggle({
+    Title = "Enable Feature",
+    Value = false,
+    Callback = function(state) print("State:", state) end,
+})
+Tab:Toggle({
+    Title = "Accept Terms",
+    Type = "Checkbox",
+    Value = false,
+    Callback = function(state) print("Accepted:", state) end,
+})
+
+========================================================================
+7.3. SLIDER
+========================================================================
+Parameters:
+  Title: string        -- bat buoc
+  Desc: string?        -- nil
+  Value.Min: number    -- 0
+  Value.Max: number    -- 100
+  Value.Default: number-- 50
+  Step: number?        -- 1 (1 = integer; 0.1 = float)
+  Locked: boolean?     -- false
+  Flag: string?        -- nil
+  Callback: function?  -- nil, nhan value
+  Width: number?       -- 130
+  Icons: table?        -- tuy chon: { From = "sfsymbols:sunMinFill",
+                       --             To = "sfsymbols:sunMaxFill" }
+
+Methods:
+  :SetTitle(Title: string)
+  :SetDesc(Description: string)
+  :Set(Value: number)
+  :SetMin(Min: number)
+  :SetMax(Max: number)
+  :Lock()
+  :Unlock()
+  :Highlight()
+  :Destroy()
+
+Vi du:
+Tab:Slider({
+    Title = "Volume",
+    Value = { Min = 0, Max = 100, Default = 50 },
+    Step = 1,
+    Callback = function(value) print("Volume:", value) end,
+})
+
+========================================================================
+7.4. INPUT (Nhap van ban)
+========================================================================
+Parameters:
+  Title: string       -- bat buoc
+  Desc: string?       -- nil
+  Icon: string?       -- nil
+  Type: string?       -- "Default" (hoac "Textarea" cho nhieu dong)
+  Placeholder: string?-- nil
+  Value: string?      -- rong
+  Locked: boolean?    -- false
+  Flag: string?       -- nil
+  Callback: function? -- nil, nhan text
+
+Methods:
+  :SetTitle(Title: string)
+  :SetDesc(Description: string)
+  :Set(Value: string)
+  :Lock()
+  :Unlock()
+  :Highlight()
+  :Destroy()
+
+Vi du:
+Tab:Input({
+    Title = "Username",
+    Type = "Default",   -- hoac "Textarea"
+    Placeholder = "Nhap ten...",
+    Callback = function(text) print("Input:", text) end,
+})
+
+========================================================================
+7.5. DROPDOWN (Chon tu danh sach - ke ca Multi)
+========================================================================
+Parameters:
+  Title: string          -- bat buoc
+  Desc: string?          -- nil
+  Values: table          -- {} (mang cac gia tri; PHAI unique - khong trung)
+  Value: string?         -- nil (gia tri chon mac dinh)
+  AllowNone: boolean?    -- false (cho phep khong chon gi)
+  SearchBarEnabled: boolean? -- false (thanh tim kiem trong dropdown)
+  Multi: boolean?        -- false (chon nhieu; callback nhan table)
+  Locked: boolean?       -- false
+  Flag: string?          -- nil
+  Callback: function?    -- nil
+
+Luu y quan trong (tu docs): Dropdown KHONG ho tro gia tri trung lap.
+Moi entry trong Values phai la duy nhat.
+
+Methods:
+  :SetTitle(Title: string)
+  :SetDesc(Description: string)
+  :Select(Value: string | table)  -- chon gia tri (table khi Multi)
+  :Lock()
+  :Unlock()
+  :Highlight()
+  :Destroy()
+
+Vi du (don gian + Multi):
+Tab:Dropdown({
+    Title = "Choose Theme",
+    Values = { "Light", "Dark", "Auto" },
+    Value = "Dark",
+    Callback = function(selected) print("Theme:", selected) end,
+})
+Tab:Dropdown({
+    Title = "Select Features",
+    Values = { "Feature A", "Feature B", "Feature C" },
+    Multi = true,
+    AllowNone = true,
+    Callback = function(selected) print(selected) end,  -- selected la table
+})
+
+========================================================================
+7.6. PARAGRAPH (Van ban / thong tin - co Buttons)
+========================================================================
+Parameters (docs goi la Properties):
+  Title: string               -- ""
+  Desc: string                -- ""
+  Image: string?              -- nil (icon hoac anh)
+  ImageSize: number?          -- nil
+  Thumbnail: string?          -- nil (vd: "rbxassetid://")
+  ThumbnailSize: number?      -- nil
+  Color: string | Color3?     -- nil
+  Buttons: table?             -- nil (mang cac nut, xem duoi)
+  Locked: boolean?            -- false
+
+Button trong Paragraph (Button Properties):
+  Title: string               -- ""
+  Icon: string?               -- nil
+  Variant: string?            -- nil
+  Callback()                  -- nil
+
+Methods:
+  :SetTitle(Title: string)
+  :SetDesc(Description: string)
+  :SetImage(Image: string, ImageSize: number?)
+  :SetThumbnail(Thumbnail: string, ThumbnailSize: number?)
+  :SetColor(Color: Color3)
+  :Destroy()
+
+Vi du (co Buttons):
+Tab:Paragraph({
+    Title = "Update Available",
+    Desc = "Version 3.0 san sang cai dat",
+    Image = "check-circle",
+    ImageSize = 20,
+    Thumbnail = "rbxassetid://",
+    ThumbnailSize = 80,
+    Buttons = {
+        { Title = "Install", Icon = "download", Callback = function() end },
+    },
+})
+
+========================================================================
+7.7. KEYBIND (Phim tat)
+========================================================================
+Parameters:
+  Title: string       -- bat buoc
+  Desc: string?       -- nil
+  Value: string?      -- nil (phim mac dinh, vd: "V")
+  Locked: boolean?    -- false
+  Flag: string?       -- nil
+  Callback: function? -- nil, nhan key
+
+Methods:
+  :SetTitle(Title: string)
+  :Set(Value: Enum.KeyCode)
+  :Lock()
+  :Unlock()
+
+Vi du:
+Tab:Keybind({
+    Title = "Toggle UI",
+    Value = "V",
+    Callback = function(key) print("Keybind:", key) end,
+})
+
+========================================================================
+7.8. COLORPICKER
+========================================================================
+Parameters:
+  Title: string       -- bat buoc
+  Desc: string?       -- nil
+  Default: Color3?    -- Color3.fromRGB(255, 255, 255)
+  Locked: boolean?    -- false
+  Flag: string?       -- nil
+  Callback: function? -- nil, nhan color (Color3)
+
+Methods:
+  :Set(Color: Color3, Transparency: number?)
+  :Lock()
+  :Unlock()
+
+Vi du:
+Tab:Colorpicker({
+    Title = "Select Color",
+    Default = Color3.fromRGB(255, 0, 0),
+    Callback = function(color) print("Color:", color) end,
+})
+
+========================================================================
+7.9. CODE (Hien block code)
+========================================================================
+Parameters:
+  Title: string?      -- nil
+  Code: string        -- bat buoc (noi dung code)
+  CodeSize: number    -- 18
+  CodeTheme: table    -- nil
+  CanCopied: boolean  -- true (cho phep copy)
+  Height: UDim        -- nil
+  OnCopy: function?   -- nil
+
+Methods:
+  :SetCode(Code: string)
+  :Destroy()
+
+Vi du:
+Tab:Code({
+    Title = "Example Code",
+    Code = "print('Hello World')",
+})
+
+========================================================================
+7.10. DIVIDER (Duong phan cach) ---
+Khong co tham so. Goi khong arguments:
+Tab:Divider()
+
+Dung de tach nhom element:
+Tab:Button({ Title = "Option 1" })
+Tab:Divider()
+Tab:Button({ Title = "Option 2" })
+
+========================================================================
+7.11. SPACE (Khoang trong) ---
+Parameters:
+  Columns: number?  -- 1
+
+Vi du:
+Tab:Space()                 -- khoang thang 1 cot
+Tab:Space({ Columns = 3 })  -- 3 cot
+
+========================================================================
+7.12. IMAGE
+========================================================================
+Parameters:
+  Image: string         -- bat buoc (URL hoac "rbxassetid://")
+  AspectRatio: string?  -- "16:9"
+  Radius: number?       -- 23 hoac 12
+
+Vi du:
+Tab:Image({
+    Image = "https://example.com/image.png",
+    AspectRatio = "16:9",
+    Radius = 12,
+})
+
+========================================================================
+7.13. HSTACK & VStack (Bo cuon ngang / thang)
+========================================================================
+HStack: bo cuon element theo HORIZONTAL (ngang).
+VStack: bo cuon element theo VERTICAL (thang dung).
+
+Parameters (chung):
+  AutoSpace: boolean?  -- nil
+
+Methods:
+  Ta khong tao element rieng cho no - goi Tab:HStack() / Tab:VStack()
+  roi them element vao bo cuon do.
+
+Vi du (ket hop HStack + VStack):
+local YourHStack = YourTab:HStack()
+local LeftVStack = YourHStack:VStack()
+local RightVStack = YourHStack:VStack()
+
+LeftVStack:Button({ Title = "Left Button" })
+LeftVStack:Toggle({ Title = "Left Toggle" })
+RightVStack:Button({ Title = "Right Button" })
+
+========================================================================
+7.14. PROGRESSBAR (Thanh tien trinh)
+========================================================================
+Parameters:
+  Title: string              -- "Progress"
+  Desc: string?              -- nil
+  Value.Min: number          -- 0
+  Value.Max: number          -- 100
+  Value.Default: number      -- Min
+  ShowValue: boolean?        -- true tru khi Indeterminate
+  DisplayMode: string?       -- "Percent"
+  Format: function?          -- nil (value, percentage, min, max) -> string
+  Animate: boolean?          -- true
+  AnimationDuration: number? -- 0.15
+  Indeterminate: boolean?    -- false (che do loading khong xac dinh)
+  IndeterminateText: string? -- ""
+  Speed: number?             -- 1
+  ControlGap: number?        -- 16
+  Width: number?             -- 160
+  ValueWidth: number?        -- 44
+
+Methods:
+  :Set(Value: number)
+  :Get()
+  :GetPercentage()
+  :SetRange(Min: number, Max: number)
+  :SetMin(Min: number)
+  :SetMax(Max: number)
+
+Vi du:
+local Progress = Tab:ProgressBar({
+    Title = "Download",
+    Desc = "Dang tai file...",
+    Value = { Min = 0, Max = 100, Default = 25 },
+})
+
+--- Cac element khac (Button, Toggle, Slider, Input, Dropdown, Paragraph,
+--- Keybind, Colorpicker, Code) DEU co :Destroy() neu co method nay.
+--- Divider, Space, Image thuong KHONG co method Destroy trong docs.
+
+========================================================================
+PHAN 8: DIALOG, POPUP, NOTIFICATION, TAG
+========================================================================
+
+========================================================================
+8.1. DIALOG (Modal xac nhan - tren Window)
+========================================================================
+Tao: local Dialog = Window:Dialog({ ... })
+
+Parameters:
+  Title: string        -- "Dialog"
+  Icon: string?        -- nil
+  IconThemed: boolean? -- false
+  Content: string      -- nil (noi dung thong diep)
+  Buttons: table       -- {} (mang cac nut)
+
+Button config (trong Dialog/Popup):
+  Title: string       -- "Button"
+  Icon: string?       -- nil
+  Variant: string?    -- "Primary"
+  Callback: function? -- nil
+
+Methods:
+  :Show()   -- Hien dialog
+  :Close()  -- Dong dialog
+
+Vi du:
+local Dialog = Window:Dialog({
+    Title = "Confirm Action",
+    Content = "Ban co chac khong?",
+    Buttons = {
+        { Title = "Yes", Callback = function() print("Confirmed") end },
+        { Title = "No", Callback = function() print("Cancelled") end },
+    },
+})
+Dialog:Show()
+
+========================================================================
+8.2. POPUP (Cua popup doc lap - toan cuc WindUI)
+========================================================================
+Tao: local Popup = WindUI:Popup({ ... })
+
+Parameters:
+  Title: string        -- "Popup"
+  Icon: string?        -- nil
+  Content: string      -- nil
+  Buttons: table       -- {}
+
+Methods:
+  :Close()  -- Dong popup
+
+Vi du:
+local Popup = WindUI:Popup({
+    Title = "Welcome",
+    Content = "Chao mung ban!",
+    Buttons = {
+        { Title = "Get Started", Callback = function() print("...") end },
+    },
+})
+
+Phan biet (tu docs):
+- Popup: cua so doc lap voi title + styling day du, cho announcement.
+- Dialog: prompt modal chan tuong tac voi cua so, cho xac nhan.
+- Notification: thong bao tam thoi tu dong tat, cho feedback.
+
+========================================================================
+8.3. NOTIFICATION (WindUI:Notify)
+========================================================================
+Parameters:
+  Title: string        -- "Notification"
+  Content: string      -- nil
+  Icon: string?        -- nil
+  Duration: number?    -- 3 (giay)
+
+Vi du:
+WindUI:Notify({
+    Title = "Success",
+    Content = "Hoan tat thanh cong",
+    Duration = 3,
+})
+
+========================================================================
+8.4. TAG (Badge nhan tren Window hoac Tab)
+========================================================================
+Tao (co 2 cach theo docs):
+  local Tag = Window:Tag({ ... })  -- tren cua so
+  Tab:Tag({ ... })                 -- tren tab (vi du docs)
+
+Parameters:
+  Title: string    -- bat buoc
+  Icon: string?    -- nil
+  Color: Color3?   -- nil
+
+Methods:
+  :SetTitle(Title: string)
+  :SetIcon(Icon: string)
+  :SetColor(Color: Color3)
+
+Vi du (FPS counter):
+local FPSTag = Window:Tag({
+    Title = "FPS: 0",
+    Color = Color3.fromRGB(100, 150, 255),
+})
+-- Sau do trong RenderStepped: FPSTag:SetTitle("FPS: " .. fps); FPSTag:SetColor(...)
+
+========================================================================
+PHAN 9: THEMES (Giao dien / mau sac)
+========================================================================
+
+--- 9.1. Dat theme trong CreateWindow ---
+local Window = WindUI:CreateWindow({
+    --...,
+    Theme = "Dark",   -- ten theme
+})
+
+--- 9.2. Dat theme bang ham ---
+WindUI:SetTheme("Dark")
+
+--- 9.3. Tao theme tuy chinh ---
+WindUI:AddTheme({
+    Name = "Dark",
+    Accent = Color3.fromHex("#18181b"),
+    Background = Color3.fromHex("#101010"),
+    Outline = Color3.fromHex("#FFFFFF"),
+    Text = Color3.fromHex("#FFFFFF"),
+    Placeholder = Color3.fromHex("#7a7a7a"),
+    Button = Color3.fromHex("#52525b"),
+    Icon = Color3.fromHex("#a1a1aa"),
+})
+
+--- 9.4. Lay thong tin theme ---
+WindUI:GetThemes()         -- danh sach cac theme
+WindUI:GetCurrentTheme()   -- theme hien tai
+
+Luu y: docs hien thi anh "All Themes" nhung khong liet ke text danh sach
+theme built-in trong trang markdown - chi biet vi du "Dark".
+Goi y: dung GetThemes() trong game de xem danh sach chinh xac.
+
+========================================================================
+PHAN 10: CONFIGS (He thong luu / tai cau hinh)
+========================================================================
+
+--- 10.1. Bat bang cach dat Folder trong Window ---
+local Window = WindUI:CreateWindow({
+    Title = "My Application",
+    Folder = "MyApp",   -- tao thu muc luu config
+})
+-- Duong dan luu: [YOUR_EXPLOIT]/WindUI/[Window.Folder]/configs/
+
+--- 10.2. Luu trang thai element bang Flag ---
+Bat ky element nao co thuoc tinh Flag deu tu dong duoc luu.
+Tao ConfigManager:
+local MyConfig = Window.ConfigManager:Config("MyConfigFile")
+-- tao/ tai file `MyConfigFile.json`
+
+Vi du:
+local DarkMode = Tab:Toggle({
+    Title = "Dark Mode",
+    Flag = "dark_mode_enabled",
+    Value = false,
+    Callback = function(state) print("Dark mode:", state) end,
+})
+
+local Volume = Tab:Slider({
+    Title = "Volume",
+    Flag = "master_volume",
+    Value = { Min = 0, Max = 100, Default = 75 },
+    Callback = function(value) print("Volume:", value) end,
+})
+
+local Username = Tab:Input({
+    Title = "Username",
+    Flag = "user_name",
+    Callback = function(text) print("Username:", text) end,
+})
+
+-- Luu thu cong:
+MyConfig:Save()
+
+--- 10.3. Cau truc thu muc (tu docs) ---
+-- Khi Folder = "MyApp", WindUI tao:
+-- /WindUI/MyApp/            -- thu muc chinh
+-- /WindUI/MyApp/configs/    -- file config
+-- /WindUI/MyApp/assets/     -- asset cache
+-- /MyApp/                   -- thu muc backup tuy chon
+
+Cac element ho tro Flag (theo docs): Toggle, Slider, Dropdown, Input,
+Button, Keybind, Colorpicker.
+
+========================================================================
+PHAN 11: ICONS (Bieu tuong)
+========================================================================
+
+--- 11.1. Nguon icon ho tro ---
+1. Built-in Icons (khuyen dung) - Lucide la mac dinh
+2. Roblox Asset ID - dung dinh dang rbxassetid://
+3. Image URL - link anh external (raw)
+
+--- 11.2. Prefix cac bo icon ---
+Lucide Icons       : "lucide:"    (mac dinh, chi can ten: "save")
+Craft Icons        : "craft:"
+Geist Icons        : "geist:"
+Solar Icons        : "solar:"     (vd: "solar:pen-bold")
+SF Symbols         : "sfsymbols:" (vd: "sfsymbols:sunMinFill")
+Gravity UI Icons   : "gravity:"
+
+--- 11.3. Vi du dung ---
+Tab:Button({ Title = "Save", Icon = "save" })                     -- Lucide
+Tab:Button({ Title = "Edit", Icon = "solar:pen-bold" })           -- Solar
+Tab:Button({ Icon = "rbxassetid://123456789", IconThemed = true })-- Roblox asset
+Tab:Button({ Icon = "https://example.com/my-icon.png" })          -- URL
+
+Ten Lucide dung duoc o: Window.Icon, Tab.Icon, Button.Icon, Toggle.Icon,
+Input.Icon, Section.Icon, Notification.Icon, Dialog.Icon, Popup.Icon...
+(Lien ket danh sach Lucide: https://lucide.dev)
+
+========================================================================
+PHAN 12: LUU Y KHI TICH HOP (Practical gotchas)
+========================================================================
+
+1. PHAI GOI Window:SelectTab(1) (hoac Tab:Select()) SAU KHI tao xong cac
+   tab - neu khong, cac trang se an/ khong hien thi. Doc them method
+   :SelectTab(Tab: table) tren Window va :Select() tren Tab.
+
+2. Thuoc tinh Folder (trong Window) giu trang thai mo/tat cua cua so
+   giua cac lan chay - neu nguoi dung da tung dong UI, lan sau co the
+   no nho trang thai "dong" truoc do.
+
+3. Text tieng Viet hoan toan render duoc - khong can xu ly dac biet.
+
+4. Truoc khi chay lai script (re-run), GOI Window:Destroy() de pha huy
+   UI cu - neu khong se co 2 cua so/ 2 loop song song.
+
+5. Loadstring dung HttpGet tu GitHub (github.com/Footagesus/WindUI) -
+   can ket noi Internet va HttpGet trong executor.
+
+6. Slider dung Value = { Min, Max, Default } - KHONG truyen Value la
+   number don le. Step = 1 cho integer, Step = 0.1 cho float.
+
+7. Dropdown KHONG cho phep Values trung lap - moi entry phai unique.
+   Multi = true thi Callback nhan table, dung :Select(table) de chon.
+
+8. Background cua Window chi hoat dong voi URL raw HOAC rbxassetid:// -
+   KHONG dung duoc Decal ID.
+
+9. KeySystem phai nam TRONG bang cua CreateWindow; dung KeyValidator
+   (function), KHONG dung thuoc tinh Key da deprecated.
+
+10. Neu dung Acrylic, co the can executor ho tro; dung
+    Window:ToggleAcrylic(true/false) de bat/tat luc chay.
+
+11. Tag dung duoc tren Window va Tab - dung :SetTitle/ :SetColor de
+    cap nhat realtime (vi du FPS, Ping).
+
+12. Config luu khi co Folder + Flag; goi Window.ConfigManager:Config("ten")
+    roi :Save() de luu thu cong. File JSON nam trong [Folder]/configs/.
+
+========================================================================
+CUOI CUNG - NGUON
+========================================================================
+Tong hop tu 27 trang docs: loadstring, themes, window, keysystem, tab,
+tabsection, sections, button, toggle, slider, input, dropdown, paragraph,
+keybind, colorpicker, code, divider, space, image, hstackvstack,
+progressbar, dialog, popup, notification, tag, configs, icons.
+(Group bo qua vi deprecated.)
+========================================================================
