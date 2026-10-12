@@ -1,0 +1,1329 @@
+repeat wait() until game:IsLoaded()
+getgenv().Key = ""        -- Your "Key"
+getgenv().Hide_UI = false -- if true it turns off GUI
+getgenv().LowCPU = true   -- Remove All Map Path to Boost FPS
+getgenv().Studio = {
+    ["Aotr"] = {
+        ["One Click"] = {
+            ["Setting Farm"] = {
+                ["Select Slots"] = 'A', -- B, C
+                ["Start Delay"] = 5,
+                ["Delay Farm"] = 2,
+                ["Last Titan"] = 36,
+                ["Use Teleport"] = true,
+                ["Multi Slash"] = {
+                    ["Enable"] = true,
+                    ["Time"] = 3,
+                },
+            },
+            ["Family"] = {
+                ["Roll"] = true,
+                ["Select"] = { 'Fritz' }, -- 'Fritz', 'Helos', 'Ackerman', 'Yeager', 'Reiss'
+            },
+            ["Map"] = {
+                ["Mode"] = 'Missions',        -- 'Missions', 'Raids'
+                ["Missions"] = 'Shiganshina', -- Name Map or Wiki
+                ["Raids"] = 'Attack Titan',   -- Name Map or Wiki
+                ["Objective"] = 'Skirmish',   -- Name Map or Wiki
+            },
+            ["Upgrade"] = {
+                ["Enable"] = true,
+                ["Equipment"] = 'MAX', -- 'MAX' or 'Blade_Durability', 'ODM_Damage', 'ODM_Crit_Chance', 'ODM_Gas', 'ODM_Range', 'ODM_Speed', 'ODM_Crit_Damage'
+            },
+            ["Claim Quests"] = true,
+            ["Claim Achievements"] = true,
+            ["Buy Boosts"] = true,
+            ["Skill Tree"] = true,
+            ["Prestige"] = {
+                ["Enable"] = true,
+                ["Prestige When Gold"] = {
+                    PRESTIGE_1 = 200000000,
+                    PRESTIGE_2 = 400000000,
+                    PRESTIGE_3 = 600000000,
+                    PRESTIGE_4 = 800000000,
+                    PRESTIGE_5 = 1000000000
+                },
+            }
+        },
+        ["Webhook"] = {
+            ["Url"] = "https://discord.com/api/webhooks/1505277964483301598/P-ZlbxVQi0wteRg5c_DBRgTN0VZgJVUmHLoVzr5HakOQp79RwQN625uje37wzdVF4W_a",         -- URL
+            ["Ping Notify"] = "", -- '<@here>' or <@User ID>
+        },
+        ["Misc"] = {
+            ["Modify"] = {
+                ["Enable"] = true,
+                ["Mod"] = { "No_Perks", "No_Skills", "No_Memories", "Nightmare", "Oddball", "Injury_Prone", "Chronic_Injuries", "Fog", "Glass_Cannon" },
+            },
+            ["Refresh"] = 10,
+            ["Retry"] = true,
+            ["Lock Fps"] = 60,
+            ["AntiShadowBan"] = true, -- Thêm config anti shadow ban
+            ["SafeDelay"] = true,     -- Thêm delay an toàn
+        }
+    }
+}
+
+if not LPH_OBFUSCATED then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Luraph/macrosdk/main/luraphsdk.lua"))()
+end
+
+local plr = game.Players.LocalPlayer
+local character = plr.Character or plr.CharacterAdded:Wait()
+local runs = cloneref(game:GetService("RunService"))
+local tweens = cloneref(game:GetService("TweenService"))
+local uis = cloneref(game:GetService("UserInputService"))
+local https = cloneref(game:GetService('HttpService'))
+local tps = cloneref(game:GetService('TeleportService'))
+
+local Config = getgenv().Studio["Aotr"]
+local OneClick = Config["One Click"]
+local Webhook = Config["Webhook"]
+local Misc = Config["Misc"]
+local Map = OneClick["Map"]
+local Family = OneClick["Family"]
+local SettingFarm = OneClick["Setting Farm"]
+local Upgrade = OneClick["Upgrade"]
+local Prestige = OneClick["Prestige"]
+local Modify = Misc["Modify"]
+
+if OneClick["Upgrade"]["Equipment"] == "MAX" then
+    OneClick["Upgrade"]["Equipment"] = { 'Blade_Durability', 'ODM_Damage', 'Crit_Chance', 'ODM_Gas', 'ODM_Range',
+        'ODM_Speed', 'Crit_Damage', 'ODM_Control' }
+end
+
+-- Tối ưu loading
+repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+local plr = game.Players.LocalPlayer
+local start_loading = tick()
+repeat
+    wait()
+until plr.PlayerGui.Fullscreen.Loading_Screen.Visible == false or (function()
+        if (tick() - start_loading) >= 15 then
+            warn('Game load failed ! Rejoining')
+            game:GetService('TeleportService'):Teleport(13379208636)
+            return true
+        end
+    end)()
+
+task.spawn(function()
+    while true do
+        if getfpscap() > Misc["Lock Fps"] then
+            setfpscap(Misc["Lock Fps"] or 20)
+        end
+        task.wait(1)
+    end
+end)
+
+SetStatus = function()
+    -- _nguoitinhcuaeZ
+end
+
+if not getgenv().Hide_UI then
+    local Players = game:GetService("Players")
+    local TweenService = game:GetService("TweenService")
+    local Lighting = game:GetService("Lighting")
+    local player = Players.LocalPlayer
+    local blur = Instance.new("BlurEffect", Lighting)
+    blur.Size = 0
+    TweenService:Create(blur, TweenInfo.new(0.5), { Size = 40 }):Play()
+    task.delay(2, function()
+        if blur then blur:Destroy() end
+    end)
+
+    local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    screenGui.Name = "VxezeLoader"
+    screenGui.ResetOnSpawn = false
+    screenGui.IgnoreGuiInset = true
+
+    local frame = Instance.new("Frame", screenGui)
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundTransparency = 1
+
+    local bg = Instance.new("Frame", frame)
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.BackgroundColor3 = Color3.fromRGB(5, 5, 10)
+    bg.BackgroundTransparency = 1
+    TweenService:Create(bg, TweenInfo.new(0.5), { BackgroundTransparency = 0.2 }):Play()
+
+    local getTitleScale = function()
+        local s = workspace.CurrentCamera.ViewportSize
+        return math.clamp(math.min(s.X, s.Y) / 600, 0.3, 0.5)
+    end
+
+    local gradColor = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 191, 255)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 200, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 200)),
+    })
+
+    local statusGradColor = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 180, 220)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(190, 200, 230)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(210, 210, 220)),
+    })
+
+    local makeLabel = function(parent, pos, size)
+        local t = Instance.new("TextLabel", parent)
+        t.Font = Enum.Font.FredokaOne
+        t.TextColor3 = Color3.fromRGB(255, 255, 255)
+        t.TextStrokeColor3 = Color3.fromRGB(0, 100, 150)
+        t.TextStrokeTransparency = 0.3
+        t.TextTransparency = 1
+        t.BackgroundTransparency = 1
+        t.Position = pos
+        t.Size = size
+        t.TextScaled = true
+        local g = Instance.new("UIGradient", t)
+        g.Color = gradColor
+        g.Rotation = 90
+        return t
+    end
+
+    local makeStatusLabel = function(parent, pos, size)
+        local t = Instance.new("TextLabel", parent)
+        t.Font = Enum.Font.FredokaOne
+        t.TextColor3 = Color3.fromRGB(230, 230, 250)
+        t.TextTransparency = 1
+        t.BackgroundTransparency = 1
+        t.Position = pos
+        t.Size = size
+        t.TextScaled = true
+        t.TextXAlignment = Enum.TextXAlignment.Center
+        t.TextYAlignment = Enum.TextYAlignment.Center
+        local g = Instance.new("UIGradient", t)
+        g.Color = statusGradColor
+        g.Rotation = 90
+        return t
+    end
+
+    local logo = Instance.new("ImageLabel", frame)
+    logo.Image = "rbxassetid://104363488394469"
+    logo.BackgroundTransparency = 1
+    logo.AnchorPoint = Vector2.new(0.5, 0.5)
+    logo.Position = UDim2.new(0.5, 0, 0.3, 0)
+    logo.Size = UDim2.new(getTitleScale(), 0, getTitleScale(), 0)
+    logo.ImageTransparency = 1
+    Instance.new("UIAspectRatioConstraint", logo).AspectRatio = 1
+    TweenService:Create(logo, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        { ImageTransparency = 0 }):Play()
+
+    local titleText = makeLabel(frame, UDim2.new(0.5, 0, 0.52, 0), UDim2.new(0.5, 0, 0.09, 0))
+    titleText.Text = "Vxeze Hub"
+    titleText.AnchorPoint = Vector2.new(0.5, 0.5)
+    TweenService:Create(titleText, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        { TextTransparency = 0 }):Play()
+
+    local statusText = makeStatusLabel(frame, UDim2.new(0.5, 0, 0.66, 0), UDim2.new(0.55, 0, 0.05, 0))
+    statusText.Text = "Loading..."
+    statusText.AnchorPoint = Vector2.new(0.5, 0.5)
+    statusText.TextTransparency = 1
+
+    SetStatus = function(newStatus)
+        if not newStatus or newStatus == "" then
+            statusText.Text = ""
+            return
+        end
+        if statusText.Text == newStatus then return end
+        statusText.Text = newStatus
+        if statusText.TextTransparency == 0 then
+            local fadeOut = TweenService:Create(statusText, TweenInfo.new(0.15), { TextTransparency = 1 })
+            fadeOut:Play()
+            fadeOut.Completed:Wait()
+        end
+        TweenService:Create(statusText, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            { TextTransparency = 0 }):Play()
+    end
+
+    task.wait(0.2)
+    TweenService:Create(statusText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        { TextTransparency = 0 }):Play()
+
+    local discordText = Instance.new("TextLabel", frame)
+    discordText.Text = "dsc.gg/vxezehub"
+    discordText.Font = Enum.Font.GothamMedium
+    discordText.TextColor3 = Color3.fromRGB(150, 150, 170)
+    discordText.TextSize = 14
+    discordText.TextTransparency = 0.3
+    discordText.BackgroundTransparency = 1
+    discordText.AnchorPoint = Vector2.new(0, 1)
+    discordText.Position = UDim2.new(0.02, 0, 0.98, 0)
+    discordText.Size = UDim2.new(0.3, 0, 0.05, 0)
+    discordText.TextXAlignment = Enum.TextXAlignment.Left
+    discordText.TextScaled = true
+
+    task.wait(0.8)
+    TweenService:Create(discordText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        { TextTransparency = 0 }):Play()
+
+    if setclipboard then
+        setclipboard("dsc.gg/vxezehub")
+    elseif toclipboard then
+        toclipboard("dsc.gg/vxezehub")
+    end
+end
+
+if getgenv().LowCPU then
+    local g = game
+    local l = g:GetService("Lighting")
+    local ws = workspace
+    local ss = g:GetService("SoundService")
+
+    pcall(function()
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+        settings():GetService("RenderSettings").EagerBulkExecution = false
+        settings():GetService("RenderSettings").MeshLODFactor = 0
+        settings():GetService("RenderSettings").OcclusionCullingEnabled = false
+        settings():GetService("RenderSettings").AutoFRMLevel = 1
+    end)
+
+    pcall(function()
+        ss.AmbientReverb = Enum.ReverbType.NoReverb
+        ss.DistanceFactor = 1
+        ss.RolloffScale = 0
+        ss.DopplerScale = 0
+        ss.VolumetricAudio = Enum.VolumetricAudio.Disabled
+    end)
+
+    pcall(function()
+        ws.PhysicsSimulationRate = Enum.PhysicsSimulationRate.Fixed30Hz
+        ws.MeshPartHeadsAndAccessories = Enum.MeshPartHeadsAndAccessories.Disabled
+    end)
+
+    ws.ClientAnimatorThrottling = Enum.ClientAnimatorThrottlingMode.Enabled
+    ws.InterpolationThrottling = Enum.InterpolationThrottlingMode.Enabled
+
+    l.GlobalShadows = false
+    l.FogStart = 9e9
+    l.FogEnd = 9e9
+    l.Brightness = 0
+    l.Ambient = Color3.new(0, 0, 0)
+    l.EnvironmentDiffuseScale = 0
+    l.EnvironmentSpecularScale = 0
+    l.OutdoorAmbient = Color3.new(0, 0, 0)
+    l.ShadowSoftness = 0
+    l.ColorShift_Bottom = Color3.new(0, 0, 0)
+    l.ColorShift_Top = Color3.new(0, 0, 0)
+
+    for _, v in ipairs(l:GetChildren()) do
+        if v:IsA("PostEffect") then
+            v.Enabled = false
+        elseif v:IsA("Atmosphere") or v:IsA("Sky") then
+            pcall(function() v:Destroy() end)
+        end
+    end
+
+    pcall(function() l.LightingLayers:Destroy() end)
+    pcall(function() l.Sky:Destroy() end)
+
+    g.DescendantAdded:Connect(LPH_JIT(function(o)
+        if not o or not o.Parent then return end
+        local c = o.ClassName
+        if c == "ParticleEmitter" or c == "Trail" then
+            pcall(function()
+                o.Lifetime = NumberRange.new(0, 0)
+                o.Rate = 0
+                o.Enabled = false
+            end)
+        elseif c == "Fire" or c == "Smoke" or c == "SpotLight" or c == "PointLight" or c == "SurfaceLight" or c == "Beam" then
+            pcall(function() o.Enabled = false end)
+        elseif c == "BillboardGui" or c == "SurfaceGui" then
+            pcall(function() o.Enabled = false end)
+        elseif c == "Explosion" then
+            pcall(function()
+                o.BlastPressure = 0
+                o.BlastRadius = 0
+            end)
+        elseif c == "Decal" or c == "Texture" or c == "SurfaceAppearance" or c == "SelectionBox" or c == "SelectionSphere" then
+            pcall(function() o:Destroy() end)
+        elseif c == "Atmosphere" or c == "Sky" then
+            pcall(function() o:Destroy() end)
+        elseif c == "PostEffect" then
+            pcall(function() o.Enabled = false end)
+        elseif c == "Sound" then
+            pcall(function() o.Volume = 0 end)
+        elseif c == "Part" or c == "MeshPart" or c == "Union" or c == "CornerWedgePart" or c == "TrussPart" or c == "WedgePart" then
+            pcall(function()
+                o.Transparency = 1
+                o.CastShadow = false
+                o.Material = Enum.Material.Plastic
+                o.Reflectance = 0
+                if c == "MeshPart" then
+                    o.RenderFidelity = Enum.RenderFidelity.Performance
+                end
+            end)
+        elseif c == "SpecialMesh" or c == "CylinderMesh" or c == "BlockMesh" then
+            pcall(function()
+                local p = o.Parent
+                if p and p:IsA("BasePart") then
+                    p.Transparency = 1
+                    p.CastShadow = false
+                end
+            end)
+        end
+    end))
+
+    task.spawn(LPH_JIT(function()
+        local descendants = g:GetDescendants()
+        for i = 1, #descendants do
+            local v = descendants[i]
+            pcall(function()
+                local c = v.ClassName
+                if c == "Part" or c == "MeshPart" or c == "Union" or c == "CornerWedgePart" or c == "TrussPart" or c == "WedgePart" then
+                    v.Material = Enum.Material.Plastic
+                    v.Reflectance = 0
+                    v.CastShadow = false
+                    v.Transparency = 1
+                    if c == "MeshPart" then
+                        v.RenderFidelity = Enum.RenderFidelity.Performance
+                    end
+                elseif c == "Decal" or c == "Texture" or c == "SurfaceAppearance" or c == "SelectionBox" or c == "SelectionSphere" then
+                    v:Destroy()
+                elseif c == "ParticleEmitter" or c == "Trail" then
+                    v.Lifetime = NumberRange.new(0, 0)
+                    v.Rate = 0
+                    v.Enabled = false
+                elseif c == "Explosion" then
+                    v.BlastPressure = 0
+                    v.BlastRadius = 0
+                elseif c == "Fire" or c == "SpotLight" or c == "PointLight" or c == "SurfaceLight" or c == "Smoke" or c == "Beam" then
+                    v.Enabled = false
+                elseif c == "BillboardGui" or c == "SurfaceGui" then
+                    v.Enabled = false
+                elseif c == "Atmosphere" or c == "Sky" then
+                    v:Destroy()
+                elseif c == "Sound" then
+                    v.Volume = 0
+                elseif c == "SpecialMesh" or c == "CylinderMesh" or c == "BlockMesh" then
+                    local p = v.Parent
+                    if p and p:IsA("BasePart") then
+                        p.Transparency = 1
+                        p.CastShadow = false
+                    end
+                end
+            end)
+            if i % 500 == 0 then task.wait() end
+        end
+        descendants = nil
+    end))
+
+    task.spawn(LPH_JIT(function()
+        local ws_desc = ws:GetDescendants()
+        for i = 1, #ws_desc do
+            pcall(function()
+                local v = ws_desc[i]
+                local c = v.ClassName
+                if c == "Part" or c == "MeshPart" or c == "Union" or c == "CornerWedgePart" or c == "TrussPart" or c == "WedgePart" then
+                    v.Transparency = 1
+                    v.CastShadow = false
+                end
+            end)
+            if i % 500 == 0 then task.wait() end
+        end
+        ws_desc = nil
+    end))
+
+    task.spawn(LPH_JIT(function()
+        local ok, nil_inst = pcall(getnilinstances)
+        if not ok or not nil_inst then return end
+        for i = 1, #nil_inst do
+            local v = nil_inst[i]
+            pcall(function()
+                if v:IsA("BasePart") then
+                    v.Transparency = 1
+                    v.CastShadow = false
+                end
+                local ch = v:GetDescendants()
+                for j = 1, #ch do
+                    pcall(function()
+                        if ch[j]:IsA("BasePart") then
+                            ch[j].Transparency = 1
+                            ch[j].CastShadow = false
+                        end
+                    end)
+                end
+            end)
+            if i % 100 == 0 then task.wait() end
+        end
+        nil_inst = nil
+    end))
+
+    task.spawn(LPH_JIT(function()
+        while true do
+            task.wait(10)
+            pcall(function()
+                for _, v in ipairs(l:GetChildren()) do
+                    if v:IsA("PostEffect") then
+                        v.Enabled = false
+                    elseif v:IsA("Atmosphere") or v:IsA("Sky") then
+                        v:Destroy()
+                    end
+                end
+                local cam = ws.CurrentCamera
+                if cam then
+                    for _, v in ipairs(cam:GetChildren()) do
+                        if v:IsA("PostEffect") then
+                            v.Enabled = false
+                        end
+                    end
+                end
+            end)
+        end
+    end))
+end
+
+-- Script
+run_on_actor(getactors()[1], [[
+    local hookmet = hookmetamethod
+    if isfunctionhooked(hookmet) then
+        restorefunction(hookmet)
+    end
+    local old
+    old = hookmetamethod(game,'__namecall',function(self,...)
+        local args = {...}
+        if self.Name == 'POST' and args[2] == 'detect' then
+            warn('[ IMT ] Zero Detection Enabled...')
+            return task.wait(9e9)
+        end
+        return old(self, unpack(args))
+    end
+]])
+
+game.NetworkClient.ChildRemoved:Connect(function()
+    task.wait(5)
+    tps:Teleport(13379208636)
+end)
+
+-- Data
+if not isfolder('nguoitinhcuaeZ_AOTR') then
+    makefolder('nguoitinhcuaeZ_AOTR')
+end
+if not isfile('nguoitinhcuaeZ_AOTR/' .. plr.Name .. '.json') then
+    local default = {
+        Name = plr.Name,
+        Refresh = 0,
+        Time = tick()
+    }
+    writefile('nguoitinhcuaeZ_AOTR/' .. plr.Name .. '.json', https:JSONEncode(default))
+end
+
+local nguoitinhcuaeX = {}
+nguoitinhcuaeX.COMM = {}
+nguoitinhcuaeX.COMM.ID, nguoitinhcuaeX.COMM.CHANNEL = create_comm_channel()
+nguoitinhcuaeX.COMM.CHANNEL.Event:Connect(function(type, data)
+    if type == 'prestige' then
+        nguoitinhcuaeX.PRESTIGED = true
+    end
+end)
+
+nguoitinhcuaeX.GET = function(...)
+    return game.ReplicatedStorage.Assets.Remotes.GET:InvokeServer(...)
+end
+nguoitinhcuaeX.POST = function(...)
+    return game.ReplicatedStorage.Assets.Remotes.POST:FireServer(...)
+end
+
+-- Sửa lỗi load DATA chậm
+nguoitinhcuaeX.LoadData = function()
+    local attempts = 0
+    local maxAttempts = 10
+    while nguoitinhcuaeX.DATA == nil and attempts < maxAttempts do
+        SetStatus('Loading functions... (' .. (attempts + 1) .. '/' .. maxAttempts .. ')')
+        pcall(function()
+            nguoitinhcuaeX.DATA = nguoitinhcuaeX.GET("Functions", "Layout", {})
+        end)
+        if nguoitinhcuaeX.DATA == nil then
+            attempts = attempts + 1
+            task.wait(1)
+        end
+    end
+    if nguoitinhcuaeX.DATA == nil then
+        SetStatus('Failed to load data, retrying...')
+        task.wait(3)
+        nguoitinhcuaeX.LoadData()
+    end
+end
+
+nguoitinhcuaeX.LoadData()
+
+task.spawn(function()
+    while true do
+        pcall(function()
+            nguoitinhcuaeX.DATA = nguoitinhcuaeX.GET("Functions", "Layout", {})
+        end)
+        task.wait(10)
+    end
+end)
+
+nguoitinhcuaeX.CURRENT_SLOT = nguoitinhcuaeX.DATA.Current_Slot
+nguoitinhcuaeX.SHADOW_BANNED = nguoitinhcuaeX.DATA.Disabled or 'No'
+
+-- Anti Shadow Ban Check
+nguoitinhcuaeX.CheckShadowBan = function()
+    local data = nguoitinhcuaeX.GET("Functions", "Layout", {})
+    if data and data.Disabled and data.Disabled ~= 'No' then
+        nguoitinhcuaeX.SHADOW_BANNED = data.Disabled
+        warn('[ANTI-SHADOW] Shadow banned detected: ' .. data.Disabled)
+        SetStatus('Shadow banned detected, avoiding detection...')
+        return true
+    end
+    return false
+end
+
+nguoitinhcuaeX.COMPLETED_MISSION = false
+nguoitinhcuaeX.LOGO =
+'https://cdn.discordapp.com/attachments/1452263532489080924/1475940850105319495/EAAB692B-49F8-4132-972F-9BF3C1195E1C.png?ex=69f10d88&is=69efbc08&hm=a64ca084d9f7eecfabdea324f89419d3f1b0a3411a55f621f55e12c2a13f7e85&'
+
+nguoitinhcuaeX.SendWebhook = function(type, _data)
+    local url = Webhook["Url"]
+    if not url or url == "" then return end
+    local data
+    if type == 'completed' then
+        local a, b
+        while not a do
+            a, b = nguoitinhcuaeX.GET("S_Rewards", "Get", true)
+            task.wait(1)
+        end
+        local rewards = {}
+        if a and a.Obtained then
+            for i, v in next, a.Obtained do
+                if typeof(v) ~= 'table' then
+                    if v > 0 then
+                        table.insert(rewards, i .. ' - ' .. v)
+                    end
+                end
+            end
+        end
+        local map = {}
+        table.insert(map, 'MODE : ' .. workspace:GetAttribute('Type'))
+        table.insert(map, 'DIFFICULTY : ' .. workspace:GetAttribute('Difficulty'))
+        table.insert(map, 'OBJECTIVE : ' .. workspace:GetAttribute('Objective'))
+        table.insert(map, 'PLAYER_COUNT : ' .. workspace:GetAttribute('Player_Count'))
+        data = {
+            content = Webhook["Ping Notify"],
+            username = "W SCRIPT HUB",
+            avatar_url = nguoitinhcuaeX.LOGO,
+            embeds = { {
+                title = "AOTR - Mission Completed!",
+                description = "Character : " .. plr.Name .. '\n' .. 'Slot : ' .. SettingFarm["Select Slots"],
+                color = 11400703,
+                fields = { {
+                    name = "Mission Data",
+                    value = '```c\n' .. table.concat(_data[1], '\n') .. '```',
+                    inline = true
+                }, {
+                    name = "Rewards",
+                    value = '```c\n' .. table.concat(rewards, '\n') .. '```',
+                    inline = true
+                }, {
+                    name = "\u{200B}",
+                    value = "\u{200B}",
+                    inline = false
+                }, {
+                    name = "Account Data",
+                    value = '```c\n' .. table.concat(_data[2], '\n') .. '```',
+                    inline = true
+                }, {
+                    name = "Map Data",
+                    value = '```c\n' .. table.concat(map, '\n') .. '```',
+                    inline = true
+                } },
+                thumbnail = {
+                    url = nguoitinhcuaeX.LOGO
+                },
+                footer = {
+                    text = "- Vxeze Hub : AOTR Kaitun | " .. os.date("%H:%M:%S"),
+                    icon_url = nguoitinhcuaeX.LOGO
+                }
+            } }
+        }
+    elseif type == 'prestige' then
+        data = {
+            content = Webhook["Ping Notify"],
+            username = "W SCRIPT HUB",
+            avatar_url = nguoitinhcuaeX.LOGO,
+            embeds = { {
+                title = "AOTR - Prestiged Successfully!",
+                description = "Character : " .. plr.Name,
+                color = 11400703,
+                fields = { {
+                    name = "Prestige Data",
+                    value = '```c\n' .. _data[1] .. ' -> ' .. _data[2] .. '```',
+                    inline = false
+                } },
+                thumbnail = {
+                    url = nguoitinhcuaeX.LOGO
+                },
+                footer = {
+                    text = "- Vxeze Hub : AOTR Kaitun | " .. os.date("%H:%M:%S"),
+                    icon_url = nguoitinhcuaeX.LOGO
+                }
+            } }
+        }
+    end
+    request({
+        Url = url or 'https://google.com',
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = https:JSONEncode(data)
+    })
+    print('Sent webhook')
+end
+
+if game.PlaceId == 13379208636 then
+    local DATA_LOADED, DATA_INSPECT = nguoitinhcuaeX.GET("Functions", "Select", SettingFarm["Select Slots"])
+    if DATA_LOADED then
+        nguoitinhcuaeX.CURRENT_FAMILY = DATA_INSPECT.Slots[SettingFarm["Select Slots"]].Avatar.Family or 'Unknown'
+        nguoitinhcuaeX.CURRENT_SPIN = DATA_INSPECT.Spins or 0
+        print("[Init] Family: " .. nguoitinhcuaeX.CURRENT_FAMILY .. " | Spins: " .. nguoitinhcuaeX.CURRENT_SPIN)
+    end
+
+    task.spawn(function()
+        while task.wait(1.5) do
+            if Family["Roll"] then
+                local current = nguoitinhcuaeX.CURRENT_FAMILY
+                if not current or not table.find(Family["Select"], current) then
+                    if nguoitinhcuaeX.CURRENT_SPIN and nguoitinhcuaeX.CURRENT_SPIN >= 1 then
+                        local newSpins, newFamily = nguoitinhcuaeX.GET("Family", "Roll")
+                        if newFamily then
+                            nguoitinhcuaeX.CURRENT_SPIN = newSpins
+                            nguoitinhcuaeX.CURRENT_FAMILY = newFamily
+                            print("[Debug] Rolled: " .. newFamily .. " | Spins Left: " .. newSpins)
+                            SetStatus("Rolled: " .. newFamily .. " | Spins Left: " .. newSpins)
+                        end
+                    else
+                        print("[Debug] No spins left, teleporting to get more...")
+                        SetStatus("No spins left, teleporting to get more...")
+                        tps:Teleport(14916516914)
+                    end
+                else
+                    print("[Debug] Already have desired family: " .. current)
+                    SetStatus("Already have desired family: " .. current)
+                    tps:Teleport(14916516914)
+                end
+            else
+                SetStatus("Teleport...")
+                tps:Teleport(14916516914)
+            end
+        end
+    end)
+else
+    titanHitCooldown = {}
+    priority = {
+        Attack_Titan = true,
+        Female_Titan = true,
+        Armored_Titan = true
+    }
+
+    -- Sửa lỗi function thành local function
+    local getNape = function(titan)
+        local hit = titan:FindFirstChild("Hitboxes") and titan.Hitboxes:FindFirstChild("Hit")
+        local nape = hit and hit:FindFirstChild("Nape")
+        local hum = titan:FindFirstChildWhichIsA("Humanoid")
+        if nape and hum and hum.Health > 0 and nape:IsDescendantOf(workspace) then
+            return nape, hum
+        end
+    end
+
+    local getClosestValidNape = function()
+        local hrp = character and character:FindFirstChild("HumanoidRootPart")
+        local titans = workspace:FindFirstChild("Titans")
+        if not hrp or not titans then return end
+        local closest, dist = nil, math.huge
+        for _, titan in ipairs(titans:GetChildren()) do
+            local nape = getNape(titan)
+            if nape and not priority[titan.Name] then
+                local d = (hrp.Position - nape.Position).Magnitude
+                if d < dist then
+                    closest, dist = nape, d
+                end
+            end
+        end
+        if closest then
+            return closest
+        end
+        for _, titan in ipairs(titans:GetChildren()) do
+            local nape = getNape(titan)
+            if nape then
+                local d = (hrp.Position - nape.Position).Magnitude
+                if d < dist then
+                    closest, dist = nape, d
+                end
+            end
+        end
+        return closest
+    end
+
+    local getLegitDamage = function(nape)
+        local hrp = character and character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return 0, 0.25 end
+        local velocity = hrp.AssemblyLinearVelocity.Magnitude
+        local dist = (hrp.Position - nape.Position).Magnitude
+        local dmg = math.clamp((velocity * 2 + dist / 4) * (math.random(95, 105) / 100), 200, 300)
+        return dmg, math.random(20, 30) / 100
+    end
+
+    local getClosestNapes = function(limit)
+        local priority = {
+            Female_Titan = true,
+            Attack_Titan = true,
+            Armored_Titan = true
+        }
+        local normal, special = {}, {}
+        for _, v in next, workspace.Titans:GetChildren() do
+            local hum = v:FindFirstChild("Humanoid")
+            local nape = v:FindFirstChild("Nape", true)
+            if hum and nape then
+                local data = { part = nape, dist = plr:DistanceFromCharacter(nape.Position) }
+                if priority[v.Name] then
+                    table.insert(special, data)
+                else
+                    table.insert(normal, data)
+                end
+            end
+        end
+        local selected = #normal > 0 and normal or special
+        table.sort(selected, function(a, b)
+            return a.dist < b.dist
+        end)
+        local out = {}
+        for i = 1, math.min(limit, #selected) do
+            out[i] = selected[i].part
+        end
+        return out
+    end
+
+    local Refill = function()
+        for _, v in next, { workspace.Climbable, workspace.Unclimbable } do
+            for _, v2 in next, v:GetDescendants() do
+                if v2.Name == 'Refill' then
+                    return v2
+                end
+            end
+        end
+        return nil
+    end
+
+    local isBladesZero = function()
+        local gui = plr.PlayerGui
+        local sets = gui:FindFirstChild("Interface", true) and
+            gui.Interface.HUD.Main.Top['7'].Blades:FindFirstChild("Sets", true)
+        if sets and sets:IsA("TextLabel") then
+            local left = tonumber(sets.Text:match("^(%d+)") or "0") == 0 and
+                (character['Rig_' .. plr.Name].LeftHand.Blade_1.Transparency == 1)
+            return left
+        end
+        return false
+    end
+
+    local vim = Instance.new('VirtualInputManager')
+    local sendKey = function(v, t)
+        vim:SendKeyEvent(true, Enum.KeyCode[v], false, game)
+        task.wait(t)
+        vim:SendKeyEvent(false, Enum.KeyCode[v], false, game)
+    end
+
+    local click = function(btn)
+        if not btn then return false end
+        local pos = btn.AbsolutePosition
+        local size = btn.AbsoluteSize
+        local inset = game:GetService('GuiService'):GetGuiInset()
+        local x = pos.X + size.X / 2
+        local y = pos.Y + size.Y / 2 + inset.Y
+        vim:SendMouseButtonEvent(x, y, 0, true, game, 0)
+        task.wait()
+        vim:SendMouseButtonEvent(x, y, 0, false, game, 0)
+        return true
+    end
+
+    local NoclipLoop = function()
+        if plr.Character ~= nil then
+            for _, child in pairs(plr.Character:GetDescendants()) do
+                if child:IsA("BasePart") and child.CanCollide == true then
+                    child.CanCollide = false
+                end
+            end
+        end
+    end
+    runs.Stepped:Connect(NoclipLoop)
+
+    nguoitinhcuaeX.IS_TWEENING = false
+
+    local glideConnection
+    local cancel = function()
+        nguoitinhcuaeX.IS_TWEENING = false
+        if glideConnection then
+            glideConnection:Disconnect()
+            glideConnection = nil
+        end
+    end
+
+    local tween = function(v, speed)
+        cancel()
+        local char = plr.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        if typeof(v) == "CFrame" then
+            v = v.Position
+        end
+        local target = v
+        nguoitinhcuaeX.IS_TWEENING = true
+        glideConnection = runs.Heartbeat:Connect(function()
+            if not hrp or not hrp.Parent then
+                cancel()
+                return
+            end
+            local diff = target - hrp.Position
+            local dist = diff.Magnitude
+            if dist <= 8 then
+                hrp.AssemblyLinearVelocity = Vector3.zero
+                cancel()
+                return
+            end
+            local vel = diff.Unit * math.min(speed, dist * 6)
+            local yDiff = target.Y - hrp.Position.Y
+            if math.abs(yDiff) < 8 then
+                vel = Vector3.new(vel.X, 0, vel.Z)
+            end
+            hrp.AssemblyLinearVelocity = vel
+        end)
+    end
+
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    local att = Instance.new("Attachment")
+    att.Parent = hrp
+    local vf = Instance.new("VectorForce")
+    vf.Attachment0 = att
+    vf.RelativeTo = Enum.ActuatorRelativeTo.World
+    vf.ApplyAtCenterOfMass = true
+    vf.Parent = hrp
+    runs.Heartbeat:Connect(function()
+        local mass = hrp.AssemblyMass
+        vf.Force = Vector3.new(0, workspace.Gravity * mass, 0)
+    end)
+
+    LAST_RELOAD_BLADE = tick()
+    if game.PlaceId == 14916516914 then
+        task.delay(30, function()
+            tps:Teleport(game.PlaceId)
+        end)
+    end
+
+    task.spawn(function()
+        if game.PlaceId ~= 14916516914 then
+            repeat wait(0.5) until plr:GetAttribute('Added') and workspace:GetAttribute('Seconds')
+            SPAWN_POINT = character.HumanoidRootPart.CFrame
+        elseif game.PlaceId ~= 13379208636 then
+            repeat wait(0.5) until plr:GetAttribute('Level') and plr:GetAttribute('Prestige') and plr:GetAttribute('Added')
+            pcall(function()
+                game:GetService("CoreGui").TopBarApp:Destroy()
+                game:GetService("CoreGui").RobloxGui:Destroy()
+                settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+            end)
+        end
+        while true do
+            if game.PlaceId == 14916516914 then
+                -- Anti shadow ban check
+                if Misc["AntiShadowBan"] then
+                    nguoitinhcuaeX.CheckShadowBan()
+                end
+
+                if not plr.PlayerGui.Interface.Gear_Up.Main_Menu.Visible then
+                    repeat
+                        sendKey('Tab', 0.1)
+                        task.wait(2.5)
+                    until plr.PlayerGui.Interface.Gear_Up.Main_Menu.Visible
+                end
+                -- skill tree
+                if OneClick["Skill Tree"] then
+                    SetStatus('Checking Skill Tree')
+                    local unlocked = nguoitinhcuaeX.DATA.Slots[nguoitinhcuaeX.CURRENT_SLOT].Skills.Unlocked
+                    for i = 1, 13, 1 do
+                        if not table.find(unlocked, tostring(i)) then
+                            local a, b, c = nguoitinhcuaeX.GET("S_Equipment", "Unlock", { i })
+                            if c:find('enough') then
+                                break
+                            end
+                            SetStatus('Unlocked : ' .. tostring(i))
+                            task.wait(0.5)
+                        end
+                    end
+                    task.wait(1)
+                end
+                -- upgrade
+                if Upgrade["Enable"] then
+                    SetStatus('Checking Equipments')
+                    nguoitinhcuaeX.GET("S_Equipment", "Upgrade", Upgrade["Enable"])
+                    task.wait(1)
+                end
+                -- prestige with improved logic
+                if Prestige["Enable"] and (plr:GetAttribute('Prestige') < 5) and plr:GetAttribute('Level') >= 100 then
+                    SetStatus('Checking prestige...')
+                    local currentPrestige = plr:GetAttribute('Prestige')
+                    local currentGold = nguoitinhcuaeX.DATA.Slots[nguoitinhcuaeX.CURRENT_SLOT].Currency.Gold
+                    local requiredGold = Prestige["Prestige When Gold"]['PRESTIGE_' .. (currentPrestige + 1)]
+
+                    if requiredGold and currentGold >= requiredGold then
+                        SetStatus('Prestiging...')
+                        pcall(function()
+                            nguoitinhcuaeX.GET("S_Equipment", "Prestige", {})
+                        end)
+                        task.wait(3)
+                        local newPrestige = plr:GetAttribute('Prestige')
+                        if newPrestige > currentPrestige then
+                            nguoitinhcuaeX.SendWebhook('prestige', { currentPrestige, newPrestige })
+                            SetStatus('Prestige completed: ' .. newPrestige)
+                        end
+                    end
+                end
+                -- claim achievements
+                if OneClick["Claim Achievements"] then
+                    SetStatus('Claiming Achievements')
+                    if plr.PlayerGui.Interface.Topbar.Main.Icons.Achievements.New.Visible then
+                        run_on_actor(getactors()[1], [[
+                        for _,v in pairs(getgc(true)) do
+                            if type(v) == "table" and rawget(v,"Modules") then
+                                local data = v.Modules.Update.Get_Data(v, true)
+                                if data and data.Titles then
+                                    local total = 0
+                                    local claimable = {}
+                                    for _,category in pairs(v.Modules.Titles) do
+                                        for index,info in pairs(category.Titles) do
+                                            local title = data.Titles[index]
+                                            if title then
+                                                local req = type(info.Requirement) == "string" and 1 or info.Requirement
+                                                if not title.Owned and (title.Current or 0) >= req then
+                                                    total = total + 1
+                                                    table.insert(claimable,{
+                                                        Index = index,
+                                                        Title = info.Title,
+                                                        Current = title.Current,
+                                                        Requirement = req,
+                                                        Rarity = info.Rarity,
+                                                        Category = category.Tag
+                                                    })
+                                                end
+                                            end
+                                        end
+                                    end
+                                    for _,v in next,claimable do
+                                        game.ReplicatedStorage.Assets.Remotes.GET:InvokeServer("S_Achievements","Claim",v.Index)
+                                    end
+                                    break
+                                end
+                            end
+                        end
+                    ]])
+                    end
+                end
+                -- claim quest
+                if OneClick["Claim Quests"] then
+                    SetStatus('Checking Quests')
+                    local storage_quests = require(game.ReplicatedStorage.Modules.Storage.Quest)
+                    for i, v in next, nguoitinhcuaeX.DATA.Slots[nguoitinhcuaeX.CURRENT_SLOT].Quests do
+                        if i ~= 'Regiment' then
+                            if i == 'Daily' then
+                                for r, z in next, v do
+                                    if not z.Rewarded and z.Current == z.Amount then
+                                        nguoitinhcuaeX.GET('Functions', 'Quests', z.Tag, i)
+                                    end
+                                end
+                            elseif i == 'Main' then
+                                for r, z in next, v do
+                                    if not z.Rewarded then
+                                        for _, q in next, storage_quests do
+                                            for b, c in next, q.Quests do
+                                                if z.Tag == c.Tag and z.Current == c.Amount then
+                                                    print(z.Tag, i)
+                                                    nguoitinhcuaeX.GET('Functions', 'Quest', z.Tag, i)
+                                                    break
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    task.wait(1)
+                end
+                -- auto buy boosts
+                if OneClick["Buy Boosts"] then
+                    SetStatus('Buying gold boosts...')
+                    run_on_actor(getactors()[1], [[
+                    for _,v in pairs(getgc(true)) do
+                        if type(v) == "table" and rawget(v,"Modules") then
+                            local ok,data = pcall(v.Modules.Update.Get_Data, v, true)
+                            local current_slot = data.Current_Slot
+                            if ok and data and data.Boosts then
+                                if data.Boosts.Gold == 0 then
+                                    local gem = data.Slots[current_slot].Currency.Gems
+                                    if gem > 7999 then
+                                        game.ReplicatedStorage.Assets.Remotes.GET:InvokeServer("S_Market", "Buy", '1_Boosts', 8, 1)
+                                    elseif gem > 4499 then
+                                        game.ReplicatedStorage.Assets.Remotes.GET:InvokeServer("S_Market", "Buy", '1_Boosts', 7, 1)
+                                    end
+                                end
+                                break
+                            end
+                        end
+                    end
+                ]])
+                    task.wait(1)
+                    run_on_actor(getactors()[1], [[
+                    for _,v in pairs(getgc(true)) do
+                        if type(v) == "table" and rawget(v,"Modules") then
+                            local ok,data = pcall(v.Modules.Update.Get_Data, v, true)
+                            local current_slot = data.Current_Slot
+                            if ok and data and data.Boosts then
+                                for r,z in next,data.Slots[current_slot].Inventory.Items do
+                                    if r:find('Gold Boost') then
+                                        game.ReplicatedStorage.Assets.Remotes.GET:InvokeServer("S_Inventory", "Item", r)
+                                    end
+                                end
+                                break
+                            end
+                        end
+                    end
+                ]])
+                    SetStatus('Used Gold Boost')
+                end
+                -- mission với fix lỗi Create
+                if game.ReplicatedStorage:FindFirstChild("Missions") then
+                    nguoitinhcuaeX.GET("Missions", "Open")
+                    task.wait(1)
+                    print('Created Mission')
+                    SetStatus('Creating Mission')
+                    local missionStarted = false
+                    while not missionStarted do
+                        local isLeader = (function()
+                            for _, m in next, game.ReplicatedStorage.Missions:GetChildren() do
+                                local l = m:FindFirstChild("Leader")
+                                if l and l.Value == plr.Name then
+                                    return true
+                                end
+                            end
+                            return false
+                        end)()
+                        if not isLeader then
+                            nguoitinhcuaeX.POST("S_Missions", "Create", {
+                                Name = (function()
+                                    if Map["Mode"] == 'Missions' then
+                                        return Map["Missions"]
+                                    else
+                                        if Map["Raids"]:find('Attack') then
+                                            return 'Trost'
+                                        elseif Map["Raids"]:find('Female') then
+                                            return 'Stohess'
+                                        else
+                                            return 'Shiganshina'
+                                        end
+                                    end
+                                end)(),
+                                Difficulty = (function()
+                                    if not plr.PlayerGui.Interface.Equipment.Visible then
+                                        repeat
+                                            click(plr.PlayerGui.Interface.Topbar.Main.Categories.Equipment.Interact)
+                                            print('Open Equipment Page')
+                                            task.wait(1)
+                                        until plr.PlayerGui.Interface.Equipment.Visible
+                                    end
+                                    local grade = plr.PlayerGui.Interface.Equipment.Categories.Upgrades.Main.Title.Text
+                                        :match("%[(.-) GRADE%]")
+                                    SetStatus('Your Grade : ' .. grade)
+                                    print('Current Grade : ' .. grade)
+                                    writefile(plr.Name .. '_AOTR_GRADE.imt', grade)
+                                    if grade == 'E-' or grade == 'E' then
+                                        return 'Easy'
+                                    elseif grade == 'E+' or grade == 'D-' or grade == 'D' then
+                                        return 'Normal'
+                                    elseif grade == 'D+' or grade == 'C-' or grade == 'C' or grade == 'C+' then
+                                        return 'Hard'
+                                    elseif grade == 'B-' or grade == 'B' or grade == 'B+' then
+                                        return 'Severe'
+                                    elseif grade == 'A-' or grade == 'A' or grade == 'A+'
+                                        or grade == 'S-' or grade == 'S' or grade == 'S+' then
+                                        return 'Aberrant'
+                                    end
+                                end)(),
+                                Type = Map["Mode"],
+                                Objective = (function()
+                                    if Map["Mode"] == 'Missions' then
+                                        return Map["Objective"]
+                                    else
+                                        return Map["Raids"]
+                                    end
+                                end)()
+                            })
+                            task.wait(1)
+                        else
+                            if Misc["Modify"]["Enable"] then
+                                for _, v in next, Misc["Modify"]["Mod"] do
+                                    local newKey = v:gsub("_", " ")
+                                    local enabled
+                                    repeat
+                                        enabled = nguoitinhcuaeX.GET("S_Missions", "Modify", newKey)
+                                        task.wait()
+                                    until enabled == true
+                                end
+                            end
+                            print('Started')
+                            SetStatus('Started Mission')
+                            nguoitinhcuaeX.POST("S_Missions", "Start")
+                            missionStarted = true
+                            task.wait(5)
+                        end
+                        task.wait(1)
+                    end
+                end
+            else
+                if not nguoitinhcuaeX.COMPLETED_MISSION then
+                    SetStatus('Farming Missions')
+                    pcall(function()
+                        local IS_BLADE = character:FindFirstChild('Rig_' .. plr.Name).PrimaryPart.Name == 'LowerTorso'
+                        if IS_BLADE then
+                            -- Farm with Blade
+                            if isBladesZero() then
+                                local refill = Refill()
+                                if refill then
+                                    SetStatus('Refill Blades...')
+                                    character.HumanoidRootPart.CFrame = refill:GetPivot() * CFrame.new(0, 25, 0)
+                                    nguoitinhcuaeX.POST("Attacks", "Reload", refill)
+                                    task.wait(3.5)
+                                end
+                            end
+                            local napes = getClosestNapes(SettingFarm["Multi Slash"]["Time"])
+                            if #napes > 0 then
+                                local obj = game.ReplicatedStorage.Objectives.Slay
+                                local titanNumbers = obj:GetAttribute('Requirement') - obj.Value
+                                if titanNumbers <= 5 and (workspace:GetAttribute('Seconds') < SettingFarm["Last Titan"]) then
+                                    task.spawn(function()
+                                        while (workspace:GetAttribute('Seconds') < SettingFarm["Last Titan"]) do
+                                            SetStatus('Waiting ' ..
+                                                (SettingFarm["Last Titan"] - workspace:GetAttribute('Seconds')))
+                                            task.wait(0.25)
+                                        end
+                                    end)
+                                    local HOVER_POINT = character.HumanoidRootPart.CFrame
+                                    repeat
+                                        character.HumanoidRootPart.CFrame = (HOVER_POINT * CFrame.new(0, 80, -30))
+                                        task.wait()
+                                    until (workspace:GetAttribute('Seconds') >= SettingFarm["Last Titan"])
+                                end
+                                local target = napes[1]
+                                local hoverPos = target.Position + Vector3.new(0, 80, 0)
+                                if SettingFarm["Use Teleport"] and plr:DistanceFromCharacter(hoverPos) < 600 then
+                                    character.HumanoidRootPart.CFrame = CFrame.new(hoverPos)
+                                end
+                                tween(hoverPos, 600)
+                                SetStatus('Tween to titan')
+                                if character['Rig_' .. plr.Name].LeftHand.Blade_1.Transparency == 1 and ((tick() - LAST_RELOAD_BLADE) >= 2) then
+                                    game.ReplicatedStorage.Assets.Remotes.GET:InvokeServer("Blades", "Reload")
+                                    LAST_RELOAD_BLADE = tick()
+                                    task.wait(1)
+                                end
+                                local limit = {}
+                                for _, nape in next, napes do
+                                    if #limit >= SettingFarm["Multi Slash"]["Time"] then
+                                        break
+                                    end
+                                    local id = nape:GetFullName()
+                                    if (not titanHitCooldown[id] or (tick() - titanHitCooldown[id] >= SettingFarm["Delay Farm"])) then
+                                        if plr:DistanceFromCharacter(nape.Position) <= 250 then
+                                            table.insert(limit, nape)
+                                        end
+                                    end
+                                end
+                                local canMulti = titanNumbers > SettingFarm["Multi Slash"]["Time"]
+                                if canMulti and SettingFarm["Multi Slash"]["Enable"] then
+                                    for _, nape in next, limit do
+                                        SetStatus('Attack titan')
+                                        titanHitCooldown[nape:GetFullName()] = tick()
+                                        local dmg, acc = getLegitDamage(nape)
+                                        nguoitinhcuaeX.POST("Attacks", "Slash", true)
+                                        nguoitinhcuaeX.POST("Hitboxes", "Register", nape, dmg, acc)
+                                        if Misc["SafeDelay"] then
+                                            task.wait(0.3 + math.random() * 0.2) -- Random delay để tránh detection
+                                        else
+                                            task.wait(0.25)
+                                        end
+                                    end
+                                else
+                                    local nape = limit[1]
+                                    if nape then
+                                        SetStatus('Attack titan')
+                                        titanHitCooldown[nape:GetFullName()] = tick()
+                                        local dmg, acc = getLegitDamage(nape)
+                                        nguoitinhcuaeX.POST("Attacks", "Slash", true)
+                                        nguoitinhcuaeX.POST("Hitboxes", "Register", nape, dmg, acc)
+                                        if Misc["SafeDelay"] then
+                                            task.wait(0.3 + math.random() * 0.2) -- Random delay để tránh detection
+                                        else
+                                            task.wait(0.3)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                end
+            end
+            task.wait()
+        end
+    end)
+
+    task.spawn(function()
+        while true do
+            if game.PlaceId ~= 14916516914 then
+                if plr.PlayerGui.Interface.Rewards.Visible and Misc["Retry"] then
+                    nguoitinhcuaeX.COMPLETED_MISSION = true
+                    local mission_data = {}
+                    local acc_data = {}
+                    for i, v in next, plr.PlayerGui.Interface.Rewards.Main.Info.Main.Stats:GetChildren() do
+                        if v:FindFirstChild('Amount') and v:FindFirstChild('Stat') then
+                            table.insert(mission_data, v.Stat.Text .. ' - ' .. v.Amount.Text)
+                        end
+                    end
+                    table.insert(acc_data, 'SHADOW BANNED - ' .. nguoitinhcuaeX.SHADOW_BANNED)
+                    table.insert(acc_data, 'LEVEL - ' .. plr:GetAttribute('Level'))
+                    table.insert(acc_data,
+                        'PRESTIGE - ' .. nguoitinhcuaeX.DATA.Slots[nguoitinhcuaeX.CURRENT_SLOT].Progression.Prestige)
+                    table.insert(acc_data, 'GRADE - ' .. readfile(plr.Name .. '_AOTR_GRADE.imt'))
+                    nguoitinhcuaeX.SendWebhook('completed', { mission_data, acc_data })
+                    while true do
+                        local data = https:JSONDecode(readfile('nguoitinhcuaeZ_AOTR/' .. plr.Name .. '.json'))
+                        if data.Refresh >= Misc["Refresh"] then
+                            data.Refresh = 0
+                            writefile('nguoitinhcuaeZ_AOTR/' .. plr.Name .. '.json', https:JSONEncode(data))
+                            tps:Teleport(13379208636)
+                        else
+                            data.Refresh = data.Refresh + 1
+                            writefile('nguoitinhcuaeZ_AOTR/' .. plr.Name .. '.json', https:JSONEncode(data))
+                            while true do
+                                SetStatus('Retrying...')
+                                nguoitinhcuaeX.GET("Functions", "Retry", "Add")
+                                task.wait(0.2)
+                            end
+                        end
+                        task.wait(0.2)
+                    end
+                elseif plr:GetAttribute('Dead') then
+                    tps:Teleport(13379208636)
+                    task.wait(5)
+                end
+            end
+            task.wait()
+        end
+    end)
+end
+
+pcall(function()
+    for i, v in next, getconnections(game:GetService("LogService").MessageOut) do
+        if v.Disable then
+            v:Disable()
+        elseif v.Disconnect then
+            v:Disable()
+        end
+    end
+end)

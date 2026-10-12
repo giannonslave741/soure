@@ -1,0 +1,511 @@
+if getgenv().__BF_LOADED then
+    return getgenv().__BF_RESULT;
+end;
+Settings = {};
+HttpService = game:GetService("HttpService");
+FolderName = "Banana Cat Hub";
+SaveFileNameGame = "-BloxFruitBNNC.json";
+SaveFileName = game.Players.LocalPlayer.Name .. SaveFileNameGame;
+    function SaveSettings(b, t, A)
+        if A ~= nil then
+        Settings[b] = Settings[b] or {};
+        Settings[b][t] = A;
+        elseif b ~= nil then
+        Settings[b] = t;
+    end;
+        if not isfolder(FolderName) then
+        makefolder(FolderName);
+    end;
+    writefile(FolderName .. "/" .. SaveFileName, HttpService:JSONEncode(Settings));
+end;
+    if getgenv().Config then
+    Settings = getgenv().Config;
+    SaveSettings();
+end;
+    function ReadSetting()
+        local b, t = pcall(function()
+            if not isfolder(FolderName) then
+            makefolder(FolderName);
+        end;
+        return HttpService:JSONDecode(readfile(FolderName .. "/" .. SaveFileName));
+    end);
+        if b then
+        return t;
+        else
+        SaveSettings();
+        return ReadSetting();
+    end;
+end;
+Settings = ReadSetting();
+getgenv().Settings = Settings;
+    function PrepareMultiSelectList(b, t, A)
+    local a = {};
+        for s in pairs(b) do
+        local b = t and t[s];
+            if b == nil then
+            a[s] = A and true or false;
+            else
+            a[s] = b;
+        end;
+    end;
+    return a;
+end;
+    function EnsureAllTrueDefaults(b, t)
+        if type(Settings[b]) ~= "table" then
+        Settings[b] = {};
+    end;
+    local A = false;
+        for a, a in ipairs(t) do
+        if Settings[b][a] == nil then Settings[b][a] = true;
+        A = true;
+    end;
+end;
+    if A then
+        for t, A in pairs(Settings[b]) do
+        SaveSettings(b, t, A);
+    end;
+end;
+end;
+    repeat
+    wait();
+until
+game:FindFirstChild("CoreGui");
+    repeat
+    wait();
+until
+not game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("LoadingScreen");
+    repeat
+    wait();
+until
+game:IsLoaded() and (game.Players.LocalPlayer:FindFirstChild("DataLoaded"));
+    function FireButton(b)
+    b.Selectable = true;
+    game:GetService("GuiService").SelectedObject = b;
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, "Return", false, b);
+    game:GetService("VirtualInputManager"):SendKeyEvent(false, "Return", false, b);
+    b.Activated:Connect(function()
+        game:GetService("GuiService").SelectedObject = nil;
+    end);
+end;
+    repeat
+    wait();
+until
+game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Main (minimal)") or (game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Main"));
+local b = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Main (minimal)") or (game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Main"));
+    repeat
+    wait();
+until
+b:FindFirstChild("ChooseTeam");
+    repeat
+    task.wait();
+        pcall(function()
+            if Settings["Select Team"] == "Pirate" then
+            FireButton(game:GetService("Players").LocalPlayer.PlayerGui["Main (minimal)"].ChooseTeam.Container.Pirates.Frame.TextButton);
+            wait(1);
+            else
+            FireButton(game:GetService("Players").LocalPlayer.PlayerGui["Main (minimal)"].ChooseTeam.Container.Marines.Frame.TextButton);
+            wait(1);
+        end;
+    end);
+until
+game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Main (minimal)") and (game:GetService("Players").LocalPlayer.PlayerGui["Main (minimal)"]:FindFirstChild("ChooseTeam")) and not game:GetService("Players").LocalPlayer.PlayerGui["Main (minimal)"]:WaitForChild("ChooseTeam").Visible or game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Main") and (game:GetService("Players").LocalPlayer.PlayerGui.Main:FindFirstChild("ChooseTeam")) and not game:GetService("Players").LocalPlayer.PlayerGui.Main:WaitForChild("ChooseTeam").Visible;
+game:GetService("GuiService").SelectedObject = nil;
+    repeat
+    wait();
+until
+game:IsLoaded() and game.Players.LocalPlayer;
+    repeat
+    wait();
+until
+game:FindFirstChild("CoreGui");
+getgenv().ExploitReq = syn and syn.request or identifyexecutor() == "Fluxus" and request or http_request or http.request or requests;
+    if getgenv().LoadScript then
+    return print("Double UI");
+end;
+getgenv().CheckPlaceId = game.PlaceId == 100117331123089 and 100117331123089 or 7449423635;
+getgenv().CheckPlaceId2 = game.PlaceId == 4442272183 and 4442272183 or 79091703265657;
+getgenv().CheckPlaceId3 = game.PlaceId == 2753915549 and 2753915549 or 85211729168715;
+getgenv().LoadScript = true;
+local t = game.Players.LocalPlayer;
+getgenv().getupvalue = debug.getupvalue;
+getgenv().getupvalues = debug.getupvalues;
+wOrigin = game.workspace._WorldOrigin;
+CommF = game.ReplicatedStorage.Remotes.CommF_;
+vu = game:GetService("VirtualUser");
+    game:GetService("Players").LocalPlayer.Idled:connect(function()
+    vu:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame);
+    wait(1);
+    vu:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame);
+end);
+local A = loadstring(game:HttpGet("https://raw.githubusercontent.com/obiiyeuem/vthangsitink/refs/heads/main/zzzz.lua"))();
+Main = A.CreateMain({Title = "Blox Fruit", Desc = " - Blox Fruit"});
+task.spawn(function()
+    repeat wait() until game.CoreGui:FindFirstChild("Nousigi Hub GUI")
+    task.wait(1)
+    local label = game.CoreGui["Nousigi Hub GUI"].Main.MainContainer.TopMain.TextLabelMain
+    local orgText = '<font color="rgb(0,128,0)">Lotus Hub</font>  - Blox Kid'
+    label.Text = orgText
+    game.CoreGui["Nousigi Hub GUI"].Main.MainContainer.TopMain.Ruafimg.Image = 'rbxassetid://96365955041994'
+    if label.Text ~= orgText then
+        task.spawn(function()
+            game.Players.LocalPlayer:Kick('nigga')
+        end)
+        task.delay(1.5,function()
+            while true do end
+        end)
+    end
+    local mt = getrawmetatable(game)
+    setreadonly(mt, false)
+    local ni = mt.__newindex
+    mt.__newindex = newcclosure(function(t, k, v)
+        if typeof(t) == "Instance" and t.Name == "TextLabelMain" and k == "Text" and t:FindFirstAncestor("Nousigi Hub GUI") then
+            if v == orgText then
+                return ni(t,k,v)
+            end
+            task.spawn(function()
+                game.Players.LocalPlayer:Kick('nigga')
+            end)
+            task.delay(1.5,function()
+                while true do end
+            end)
+        end
+        return ni(t, k, v)
+    end)
+    setreadonly(mt, true)
+end)
+PageShop = Main.CreatePage({Page_Name = "Shop", Page_Title = "Shop"});
+getgenv().Options = A.Options;
+SectionShopMisc = PageShop.CreateSection("Misc Shop");
+    function Remote(a, s, X)
+        if not a and X then
+        game.ReplicatedStorage.Remotes.CommF_:InvokeServer(s, true);
+        else
+        game.ReplicatedStorage.Remotes.CommF_:InvokeServer(a, s, X);
+    end;
+end;
+getgenv().tablefruitausea3 = {};
+whitelistedfruit = {};
+TableDevilFruit = {};
+local a, s, X = next, game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("GetFruits", false);
+    for g, g in a, s, X do
+    if g.Price >= 1000000 then table.insert(whitelistedfruit, string.split(g.Name, "-")[1] .. " Fruit");
+    getgenv().tablefruitausea3[g.Name] = g.Price;
+end;
+TableDevilFruit[g.Name] = false;
+end;
+getgenv().tablefruitausea3["Dragon (East)-Dragon (East)"] = 15000000;
+getgenv().tablefruitausea3["Dragon (West)-Dragon (West)"] = 15000000;
+ItemId = require(game.ReplicatedStorage.Economy.ItemId);
+    function CheckFruitReal(g)
+    local G, f, K = next, game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("GetFruits", false);
+        for R, R in G, f, K do
+        if R.Name == g then return R;
+    end;
+end;
+end;
+SkinFruit = {};
+    spawn(function()
+        for g, g in next, require(game:GetService("ReplicatedStorage").Modules.SkinUtil.FruitSkins).Grouped, nil do
+            for G, G in next, g, nil do
+            getgenv().tablefruitausea3[g.StorageName] = CheckFruitReal(G.Item).Price;
+            table.insert(whitelistedfruit, G.StorageName .. " Fruit");
+            SkinFruit[G.StorageName .. " Fruit"] = true;
+        end;
+    end;
+end);
+NameWorldMaterials = {Ectoplasm = {[getgenv().CheckPlaceId2] = "TravelDressrosa"}, ["Magma Ore"] = {[getgenv().CheckPlaceId2] = "TravelDressrosa"}, Leather = {[getgenv().CheckPlaceId] = "TravelZou"}, ["Scrap Metal"] = {[getgenv().CheckPlaceId] = "TravelZou"}, ["Angel Wings"] = {[getgenv().CheckPlaceId3] = "TravelMain"}, ["Fish Tail"] = {[getgenv().CheckPlaceId] = "TravelZou"}, ["Radioactive Material"] = {[getgenv().CheckPlaceId2] = "TravelDressrosa"}, ["Vampire Fang"] = {[getgenv().CheckPlaceId2] = "TravelDressrosa"}, ["Mystic Droplet"] = {[getgenv().CheckPlaceId2] = "TravelDressrosa"}, ["Mini Tusk"] = {[getgenv().CheckPlaceId] = "TravelZou"}, Gunpowder = {[getgenv().CheckPlaceId] = "TravelZou"}, ["Demonic Wisp"] = {[getgenv().CheckPlaceId] = "TravelZou"}, ["Dragon Scale"] = {[getgenv().CheckPlaceId] = "TravelZou"}, ["Conjured Cocoa"] = {[getgenv().CheckPlaceId] = "TravelZou"}, Bones = {[getgenv().CheckPlaceId] = "TravelZou"}};
+NameMaterials = {Ectoplasm = {"Ship Deckhand", "Ship Engineer", "Ship Steward", "Ship Officer", "Cursed Captain"}, ["Magma Ore"] = {"Lava Pirate", "Magma Ninja"}, Leather = {"Jungle Pirate", "Musketeer Pirate"}, ["Scrap Metal"] = {"Jungle Pirate"}, ["Angel Wings"] = {"God's Guard", "Shanda", "Royal Squad", "Royal Soldier"}, ["Fish Tail"] = {"Fishman Raider", "Fishman Captain"}, ["Radioactive Material"] = {"Factory Staff"}, ["Vampire Fang"] = {"Vampire"}, ["Mystic Droplet"] = {"Sea Soldier", "Water Fighter"}, ["Mini Tusk"] = {"Mythological Pirate"}, Gunpowder = {"Pistol Billionaire"}, ["Demonic Wisp"] = {"Demonic Soul"}, ["Dragon Scale"] = {"Dragon Crew Archer", "Dragon Crew Warrior"}, ["Conjured Cocoa"] = {"Cocoa Warrior", "Chocolate Bar Battler"}, Bones = {"Reborn Skeleton", "Demonic Soul", "Living Zombie", "Posessed Mummy"}};
+TableMaterials = {};
+    for g, G in next, NameMaterials, nil do
+    table.insert(TableMaterials, g);
+end;
+    SectionShopMisc.CreateButton({Title = "Redeem Code"}, function()
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("SUB2GAMERROBOT_EXP1");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("StrawHatMaine");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("Sub2OfficialNoobie");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("THEGREATACE");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("SUB2NOOBMASTER123");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("Sub2Daigrock");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("Axiore");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("TantaiGaming");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("Bluxxy");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("STRAWHATMAINE");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("3BVISITS");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("UPD16");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("Sub2Fer999");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("Enyu_is_Pro");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("JCWK");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("StarcodeHEO");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("MagicBUS");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("KittGaming");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("Sub2CaptainMaui");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("CODESLIDE");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("NOOB2ADMIN");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("NOEXPLOIT");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("FIGHT4FRUIT");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("EARN_FRUITS");
+    game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer("EXP_5B");
+end);
+    SectionShopMisc.CreateButton({Title = "Teleport Old World"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack({[1] = "TravelMain"}));
+end);
+    SectionShopMisc.CreateButton({Title = "Teleport New World"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack({[1] = "TravelDressrosa"}));
+end);
+    SectionShopMisc.CreateButton({Title = "Teleport Thid Sea"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack({[1] = "TravelZou"}));
+end);
+    SectionShopMisc.CreateButton({Title = "Buy Dual Flintlock"}, function()
+    game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyItem", "Dual Flintlock");
+end);
+    SectionShopMisc.CreateButton({Title = "Reroll Race"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward", "Reroll", "2");
+end);
+    SectionShopMisc.CreateButton({Title = "Reset Stats"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward", "Refund", "1");
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward", "Refund", "2");
+end);
+    SectionShopMisc.CreateButton({Title = "Buy Race Cyborg"}, function()
+    game.ReplicatedStorage.Remotes.CommF_:InvokeServer("CyborgTrainer", "Buy");
+end);
+    SectionShopMisc.CreateButton({Title = "Buy Race Ghoul"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Ectoplasm", "BuyCheck", 4);
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Ectoplasm", "Change", 4);
+end);
+SectionShopFighting = PageShop.CreateSection("Fighting Shop");
+local g = {};
+getgenv().notsave = g;
+local G = {BuyBlackLeg = "Dark Step Teacher", BuySuperhuman = "Martial Arts Master", BuySharkmanKarate = "Sharkman Teacher", DragonClaw = "Sabi", BuyDragonTalon = "Uzoth", BuyElectro = "Mad Scientist", BuyFishmanKarate = "Water Kung-fu Teacher", BuyDeathStep = "Phoeyu, the Reformed", BuyGodhuman = "Ancient Monk", BuyElectricClaw = "Previous Hero", BuySanguineArt = "Shafi"};
+NPCManager = require(game:GetService("ReplicatedStorage").NPCManager);
+    function DetectNpc(f)
+    local K = t.Character and (t.Character:FindFirstChild("HumanoidRootPart"));
+        if not K then
+        return;
+    end;
+    local R, m, E, l = next, {workspace.NPCs, game:GetService("ReplicatedStorage").NPCs}, 1 / 0;
+        for Q, Q in R, m, nil do
+        local R, m, S = next, Q:GetChildren();
+            for Q, L in R, m, S do
+            if L:GetAttribute("NPCLoaded") and (L:GetAttribute("NPCReady")) and L.Name == f and (L:FindFirstChild("HumanoidRootPart")) then Q = (K.Position - L.HumanoidRootPart.Position).Magnitude;
+                if Q < E then
+                E, l = Q, L;
+            end;
+        end;
+    end;
+end;
+    if not l then
+    return NPCManager.getNPCsByName(f)[1]._modelState._instance;
+end;
+return l, E;
+end;
+    SectionShopFighting.CreateToggle({Title = "Black Leg", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g["Black Leg"] and (task.wait()) do
+                    local K, K = pcall(function()
+                    local R = DetectNpc(G.BuyBlackLeg);
+                        if t:DistanceFromCharacter(R.HumanoidRootPart.Position) < 8 then
+                        game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyBlackLeg");
+                    end;
+                    getgenv().BackupTween(R.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+                    if K then
+                    print(K);
+                end;
+            end;
+        end);
+    end;
+    g["Black Leg"] = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "Fishman Karate", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g["Fishman Karate"] and (task.wait()) do
+                    local K, K = pcall(function()
+                    local R = DetectNpc(G.BuyFishmanKarate);
+                        if t:DistanceFromCharacter(R.HumanoidRootPart.Position) < 8 then
+                        game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyFishmanKarate");
+                    end;
+                    getgenv().BackupTween(R.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+                    if K then
+                    print(K);
+                end;
+            end;
+        end);
+    end;
+    g["Fishman Karate"] = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "Electro", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g.Electro and (task.wait()) do
+                    pcall(function()
+                    local K = DetectNpc(G.BuyElectro);
+                        if t:DistanceFromCharacter(K.HumanoidRootPart.Position) < 8 then
+                        game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyElectro");
+                    end;
+                    getgenv().BackupTween(K.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+            end;
+        end);
+    end;
+    g.Electro = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "Dragon Breath", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g.DragonClaw and (task.wait()) do
+                    pcall(function()
+                    local K = DetectNpc(G.DragonClaw);
+                        if t:DistanceFromCharacter(K.HumanoidRootPart.Position) < 8 then
+                        game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BlackbeardReward", "DragonClaw", "1");
+                        game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BlackbeardReward", "DragonClaw", "2");
+                    end;
+                    getgenv().BackupTween(K.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+            end;
+        end);
+    end;
+    g.DragonClaw = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "SuperHuman", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g.SuperHuman and (task.wait()) do
+                    pcall(function()
+                    local K = DetectNpc(G.BuySuperhuman);
+                        if t:DistanceFromCharacter(K.HumanoidRootPart.Position) < 8 then
+                        Remote("BuySuperhuman");
+                    end;
+                    getgenv().BackupTween(K.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+            end;
+        end);
+    end;
+    g.SuperHuman = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "Death Step", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g["Death Step"] and (task.wait()) do
+                    pcall(function()
+                    local K = DetectNpc(G.BuyDeathStep);
+                        if t:DistanceFromCharacter(K.HumanoidRootPart.Position) < 8 then
+                        Remote("BuyDeathStep");
+                    end;
+                    getgenv().BackupTween(K.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+            end;
+        end);
+    end;
+    g["Death Step"] = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "Sharkman Karate", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g["Sharkman Karate"] and (task.wait()) do
+                    pcall(function()
+                    local K = DetectNpc(G.BuySharkmanKarate);
+                        if t:DistanceFromCharacter(K.HumanoidRootPart.Position) < 8 then
+                        Remote("BuySharkmanKarate");
+                    end;
+                    getgenv().BackupTween(K.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+            end;
+        end);
+    end;
+    g["Sharkman Karate"] = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "Electric Claw", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g["Electric Claw"] and (task.wait()) do
+                    pcall(function()
+                    local K = DetectNpc(G.BuyElectricClaw);
+                        if t:DistanceFromCharacter(K.HumanoidRootPart.Position) < 8 then
+                        Remote("BuyElectricClaw");
+                    end;
+                    getgenv().BackupTween(K.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+            end;
+        end);
+    end;
+    g["Electric Claw"] = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "Dragon Talon", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g["Dragon Talon"] and (task.wait()) do
+                    pcall(function()
+                    local K = DetectNpc(G.BuyDragonTalon);
+                        if t:DistanceFromCharacter(K.HumanoidRootPart.Position) < 8 then
+                        Remote("BuyDragonTalon");
+                    end;
+                    getgenv().BackupTween(K.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+            end;
+        end);
+    end;
+    g["Dragon Talon"] = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "God Human", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g["God Human"] and (task.wait()) do
+                    pcall(function()
+                    local K = DetectNpc(G.BuyGodhuman);
+                        if t:DistanceFromCharacter(K.HumanoidRootPart.Position) < 8 then
+                        Remote("BuyGodhuman");
+                    end;
+                    getgenv().BackupTween(K.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+            end;
+        end);
+    end;
+    g["God Human"] = f;
+end);
+    SectionShopFighting.CreateToggle({Title = "Sanguine Art", Desc = nil, Default = false}, function(f)
+        if f then
+            spawn(function()
+                while g["Sanguine Art"] and (task.wait()) do
+                    pcall(function()
+                    local K = DetectNpc(G.BuySanguineArt);
+                        if t:DistanceFromCharacter(K.HumanoidRootPart.Position) < 8 then
+                        Remote("BuySanguineArt");
+                    end;
+                    getgenv().BackupTween(K.HumanoidRootPart.CFrame * CFrame.new(0, 4, 4));
+                end);
+            end;
+        end);
+    end;
+    g["Sanguine Art"] = f;
+end);
+SectionShopAbilities = PageShop.CreateSection("Abilities Shop");
+    SectionShopAbilities.CreateButton({Title = "Skyjump [ $10,000 Beli ]"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyHaki", "Geppo");
+end);
+    SectionShopAbilities.CreateButton({Title = "Buso Haki [ $25,000 Beli ]"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyHaki", "Buso");
+end);
+    SectionShopAbilities.CreateButton({Title = "Observation haki [ $750,000 Beli ]"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("KenTalk", "Buy");
+end);
+    SectionShopAbilities.CreateButton({Title = "Soru [ $100,000 Beli ]"}, function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyHaki", "Soru");
+end);
+PageStatusAndServer = Main.CreatePage({Page_Name = "Status And Server", Page_Title = "Status And Server"});
+SectionStatus = PageStatusAndServer.CreateSection("Status");
+TimerLabel = SectionStatus.CreateLabel({Title = "Timer"});
+TimerServerLabel = SectionStatus.CreateLabel({Title = "Timer Server"});
+NextTimerServerLabel = SectionStatus.CreateLabel({Title = "Next Time Spawn Fist of Darkness or God's Chalice"});
+StatusEliteHunter = SectionStatus.CreateLabel({Title = "Elite"});
+StatusTyrant = SectionStatus.CreateLabel({Title = "Eyes Summon Tyrant"});
+StatusKatakuri = SectionStatus.CreateLabel({Title = "Summon Katakuri"});
+Statusspy = SectionStatus.CreateLabel({Title = "Status SPY"});
+StatusMirage = SectionStatus.CreateLabel({Title = "Mirage"});
+StatusPrehistoricIsland = SectionStatus.CreateLabel({Title = "Prehistoric Island"});
+StatusFrozenDimension = SectionStatus.CreateLabel({Title = "Frozen Dimension"});
+StatusMoon = SectionStatus.CreateLabel({Title = "Moon"});
+StatusGear = SectionStatus.CreateLabel({Title = "Acient One Status"});
+SectionServer = PageStatusAndServer.CreateSection("Server");

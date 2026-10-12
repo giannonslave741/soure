@@ -1,0 +1,1614 @@
+-- LPH Macros
+-- Change all HttpGet to get
+
+if not LPH_OBFUSCATED then
+	LPH_CRASH = function() end
+	LPH_ENCSTR = function(s) return s end
+	LPH_ENCNUM = function(n) return n end
+	LPH_ATTRIBUTES = function() end
+    LPH_PRECHECK = function() end
+	VM = function() end
+	TRANSFORM = function() end
+	EXTRACT = function() end
+	UNROLL = function() end
+	INLINE = function() end
+	ERROR_HANDLING = function() end
+	OPTIMIZE = function() end
+	PRESET = function() end
+	ENCRYPT = function() end
+	LPH_CRASH = function() warn('crash') end
+end
+
+-- PRECHECK
+
+LPH_PRECHECK(function()
+    local ok, key = pcall(function()
+        local M = 0x100000000
+        local function mul32(a, b)
+            a = a % M
+            local ah, al = a // 0x10000, a % 0x10000
+            return (al * b + (ah * b % 0x10000) * 0x10000) % M
+        end
+        local session = LUAW_ENTRY_DATA[8]
+        local body = http_request({
+            Url = 'http://187.52.122.114:3000/gate?v=m&s='..session..'&k='..(ACTIVE_KEY or getgenv().Radiant.ACTIVE_KEY or ''),
+            Method = 'GET'
+        }).Body
+        local h = LPH_ENCNUM(0x2E71B4A9)
+        for i = 1, #session do
+            h = mul32(h + string.byte(session, i), 0x01000193)
+        end
+        h = mul32(h + h // 0x10000, 0x85EBCA6B)
+        h = mul32(h + h // 0x100, 0xC2B2AE35)
+        local masked = 0
+        for i = 1, 8 do
+            local c = string.byte(body, i)
+            masked = masked * 16 + (c < 58 and c - 48 or c - 87)
+        end
+        return (masked - h) % M
+    end)
+    if not ok then return 0 end
+    return key
+end, 0x5B9F3D82)
+
+-- wait for the game
+
+loadstring([[
+    -- DO_NOT_TRY_TO_HOOK_ANY_FUNCTION
+]])
+
+repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+if getgenv().Luaw_Loaded then
+    warn('[ Luaw ] Is script running ? current seasion : Luaw_xxxxx-xxxx-xxx-xx-x')
+    return
+end
+
+-- Key & script info
+
+if typeof(getgenv().Radiant) ~= 'table' and typeof(ACTIVE_KEY) ~= 'string' then
+    game.Players.LocalPlayer:Kick('[ Luaw ] You forgot key')
+    return
+end
+local SCRIPT_KEY = ACTIVE_KEY or getgenv().Radiant.ACTIVE_KEY
+
+qweqriwetuowieruwerjsg = setmetatable({}, {__index = function()
+    while true do
+    end
+end})
+
+qweqweiuoiutiruterggbn = setmetatable({}, {__index = function()
+    while true do
+    end
+end})
+
+crypto = {encrypt = function() while true do end end,decrypt = function() while true do end end,sha256=function() while true do end end}
+
+game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(c)
+	if c.Name == 'ErrorPrompt' and c:FindFirstChild('MessageArea') and c.MessageArea:FindFirstChild("ErrorFrame") then
+		wait(0.06)
+        task.spawn(function()
+            while wait() do
+                pcall(function()
+                    local text = c.MessageArea.ErrorFrame.ErrorMessage.Text
+                    if text:find('experience') and text:find('Luaw') then
+                        c.TitleFrame.ErrorTitle.Text = 'Luaw'
+                        local t1 = string.ssub(c.MessageArea.ErrorFrame.ErrorMessage.Text, 81)
+                        local t2 = string.ssub(t1,1,-19)
+                        c.MessageArea.ErrorFrame.ErrorMessage.Text = t2
+                    end
+                end)
+            end
+        end)
+	end
+end)
+
+local KICK = game.Players.LocalPlayer.Kick
+
+-- Valid key check
+
+if (not SCRIPT_KEY) or (typeof(SCRIPT_KEY) ~= 'string') or (#SCRIPT_KEY == 0) then
+    return KICK('[ Luaw ] ACTIVE_KEY is required to run this script')
+end
+
+-- Anti Hook
+
+local HOOK_DETECTED = false
+local CHECK_HOOK_FUNCTION = iscustomcclosure or isnewcclosure
+local HOOKED_HTTP_REQUEST = false
+if restorefunction then
+    if CHECK_HOOK_FUNCTION(restorefunction) then
+        HOOK_DETECTED = true
+    end
+end
+local SECURED_FUNC = {http_request = http_request,loadstring = loadstring,oth = oth,rawget = rawget}
+if CHECK_HOOK_FUNCTION then
+    if restorefunction then
+        pcall(restorefunction,CHECK_HOOK_FUNCTION)
+    end
+    if CHECK_HOOK_FUNCTION(http_request) or CHECK_HOOK_FUNCTION(loadstring) then
+        HOOK_DETECTED = true
+    end
+end
+local CHECK_IS_HOOKED = isfunctionhooked
+SECURED_FUNC.rawget = rawget
+if restorefunction then
+    pcall(restorefunction,rawget)
+    SECURED_FUNC.rawget = rawget
+end
+if CHECK_IS_HOOKED then
+    if restorefunction then
+        pcall(restorefunction,CHECK_IS_HOOKED)
+		if oth then
+			pcall(restorefunction,SECURED_FUNC.rawget(oth,'hook'))
+			pcall(restorefunction,SECURED_FUNC.rawget(oth,'unhook'))
+			pcall(restorefunction,SECURED_FUNC.rawget(oth,'get_root_callback') or SECURED_FUNC.rawget(_oth,'getrootcallback'))
+		end
+    end
+    if CHECK_IS_HOOKED(http_request) or CHECK_IS_HOOKED(loadstring) then
+        HOOK_DETECTED = true
+    end
+end
+local _oth = typeof(oth) == 'table' and oth
+if _oth then
+    local hook = SECURED_FUNC.rawget(_oth,'hook')
+    local unhook = SECURED_FUNC.rawget(_oth,'unhook')
+    local get_root_callback = SECURED_FUNC.rawget(_oth,'get_root_callback') or SECURED_FUNC.rawget(_oth,'getrootcallback')
+    if (not hook) or (not unhook) or (not get_root_callback) then
+        HOOK_DETECTED = true
+    end
+    if get_root_callback and not HOOKED_HTTP_REQUEST then
+        hook(http_request,function(...) return get_root_callback()(...) end)
+        SECURED_FUNC.http_request = http_request
+        hook(loadstring,function(a,b) return get_root_callback()(a,b) end)
+        SECURED_FUNC.loadstring = loadstring
+        HOOKED_HTTP_REQUEST = true
+    end
+end
+SECURED_FUNC.oth = _oth
+if HOOK_DETECTED then
+    return LPH_CRASH() -- hoặc gọi tới url block ip hoặc j đó
+end
+
+-- Executor check
+
+local SUPPORTED_EXECUTOR = false
+if getexecutorname then
+    if typeof(PsmSignal) == 'table' or typeof(VoltSignal) == 'table' or (typeof(WebSocket) == 'table') and typeof(hookfunction) == "function" then
+        SUPPORTED_EXECUTOR = true
+    end
+end
+if not SUPPORTED_EXECUTOR then
+    KICK('[ Luaw ] Executor not supported')
+    return
+end
+
+-- Upvalue check
+
+-- Cache
+
+local _warn = warn
+local _print = print
+local _wait = wait
+local _type = type
+local _task = task
+local _oth = oth
+local _os = os
+local _tick = tick
+local _math = math
+
+-- Random Check
+
+local RANDOM_CHECK_PASSED = true
+(function()
+    local a = _math.random(1,9999999)
+    local b = _math.random(1,9999999)
+    local c = _math.random(1,9999999)
+    local d = _math.random(1,9999999)
+    local e = _math.random(1,9999999)
+    if (a == b) or (b == c) or (a == c) or (a == d) or (d == e) or (a == e) or (c == d) then
+        RANDOM_CHECK_PASSED = false
+    end
+    local tickTest = _tick()
+    _wait(0.5)
+    local currentTick = _tick()
+    if (currentTick - tickTest) < 0.3 or currentTick == tickTest then
+        RANDOM_CHECK_PASSED = false
+    end
+end)()
+if not RANDOM_CHECK_PASSED then
+    KICK('[ Luaw ] Error : Failed to load')
+    return
+end
+
+local _mrandom  = _math.random
+local _osclock  = _os.clock
+local _ostime   = _os.time
+local _tick     = _tick
+local _tostring = tostring
+local _tonumber = tonumber
+local _pcall    = pcall
+local _floor    = _math.floor
+local _huge     = _math.huge
+local _sbyte    = string.byte
+local _Random   = Random
+local _cocreate = coroutine.create
+local _newproxy = newproxy
+local _gcinfo   = gcinfo
+local _bxor, _lrot, _rshift = bit32.bxor, bit32.lrotate, bit32.rshift
+local M32 = 0x100000000
+
+local function _svc(name)
+    local ok, service = _pcall(function()
+        local s = game:GetService(name)
+        return cloneref and cloneref(s) or s
+    end)
+    return ok and service or nil
+end
+local _httpsvc = _svc(LPH_ENCSTR("HttpService"))
+local _plrsvc  = _svc(LPH_ENCSTR("Players"))
+local _uis     = _svc(LPH_ENCSTR("UserInputService"))
+local _stats   = _svc(LPH_ENCSTR("Stats"))
+local _wsp     = _svc(LPH_ENCSTR("Workspace"))
+local _genGuid = _httpsvc and _httpsvc.GenerateGUID
+
+local function mul32(a, b)
+    a = a % M32
+    local ah, al = a // 0x10000, a % 0x10000
+    return (al * b + (ah * b % 0x10000) * 0x10000) % M32
+end
+
+-- Entropy pool
+
+local POOL, POOL_N = {}, 0
+local function put(n)
+    POOL_N = POOL_N + 1
+    POOL[POOL_N] = n % M32
+end
+local feed = function(v)
+    local t = _type(v)
+    if t == 'number' then
+        if (v ~= v) or (v == _huge) or (v == -_huge) then v = 0 end
+        local i = _floor(v)
+        put(i)                      -- 32 bit thap
+        put(i // M32)               -- 32 bit cao ( UserId / PlaceId vuot 2^32 )
+        put(_floor((v - i) * 1e9))  -- phan thap phan
+    elseif t == 'string' then
+        local h = 0x811C9DC5
+        for i = 1, #v do
+            h = mul32(_bxor(h, _sbyte(v, i)), 0x01000193)
+        end
+        put(h)
+        put(#v)
+    elseif t == 'boolean' then
+        put(v and 0xA5A5A5A5 or 0x5A5A5A5A)
+    elseif t == 'table' or t == 'function' or t == 'thread' or t == 'userdata' then
+        local hex = _tostring(v):match("0x(%x+)")
+        put(hex and (_tonumber(hex:sub(-8), 16) or 0) or 0)
+    end
+end
+local feedCall = function(fn)
+    local ok, a, b, c, d = _pcall(fn)
+    if ok then
+        feed(a) feed(b) feed(c) feed(d)
+    end
+end
+
+-- 128 bit state
+
+local _sigA, _sigB, _sigC, _sigD = 0x9E3779B9, 0x85EBCA6B, 0xC2B2AE35, 0x27D4EB2F
+local _sigCount = 0
+local _sigSeen = {}
+
+local qround = function(a, b, c, d)
+    a = (a + b) % M32
+    d = _lrot(_bxor(d, a), 16)
+    c = (c + d) % M32
+    b = _lrot(_bxor(b, c), 12)
+    a = (a + b) % M32
+    d = _lrot(_bxor(d, a), 8)
+    c = (c + d) % M32
+    b = _lrot(_bxor(b, c), 7)
+    return a, b, c, d
+end
+
+local absorb = function()
+    local a, b, c, d = _sigA, _sigB, _sigC, _sigD
+    for i = 1, POOL_N do
+        local k = mul32(POOL[i], 0xCC9E2D51)
+        k = mul32(_lrot(k, 15), 0x1B873593)
+        a = _bxor(a, k)
+        a, b, c, d = qround(a, b, c, d)
+        a, b, c, d = b, c, d, a -- xoay lane de moi input cham tat ca
+        POOL[i] = nil
+    end
+    POOL_N = 0
+    _sigA, _sigB, _sigC, _sigD = qround(a, b, c, d)
+end
+
+-- Seed tinh : danh tinh nguoi choi + server + executor
+
+do
+    put(0x4C554157)
+    feedCall(function() return _plrsvc.LocalPlayer.UserId end)
+    feedCall(function()
+        local p = _plrsvc.LocalPlayer
+        return p.Name, p.DisplayName, p.AccountAge, p.CharacterAppearanceId
+    end)
+    feedCall(function() return _plrsvc.MaxPlayers, #_plrsvc:GetPlayers() end)
+    feedCall(function() return game.PlaceId, game.GameId, game.CreatorId, game.PlaceVersion end)
+    feedCall(function() return game.JobId end)
+    feedCall(function() return getexecutorname() end)
+    feedCall(function() return identifyexecutor() end)
+    feedCall(function() return gethwid() end)
+    feedCall(function() return getclientid() end)
+    feedCall(function() return _ostime(), _osclock(), _tick() end)
+    absorb()
+end
+
+local squeeze = function(chars, n)
+    local a, b, c, d = _sigA, _sigB, _sigC, _sigD
+    local str = ""
+    for i = 1, 16 do
+        a = (a + i) % M32
+        a, b, c, d = qround(a, b, c, d)
+        local v = _bxor(_bxor(a, c), _lrot(_bxor(b, d), 16))
+        v = _bxor(v, _rshift(v, 16))
+        v = mul32(v, 0x85EBCA6B)
+        v = _bxor(v, _rshift(v, 13))
+        v = mul32(v, 0xC2B2AE35)
+        v = _bxor(v, _rshift(v, 16))
+        local idx = (v % n) + 1
+        str ..= chars:sub(idx, idx)
+    end
+    _sigA, _sigB, _sigC, _sigD = qround(_bxor(a, _sigCount), b, c, d)
+    return str
+end
+
+local random = function()
+    LPH_ATTRIBUTES(VM(ONYX))
+    local chars = LPH_ENCSTR("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    local t0 = _osclock()
+    _sigCount = _sigCount + 1
+    feed(_sigCount)
+    feed(_mrandom(0, 0x7FFFFFFF))
+    feed(_mrandom(0, 0x7FFFFFFF))
+    feedCall(function()
+        local r = _Random.new()
+        return r:NextInteger(0, 0x7FFFFFFF), r:NextNumber(),
+            _Random.new(_ostime() + _sigCount):NextInteger(0, 0x7FFFFFFF)
+    end)
+    feed(t0)
+    feed(_ostime())
+    feed(_tick())
+    for _ = 1, 4 do feed({}) end
+    feed(function() end)
+    feedCall(function() return _cocreate(random) end)
+    feedCall(function() return _newproxy(false) end)
+    feedCall(function() return _gcinfo() end)
+    feedCall(function() return collectgarbage('count') end)
+    feedCall(function()
+        local p = _plrsvc.LocalPlayer
+        return p.UserId, p:GetNetworkPing(), #_plrsvc:GetPlayers()
+    end)
+    feedCall(function()
+        local root = _plrsvc.LocalPlayer.Character.HumanoidRootPart.Position
+        return root.X, root.Y, root.Z
+    end)
+    feedCall(function() return _wsp:GetServerTimeNow(), _wsp.DistributedGameTime end)
+    feedCall(function() return _stats.HeartbeatTimeMs, _stats.DataReceiveKbps, _stats.DataSendKbps end)
+    feedCall(function() return _stats:GetTotalMemoryUsageMb() end)
+    feedCall(function()
+        local m = _uis:GetMouseLocation()
+        return m.X, m.Y
+    end)
+    feedCall(function()
+        local cf = _wsp.CurrentCamera.CFrame
+        return cf.X, cf.Y, cf.Z, cf.LookVector.X
+    end)
+    if _genGuid then
+        feedCall(function()
+            local guid = _genGuid(_httpsvc, false)
+            for word in guid:gmatch("%x%x%x%x") do
+                put(_tonumber(word, 16))
+            end
+            return guid
+        end)
+    end
+    feed(_osclock() - t0)
+    feed(_tick())
+    absorb()
+    local n = #chars
+    local str = squeeze(chars, n)
+    for _ = 1, 8 do
+        if not _sigSeen[str] then break end
+        feed(_osclock())
+        feed({})
+        absorb()
+        str = squeeze(chars, n)
+    end
+    _sigSeen[str] = true
+    return 'LUAW_' .. str
+end
+
+pcall(function()
+    local randomAddress = _tostring(random)
+    task.spawn(function()
+        while true do
+            if _tostring(random) ~= randomAddress then
+                while true do end
+            end
+            task.wait()
+        end
+    end)
+end)
+
+pcall(function()
+    if isfunctionhooked then
+        if isfunctionhooked(game.HttpGet) then
+            if restorefunction then
+                restorefunction(game.HttpGet)
+            else
+                while true do end
+            end
+        end
+    end
+end)
+if _oth then
+    if _oth.unhook then
+        pcall(function()
+            _oth.unhook(game.HttpGet)
+        end)
+    else
+        while true do end
+    end
+end
+
+local get = function(url)
+    local result = http_request({
+        Url = url,
+        Method = 'GET'
+    })
+    local body = result.Body
+    if body then
+        return body or ''
+    end
+end
+
+-- Lua Functions
+
+local bit = bit32
+local band, bor, bxor = bit.band, bit.bor, bit.bxor
+local rshift, lshift = bit.rshift, bit.lshift
+local rrotate, lrotate = bit.rrotate, bit.lrotate
+local schar, sbyte, ssub, srep = string.char, string.byte, string.sub, string.rep
+local tinsert, tconcat = table.insert, function(t)
+    local n = #t
+    if n == 0 then return "" end
+    while n > 1 do
+        local m = 0
+        for i = 1, n - 1, 2 do
+            m = m + 1
+            t[m] = t[i] .. t[i + 1]
+        end
+        if n % 2 == 1 then
+            m = m + 1
+            t[m] = t[n]
+        end
+        for i = m + 1, n do t[i] = nil end
+        n = m
+    end
+    return t[1]
+end
+local floor, min = math.floor, math.min
+local URL_MAP = {
+    ["+"] = "%2B",
+    ["/"] = "%2F",
+    ["="] = "%3D"
+}
+local create = table.create or function(n, v) return {} end
+local CLASS = {}
+do
+	local function build(fn)
+		local t = create(256, false)
+		for i = 0, 255 do t[i] = fn(i) end
+		return t
+	end
+	local function isalpha(c) return (c >= 65 and c <= 90) or (c >= 97 and c <= 122) end
+	local function isdigit(c) return c >= 48 and c <= 57 end
+	local function isalnum(c) return isalpha(c) or isdigit(c) end
+	local function isspace(c) return c == 32 or (c >= 9 and c <= 13) end
+	local function iscntrl(c) return c < 32 or c == 127 end
+	local function isgraph(c) return c >= 33 and c <= 126 end
+	local function ispunct(c) return isgraph(c) and not isalnum(c) end
+	local function islower(c) return c >= 97 and c <= 122 end
+	local function isupper(c) return c >= 65 and c <= 90 end
+	local function isxdigit(c)
+		return isdigit(c) or (c >= 65 and c <= 70) or (c >= 97 and c <= 102)
+	end
+	local map = {
+		[97]  = isalpha,   -- %a
+		[99]  = iscntrl,   -- %c
+		[100] = isdigit,   -- %d
+		[103] = isgraph,   -- %g
+		[108] = islower,   -- %l
+		[112] = ispunct,   -- %p
+		[115] = isspace,   -- %s
+		[117] = isupper,   -- %u
+		[119] = isalnum,   -- %w
+		[120] = isxdigit,  -- %x
+	}
+
+	for lower, fn in pairs(map) do
+		local t = build(fn)
+		CLASS[lower] = t
+		local neg = create(256, false)          -- chu HOA = phu dinh
+		for i = 0, 255 do neg[i] = not t[i] end
+		CLASS[lower - 32] = neg
+	end
+end
+local S_src, S_pat = "", ""
+local S_srclen, S_patlen = 0, 0
+local S_level = 0
+local S_capinit = create(32, 0)
+local S_caplen  = create(32, 0)
+local CAP_UNFINISHED = -1
+local CAP_POSITION   = -2
+local MAXCAPTURES = 32
+local function class_end(p)
+	local pat, plen = S_pat, S_patlen
+	local c = sbyte(pat, p)
+	p = p + 1
+
+	if c == 37 then -- '%'
+		if p > plen then error("malformed pattern (ends with '%')", 0) end
+		return p + 1
+	elseif c == 91 then -- '['
+		if sbyte(pat, p) == 94 then p = p + 1 end -- '^'
+		repeat
+			if p > plen then error("malformed pattern (missing ']')", 0) end
+			local cc = sbyte(pat, p)
+			p = p + 1
+			if cc == 37 and p <= plen then p = p + 1 end
+		until sbyte(pat, p) == 93 -- ']'
+		return p + 1
+	end
+	return p
+end
+local function match_bracket(c, p, ec)
+	local pat = S_pat
+	local sig = true
+	if sbyte(pat, p + 1) == 94 then -- '^'
+		sig = false
+		p = p + 1
+	end
+	p = p + 1
+	while p < ec do
+		local pc = sbyte(pat, p)
+		if pc == 37 then -- '%'
+			p = p + 1
+			local cl = sbyte(pat, p)
+			local t = CLASS[cl]
+			if t then
+				if t[c] then return sig end
+			elseif cl == c then
+				return sig
+			end
+		elseif sbyte(pat, p + 1) == 45 and p + 2 < ec then -- range a-z
+			if pc <= c and c <= sbyte(pat, p + 2) then return sig end
+			p = p + 2
+		elseif pc == c then
+			return sig
+		end
+		p = p + 1
+	end
+	return not sig
+end
+local function class_test(c, p, ep)
+	local pc = sbyte(S_pat, p)
+	if pc == 46 then return true
+	elseif pc == 37 then
+		local cl = sbyte(S_pat, p + 1)
+		local t = CLASS[cl]
+		if t then return t[c] end
+		return cl == c
+	elseif pc == 91 then
+		return match_bracket(c, p, ep - 1)
+	end
+	return pc == c
+end
+local function single_match(s, p, ep)
+	if s > S_srclen then return false end
+	local c  = sbyte(S_src, s)
+	local pc = sbyte(S_pat, p)
+
+	if pc == 46 then          -- '.'
+		return true
+	elseif pc == 37 then      -- '%x'
+		local cl = sbyte(S_pat, p + 1)
+		local t = CLASS[cl]
+		if t then return t[c] end
+		return cl == c
+	elseif pc == 91 then      -- '[...]'
+		return match_bracket(c, p, ep - 1)
+	end
+	return pc == c
+end
+local do_match
+local function start_capture(s, p, what)
+	local level = S_level + 1
+	if level > MAXCAPTURES then error("too many captures", 0) end
+	S_capinit[level] = s
+	S_caplen[level]  = what
+	S_level = level
+	local res = do_match(s, p)
+	if res == nil then S_level = level - 1 end
+	return res
+end
+local function end_capture(s, p)
+	local l = 0
+	for i = S_level, 1, -1 do
+		if S_caplen[i] == CAP_UNFINISHED then l = i break end
+	end
+	if l == 0 then error("invalid pattern capture", 0) end
+	S_caplen[l] = s - S_capinit[l]
+	local res = do_match(s, p)
+	if res == nil then S_caplen[l] = CAP_UNFINISHED end
+	return res
+end
+local function match_capture(s, l)
+	if l < 1 or l > S_level or S_caplen[l] == CAP_UNFINISHED then
+		error("invalid capture index %" .. l .. " in pattern", 0)
+	end
+	local len = S_caplen[l]
+	if S_srclen - s + 1 < len then return nil end
+	local src  = S_src
+	local init = S_capinit[l]
+	for i = 0, len - 1 do
+		if sbyte(src, init + i) ~= sbyte(src, s + i) then return nil end
+	end
+	return s + len
+end
+local function match_balance(s, p)
+	if p >= S_patlen then
+		error("malformed pattern (missing arguments to '%b')", 0)
+	end
+	if s > S_srclen then return nil end
+	local src = S_src
+	local b = sbyte(S_pat, p)
+	if sbyte(src, s) ~= b then return nil end
+
+	local e = sbyte(S_pat, p + 1)
+	local cont = 1
+	local slen = S_srclen
+	local i = s + 1
+	while i <= slen do
+		local c = sbyte(src, i)
+		if c == e then
+			cont = cont - 1
+			if cont == 0 then return i + 1 end
+		elseif c == b then
+			cont = cont + 1
+		end
+		i = i + 1
+	end
+	return nil
+end
+local function max_expand(s, p, ep)
+	local i = 0
+	while single_match(s + i, p, ep) do i = i + 1 end
+	while i >= 0 do
+		local res = do_match(s + i, ep + 1)
+		if res then return res end
+		i = i - 1
+	end
+	return nil
+end
+local function min_expand(s, p, ep)
+	while true do
+		local res = do_match(s, ep + 1)
+		if res then return res end
+		if single_match(s, p, ep) then s = s + 1 else return nil end
+	end
+end
+function do_match(s, p)
+	local pat, plen = S_pat, S_patlen
+	while true do
+		if p > plen then return s end
+		local pc = sbyte(pat, p)
+		local consumed = false
+		if pc == 40 then -- '('
+			if sbyte(pat, p + 1) == 41 then -- '()' position capture
+				return start_capture(s, p + 2, CAP_POSITION)
+			end
+			return start_capture(s, p + 1, CAP_UNFINISHED)
+		elseif pc == 41 then -- ')'
+			return end_capture(s, p + 1)
+		elseif pc == 36 and p == plen then -- '$' cuoi pattern
+			if s == S_srclen + 1 then return s end
+			return nil
+		elseif pc == 37 then -- '%'
+			local nc = sbyte(pat, p + 1)
+			if nc == 98 then -- %b
+				local r = match_balance(s, p + 2)
+				if r == nil then return nil end
+				s, p = r, p + 4
+				consumed = true
+			elseif nc == 102 then -- %f
+				local np = p + 2
+				if sbyte(pat, np) ~= 91 then
+					error("missing '[' after '%f' in pattern", 0)
+				end
+				local ep = class_end(np)
+				local prev = (s == 1) and 0 or sbyte(S_src, s - 1)
+				local cur  = (s <= S_srclen) and sbyte(S_src, s) or 0
+				if (not match_bracket(prev, np, ep - 1))
+					and match_bracket(cur, np, ep - 1) then
+					p = ep
+					consumed = true
+				else
+					return nil
+				end
+			elseif nc ~= nil and nc >= 48 and nc <= 57 then
+				local r = match_capture(s, nc - 48)
+				if r == nil then return nil end
+				s, p = r, p + 2
+				consumed = true
+			end
+		end
+		if not consumed then
+			local ep = class_end(p)
+			local m  = single_match(s, p, ep)
+			local epc = (ep <= plen) and sbyte(pat, ep) or nil
+			if epc == 63 then
+				if m then
+					local res = do_match(s + 1, ep + 1)
+					if res then return res end
+				end
+				p = ep + 1
+			elseif epc == 43 then
+				if m then return max_expand(s + 1, p, ep) end
+				return nil
+			elseif epc == 42 then
+				return max_expand(s, p, ep)
+			elseif epc == 45 then
+				return min_expand(s, p, ep)
+			else
+				if not m then return nil end
+				s = s + 1
+				p = ep
+			end
+		end
+	end
+end
+
+local function get_capture(i, s, e)
+	if i > S_level then
+		if i == 1 then return ssub(S_src, s, e - 1) end
+		error("invalid capture index %" .. i, 0)
+	end
+	local l = S_caplen[i]
+	if l == CAP_UNFINISHED then error("unfinished capture", 0) end
+	if l == CAP_POSITION then return S_capinit[i] end
+	local init = S_capinit[i]
+	return ssub(S_src, init, init + l - 1)
+end
+
+local function compile_repl(repl)
+	local parts, n = {}, 0
+	local len = #repl
+	local i, start = 1, 1
+	while i <= len do
+		if sbyte(repl, i) == 37 then
+			if start < i then
+				n = n + 1
+				parts[n] = ssub(repl, start, i - 1)
+			end
+			local d = sbyte(repl, i + 1)
+			if d ~= nil and d >= 48 and d <= 57 then
+				n = n + 1
+				parts[n] = d - 48
+			elseif d ~= nil then
+				n = n + 1 
+				parts[n] = ssub(repl, i + 1, i + 1)
+			end
+			i = i + 2
+			start = i
+		else
+			i = i + 1
+		end
+	end
+	if start <= len then
+		n = n + 1
+		parts[n] = ssub(repl, start, len)
+	end
+	return parts, n
+end
+
+local function make_getter(s, repl)
+	local t = type(repl)
+	if t == "number" then repl = tostring(repl) t = "string" end
+	if t == "string" then
+		local parts, np = compile_repl(repl)
+		if np == 0 then
+			return function() return "" end
+		elseif np == 1 and type(parts[1]) == "string" then
+			local lit = parts[1]                      -- hang so -> tra ve luon
+			return function() return lit end
+		end
+		return function(bs, e)
+			local buf = create(np, "")
+			for k = 1, np do
+				local v = parts[k]
+				if type(v) == "number" then
+					if v == 0 then
+						buf[k] = ssub(s, bs, e - 1)
+					else
+						buf[k] = tostring(get_capture(v, bs, e))
+					end
+				else
+					buf[k] = v
+				end
+			end
+			return tconcat(buf, "", 1, np)
+		end
+	elseif t == "table" then
+		return function(bs, e)
+			local v = repl[get_capture(1, bs, e)]
+			if v == nil or v == false then return ssub(s, bs, e - 1) end
+			return v
+		end
+	elseif t == "function" then
+		return function(bs, e)
+			local n, v = S_level, nil
+			if n == 0 then
+				v = repl(ssub(s, bs, e - 1))
+			elseif n == 1 then
+				v = repl(get_capture(1, bs, e))
+			else
+				local args = create(n, false)
+				for i = 1, n do args[i] = get_capture(i, bs, e) end
+				v = repl(unpack(args, 1, n))
+			end
+			if v == nil or v == false then return ssub(s, bs, e - 1) end
+			return v
+		end
+	end
+	error("bad argument #3 to 'gsub' (string/function/table expected)", 0)
+end
+
+local SPECIAL = create(256, false)
+for _, c in ipairs({ 94, 36, 42, 43, 63, 46, 40, 41, 91, 93, 37, 45 }) do
+	SPECIAL[c] = true
+end
+
+local function is_plain(pat, plen)
+	for i = 1, plen do
+		if SPECIAL[sbyte(pat, i)] then return false end
+	end
+	return true
+end
+
+local FILTER_CACHE, FILTER_N = {}, 0
+local function build_filter(p)
+	local pat, plen = S_pat, S_patlen
+	while p <= plen and sbyte(pat, p) == 40 do
+		if sbyte(pat, p + 1) == 41 then p = p + 2 else p = p + 1 end
+	end
+	if p > plen then return false end
+	local c = sbyte(pat, p)
+	if c == 37 then
+		local nc = sbyte(pat, p + 1)
+		if nc == 98 or nc == 102 or (nc ~= nil and nc >= 48 and nc <= 57) then
+			return false
+		end
+	elseif c == 41 or (c == 36 and p == plen) then
+		return false
+	end
+	local ok, ep = pcall(class_end, p)
+	if not ok then return false end
+	local q = (ep <= plen) and sbyte(pat, ep) or nil
+	if q == 42 or q == 45 or q == 63 then return false end
+	local t = create(256, false)
+	for i = 0, 255 do t[i] = class_test(i, p, ep) end
+	return t
+end
+local function get_filter(pattern, p)
+	local key = pattern
+	local f = FILTER_CACHE[key]
+	if f == nil then
+		f = build_filter(p)
+		if FILTER_N > 256 then FILTER_CACHE, FILTER_N = {}, 0 end
+		FILTER_CACHE[key] = f
+		FILTER_N = FILTER_N + 1
+	end
+	if f == false then return nil end
+	return f
+end
+local function gsub(s, pattern, repl, maxn)
+	if type(s) ~= "string" then s = tostring(s) end
+	if type(pattern) ~= "string" then pattern = tostring(pattern) end
+	local slen, plen = #s, #pattern
+	local limit = maxn
+	if limit == nil then limit = math.huge end
+	if limit <= 0 then return s, 0 end
+	local get_value = make_getter(s, repl)
+	local out, outn = {}, 0
+	local count = 0
+	local flush = 1
+	local rt = type(repl)
+	local reentrant = (rt == "function" or rt == "table")
+	S_src, S_srclen = s, slen
+	S_pat, S_patlen = pattern, plen
+	if plen > 0 and is_plain(pattern, plen) then
+		local first = sbyte(pattern, 1)
+		local lastpos = slen - plen + 1
+		local i = 1
+		S_level = 0
+		while i <= lastpos and count < limit do
+			if sbyte(s, i) == first then
+				local ok = true
+				for k = 2, plen do
+					if sbyte(s, i + k - 1) ~= sbyte(pattern, k) then ok = false break end
+				end
+				if ok then
+					local e = i + plen
+					if flush < i then
+						outn = outn + 1
+						out[outn] = ssub(s, flush, i - 1)
+					end
+					outn = outn + 1
+					out[outn] = get_value(i, e)
+					if reentrant then
+						S_src, S_srclen = s, slen
+						S_pat, S_patlen = pattern, plen
+						S_level = 0
+					end
+					flush = e
+					count = count + 1
+					i = e
+				else
+					i = i + 1
+				end
+			else
+				i = i + 1
+			end
+		end
+		if flush <= slen then
+			outn = outn + 1
+			out[outn] = ssub(s, flush, slen)
+		end
+		return tconcat(out, "", 1, outn), count
+	end
+	local p = 1
+	local anchor = sbyte(pattern, 1) == 94
+	if anchor then p = 2 end
+	local filter = (not anchor) and get_filter(pattern, p) or nil
+	local src_i = 1
+	while count < limit do
+		if filter then
+			while src_i <= slen and not filter[sbyte(s, src_i)] do
+				src_i = src_i + 1
+			end
+			if src_i > slen then break end
+		end
+		S_level = 0
+		local e = do_match(src_i, p)
+		if e then
+			count = count + 1
+			if flush < src_i then
+				outn = outn + 1
+				out[outn] = ssub(s, flush, src_i - 1)
+			end
+			outn = outn + 1
+			out[outn] = get_value(src_i, e)
+			if reentrant then
+				S_src, S_srclen = s, slen
+				S_pat, S_patlen = pattern, plen
+			end
+			flush = e
+		end
+		if e and e > src_i then
+			src_i = e
+		elseif src_i <= slen then
+			src_i = src_i + 1
+		else
+			break
+		end
+		if anchor then break end
+	end
+	if flush <= slen then
+		outn = outn + 1
+		out[outn] = ssub(s, flush, slen)
+	end
+	return tconcat(out, "", 1, outn), count
+end
+
+-- Crypto Library
+
+local MASK = 0xFFFFFFFF
+local function add32(a, b) return band(a + b, MASK) end
+
+local function sha256(msg)
+    local K = {
+        0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+        0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+        0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+        0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+        0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+        0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+        0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+        0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+    }
+    local h0,h1,h2,h3 = 0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a
+    local h4,h5,h6,h7 = 0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19
+    local bitlen = #msg * 8
+    msg = msg .. "\128"
+    while (#msg % 64) ~= 56 do msg = msg .. "\0" end
+    local function be32(x)
+        return schar(band(rshift(x,24),0xFF), band(rshift(x,16),0xFF), band(rshift(x,8),0xFF), band(x,0xFF))
+    end
+    msg = msg .. be32(floor(bitlen / 4294967296)) .. be32(bitlen % 4294967296)
+    local w = {}
+    for chunk = 1, #msg, 64 do
+        for i = 0, 15 do
+        local j = chunk + i*4
+        local b1,b2,b3,b4 = sbyte(msg, j, j+3)
+        w[i] = bor(lshift(b1,24), lshift(b2,16), lshift(b3,8), b4)
+        end
+        for i = 16, 63 do
+        local x, y = w[i-15], w[i-2]
+        local s0 = bxor(rrotate(x,7), rrotate(x,18), rshift(x,3))
+        local s1 = bxor(rrotate(y,17), rrotate(y,19), rshift(y,10))
+        w[i] = band(w[i-16] + s0 + w[i-7] + s1, MASK)
+        end
+        local a,b,c,d,e,f,g,h = h0,h1,h2,h3,h4,h5,h6,h7
+        for i = 0, 63 do
+        local S1 = bxor(rrotate(e,6), rrotate(e,11), rrotate(e,25))
+        local ch = bxor(band(e,f), band(bit.bnot(e), g))
+        local t1 = band(h + S1 + ch + K[i+1] + w[i], MASK)
+        local S0 = bxor(rrotate(a,2), rrotate(a,13), rrotate(a,22))
+        local maj = bxor(band(a,b), band(a,c), band(b,c))
+        local t2 = band(S0 + maj, MASK)
+        h=g; g=f; f=e; e=add32(d,t1); d=c; c=b; b=a; a=add32(t1,t2)
+        end
+        h0=add32(h0,a); h1=add32(h1,b); h2=add32(h2,c); h3=add32(h3,d)
+        h4=add32(h4,e); h5=add32(h5,f); h6=add32(h6,g); h7=add32(h7,h)
+    end
+    local function be(x)
+        return schar(band(rshift(x,24),0xFF), band(rshift(x,16),0xFF), band(rshift(x,8),0xFF), band(x,0xFF))
+    end
+    return be(h0)..be(h1)..be(h2)..be(h3)..be(h4)..be(h5)..be(h6)..be(h7)
+end
+local function u32le(s, i)
+    local b1,b2,b3,b4 = sbyte(s, i, i+3)
+    return bor(b1, lshift(b2,8), lshift(b3,16), lshift(b4,24))
+end
+local function qr(s, a, b, c, d)
+    s[a]=add32(s[a],s[b]); s[d]=lrotate(bxor(s[d],s[a]),16)
+    s[c]=add32(s[c],s[d]); s[b]=lrotate(bxor(s[b],s[c]),12)
+    s[a]=add32(s[a],s[b]); s[d]=lrotate(bxor(s[d],s[a]),8)
+    s[c]=add32(s[c],s[d]); s[b]=lrotate(bxor(s[b],s[c]),7)
+end
+local function chachaBlock(keyW, counter, nonceW)
+    LPH_ATTRIBUTES(VM(ONYX))
+    local s = {
+        0x61707865,0x3320646e,0x79622d32,0x6b206574,
+        keyW[1],keyW[2],keyW[3],keyW[4],keyW[5],keyW[6],keyW[7],keyW[8],
+        counter, nonceW[1],nonceW[2],nonceW[3]
+    }
+    local w = {}
+    for i=1,16 do w[i]=s[i] end
+    for _=1,10 do
+        qr(w,1,5,9,13); qr(w,2,6,10,14); qr(w,3,7,11,15); qr(w,4,8,12,16)
+        qr(w,1,6,11,16); qr(w,2,7,12,13); qr(w,3,8,9,14); qr(w,4,5,10,15)
+    end
+    local out = {}
+    for i=1,16 do
+        local v = add32(w[i], s[i])
+        out[i] = schar(band(v,0xFF), band(rshift(v,8),0xFF), band(rshift(v,16),0xFF), band(rshift(v,24),0xFF))
+    end
+    return tconcat(out)
+end
+local function chacha20(key, nonce, data, initialCounter)
+    LPH_ATTRIBUTES(VM(ONYX))
+    local keyW = {}
+    for i=1,8 do keyW[i] = u32le(key, (i-1)*4 + 1) end
+    local nonceW = {}
+    for i=1,3 do nonceW[i] = u32le(nonce, (i-1)*4 + 1) end
+    local out, dlen = {}, #data
+    local counter = initialCounter or 0
+    for off = 0, dlen-1, 64 do
+        local ks = chachaBlock(keyW, counter, nonceW)
+        local n = min(64, dlen - off)
+        local seg = {}
+        for i = 1, n do
+        seg[i] = schar(bxor(sbyte(data, off+i), sbyte(ks, i)))
+        end
+        tinsert(out, tconcat(seg))
+        counter = band(counter + 1, MASK)
+    end
+    return tconcat(out)
+end
+
+local b64encode = function(data)
+    LPH_ATTRIBUTES(PRESET(FAST))
+    local B64 = LPH_ENCSTR("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+    local B64R = {}
+    for i = 1, #B64 do B64R[sbyte(B64, i)] = i - 1 end
+    local out = {}
+    for i = 1, #data, 3 do
+        local b1, b2, b3 = sbyte(data, i), sbyte(data, i+1), sbyte(data, i+2)
+        local n1 = rshift(b1, 2)
+        local n2 = bor(lshift(band(b1,3),4), b2 and rshift(b2,4) or 0)
+        local n3 = b2 and bor(lshift(band(b2,15),2), b3 and rshift(b3,6) or 0) or nil
+        local n4 = b3 and band(b3,63) or nil
+        tinsert(out, ssub(B64,n1+1,n1+1))
+        tinsert(out, ssub(B64,n2+1,n2+1))
+        tinsert(out, n3 and ssub(B64,n3+1,n3+1) or "=")
+        tinsert(out, n4 and ssub(B64,n4+1,n4+1) or "=")
+    end
+    return tconcat(out)
+end
+
+local b64decode = function(str)
+    LPH_ATTRIBUTES(PRESET(FAST))
+    local B64 = LPH_ENCSTR("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+    local B64R = {}
+    for i = 1, #B64 do B64R[sbyte(B64, i)] = i - 1 end
+    str = gsub(str,"[^A-Za-z0-9+/]", "")
+    local out, i, n = {}, 1, #str
+    while i <= n do
+        local c1 = B64R[sbyte(str,i)] or 0
+        local c2 = B64R[sbyte(str,i+1)] or 0
+        local c3 = B64R[sbyte(str,i+2)]
+        local c4 = B64R[sbyte(str,i+3)]
+        tinsert(out, schar(bor(lshift(c1,2), rshift(c2,4))))
+        if c3 then tinsert(out, schar(band(bor(lshift(c2,4), rshift(c3,2)),0xFF))) end
+        if c4 then tinsert(out, schar(band(bor(lshift(c3,6), c4),0xFF))) end
+        i = i + 4
+    end
+    return tconcat(out)
+end
+
+local byteLUT = {}
+do
+    local sc = string.char
+    for i = 0, 255 do byteLUT[i] = sc(i) end
+end
+local gatherSeed = function()
+    local a = os.clock() * 1e7
+    local b = tick() * 1000
+    local c = #tostring({})
+    return (a + b * 31 + c) % 4294967296
+end
+local makeRandomBytes = function(seed)
+    local state = seed % 4294967296
+    return function(len)
+        local out = ""
+        for _ = 1, len do
+            state = (state * 1103515245 + 12345) % 4294967296
+            local sbyte = (state // 65536) % 256
+            out ..= byteLUT[sbyte]
+        end
+        return out
+    end
+end
+local randomBytes = makeRandomBytes(gatherSeed())
+local function isLikelyBase64(str)
+    if #str % 4 ~= 0 then return false end
+    if not str:match("^[A-Za-z0-9+/]*=?=?$") then return false end
+    return true
+end
+
+local normalizeKey = function(key)
+    if #key == 32 then
+        return key
+    end
+    if isLikelyBase64(key) and #key ~= 32 then
+        local decoded = b64decode(key)
+        if #decoded == 32 then
+        return decoded
+        end
+    endw
+    return sha256(key)
+end
+
+-- DRM Core
+
+if not LUAW_ENTRY_DATA then
+    return
+end
+
+if #LUAW_ENTRY_DATA ~= 9 then
+    return
+end
+
+local CHECK_SEASION_PASSED = false
+(function()
+    local signature = random()
+    local res = get('http://187.52.122.114:3000/'..gsub((function(key,plaintext)
+            local k = normalizeKey(key)
+            local nonce = randomBytes(12)
+            local ct = chacha20(k, nonce, plaintext)
+            return b64encode(nonce .. ct)
+        end)('FccK3xczGhC3JsCQujEKTTjS',signature),"[+/=]",URL_MAP)..'?dk='..LUAW_ENTRY_DATA[8])
+    if res == 'K12L3K12O31IO23UOI23U4OI23JFKDJSFLKSDJASD'..signature..'DASODIW9QE918209381023UELKDFJNBNG' then
+        CHECK_SEASION_PASSED = true
+    end
+end)()
+if not CHECK_SEASION_PASSED then
+    return
+end
+
+local dk = (function(key,packed)
+    local k = normalizeKey(key)
+    local raw = b64decode(packed)
+    local nonce = ssub(raw, 1, 12)
+    local ct = ssub(raw, 13)
+    return chacha20(k, nonce, ct)
+end)('2vH95kcLATnK4g4GBIyTdpgc',LUAW_ENTRY_DATA[9])
+
+local SCRIPT_INFO_SCRIPT_ID = (function(key,packed)
+    local k = normalizeKey(key)
+    local raw = b64decode(packed)
+    local nonce = ssub(raw, 1, 12)
+    local ct = ssub(raw, 13)
+    return chacha20(k, nonce, ct)
+end)(dk,LUAW_ENTRY_DATA[1])
+
+local SCRIPT_INFO_SCRIPT_VERSION = (function(key,packed)
+    local k = normalizeKey(key)
+    local raw = b64decode(packed)
+    local nonce = ssub(raw, 1, 12)
+    local ct = ssub(raw, 13)
+    return chacha20(k, nonce, ct)
+end)(dk,LUAW_ENTRY_DATA[5])
+
+local SCRIPT_INFO_LOADER_VERSION = (function(key,packed)
+    local k = normalizeKey(key)
+    local raw = b64decode(packed)
+    local nonce = ssub(raw, 1, 12)
+    local ct = ssub(raw, 13)
+    return chacha20(k, nonce, ct)
+end)(dk,LUAW_ENTRY_DATA[6])
+
+local HARDCODE_SCRIPT_ID = LPH_ENCSTR('v997ws1fltysd4gy22x0ys8pnr2w5oft') -- its important
+local HARDCODE_SCRIPT_VERSION = LPH_ENCSTR('v0.0.0.1') -- its important
+local HARDCODE_SKIP_HEARTBEAT = true -- true = less secure
+
+if HARDCODE_SCRIPT_ID ~= SCRIPT_INFO_SCRIPT_ID then
+    return
+end
+if HARDCODE_SCRIPT_VERSION ~= SCRIPT_INFO_SCRIPT_VERSION then
+    return
+end
+
+local ANTI_TAMPER_PASSED = false
+local function REPORT(a)
+    local ANTI_TAMPER_KEY = b64decode('d0VrN284aUsyTTN2SDF1NTRmTUdwbFZxcW1YZlVqOGk=')
+    if a == 'blacklist' then
+        local result
+        spawn(function()
+            result = get('http://187.52.122.114:3000/sHgboIcDqTZttF0I?KzqrOESOz0De='..
+            (function(key,plaintext)
+                local k = normalizeKey(key)
+                local nonce = randomBytes(12)
+                local ct = chacha20(k, nonce, plaintext)
+                return b64encode(nonce .. ct)
+            end)(SCRIPT_KEY,'blacklistthisniggerplshuhu')..
+            '?89Ox6ezhPECi=dxIktwuTvK5L93xmn2P5d8WN')
+        end)
+        local attemp = 0
+        repeat wait(0.5) attemp += 1 until result or attemp >= 5
+        if not result then
+            _warn('{"OPCODE": "Request"}')
+            KICK('[ Luaw ] Can not connect to the server')
+            while true do end
+        else
+            _warn('{"OPCODE": "Send"}')
+            KICK('[ Luaw ] Key and IP Blacklisted for 120 hours | Reason : Tampering')
+            while true do end
+        end
+    elseif a == 'ban' then
+        local result
+        spawn(function()
+            result = get('http://187.52.122.114:3000/sHgboIcDqTZttF0I?KzqrOESOz0De='..
+            (function(key,plaintext)
+                local k = normalizeKey(key)
+                local nonce = randomBytes(12)
+                local ct = chacha20(k, nonce, plaintext)
+                return b64encode(nonce .. ct)
+            end)(SCRIPT_KEY,'blacklistthisniggerplshuhu')..
+            '&89Ox6ezhPECi=dxIktwuTvK5L93xmn2P5d8WN')
+        end)
+        local attemp = 0
+        repeat wait(0.5) attemp += 1 until result or attemp >= 5
+        while true do end
+    else
+        local ANTI_TAMPER_SIGNATURE = random()
+        local signature_encrypted = gsub((function(key,plaintext)
+            local k = normalizeKey(key)
+            local nonce = randomBytes(12)
+            local ct = chacha20(k, nonce, plaintext)
+            return b64encode(nonce .. ct)
+        end)(ANTI_TAMPER_KEY,ANTI_TAMPER_SIGNATURE),"[+/=]",URL_MAP)
+        local result = get('http://187.52.122.114:3000/sHgboIcDqTZttF0I?TlTjt2=O1O1OOO1OO1O1&P3oxac=O10011001OOO1O001&BjOUIL='..signature_encrypted..'&G0az1t=O1O1OOO1OO1O1010O1O111O10O11')
+        if not result then
+            ANTI_TAMPER_PASSED = false
+        else
+            local decrypted = (function(key,packed)
+                local k = normalizeKey(key)
+                local raw = b64decode(packed)
+                local nonce = ssub(raw, 1, 12)
+                local ct = ssub(raw, 13)
+                return chacha20(k, nonce, ct)
+            end)(ANTI_TAMPER_KEY,result)
+            if decrypted == ('1OO1OOO1OO111OO11OOO111O'..ANTI_TAMPER_SIGNATURE..'OO11OOO11OO1111O111OOO1OO1OOO111') then
+                ANTI_TAMPER_PASSED = true
+            else
+                KICK('[ Luaw ] Failed to load Luaw')
+            end
+        end
+    end
+    ANTI_TAMPER_KEY = nil
+end
+REPORT()
+if not ANTI_TAMPER_PASSED then
+    return
+end
+
+-- IMT DRM Macros
+
+local IMMORTAL_LOGO = "https://cdn3.emoji.gg/emojis/79625-valorant-immortal-1.png"
+local function IMT_SEND_WEBHOOK(url : WebhookUrl, data : EmbedData)
+    http_request({
+        Url = url,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = game:GetService('HttpService'):JSONEncode(data)
+    })
+end
+
+local IMT_BLACKLIST = function() return REPORT('ban') end
+
+-- Check script
+
+local CHECK_SCRIPT_PASSED = false
+local CHECK_SCRIPT_FAILED_REASON = ''
+local CHECK_SCRIPT = function()
+    LPH_ATTRIBUTES(VM(ONYX))
+    local CHECK_SCRIPT_SIGNATURE = random()
+    local CHECK_SCRIPT_KEY = b64decode('Q3dUYjE3bUxUZlhFTEh1aXNyT0xyZVVTNzR1NklBbVI=')
+    local scriptid = gsub((function(key,plaintext)
+        local k = normalizeKey(key)
+        local nonce = randomBytes(12)
+        local ct = chacha20(k, nonce, plaintext)
+        return b64encode(nonce .. ct)
+    end)(CHECK_SCRIPT_KEY,SCRIPT_INFO_SCRIPT_ID), "[+/=]", URL_MAP)
+    local signature = gsub((function(key,plaintext)
+        local k = normalizeKey(key)
+        local nonce = randomBytes(12)
+        local ct = chacha20(k, nonce, plaintext)
+        return b64encode(nonce .. ct)
+    end)(CHECK_SCRIPT_KEY,CHECK_SCRIPT_SIGNATURE), "[+/=]", URL_MAP)
+    local result = get('http://187.52.122.114:3000/sHgboIcDqTZttF0I?SAeM8b=O1O1OOO1OO1O1&j81SNW='..scriptid..'&oYyvhz='..signature..'&GH299H=10O11OOO1O111O1')
+    if not result then
+        CHECK_SCRIPT_PASSED = false
+    else
+        if result == 'This script is protected by Luaw | https://discord.gg/imthub' or result == 'Script not found ( 404 ) | https://discord.gg/imthub' then
+            CHECK_SCRIPT_PASSED = false
+            CHECK_SCRIPT_FAILED_REASON = 'disabled'
+        else
+            local decrypted = (function(key,packed)
+                local k = normalizeKey(key)
+                local raw = b64decode(packed)
+                local nonce = ssub(raw, 1, 12)
+                local ct = ssub(raw, 13)
+                return chacha20(k, nonce, ct)
+            end)(CHECK_SCRIPT_KEY,result)
+            if decrypted == ('1OO1OOO111111O111OOO1OO1'..CHECK_SCRIPT_SIGNATURE..'1OO1OOO1OO111OO11OOO111O'..(SCRIPT_INFO_SCRIPT_VERSION)) then
+                CHECK_SCRIPT_PASSED = true
+            end
+        end
+    end
+    CHECK_SCRIPT_SIGNATURE = nil
+    CHECK_SCRIPT_KEY = nil
+end
+CHECK_SCRIPT()
+CHECK_SCRIPT = nil
+if not CHECK_SCRIPT_PASSED then
+    if CHECK_SCRIPT_FAILED_REASON == '' then
+        game.Players.LocalPlayer:Kick('[ Luaw ] You are not using the loader')
+    elseif CHECK_SCRIPT_FAILED_REASON == 'disabled' then
+        game.Players.LocalPlayer:Kick('[ Luaw ] Script has been disabled or deleted by the owner')
+    else
+        game.Players.LocalPlayer:Kick('[ Luaw ] Script not found ( 404 )')
+    end
+    return
+end
+
+-- another check
+
+if typeof(WebSocket) ~= 'table' then
+    return
+end
+if typeof(SECURED_FUNC.rawget(WebSocket,'connect')) ~= 'function' then
+    return
+end
+if SECURED_FUNC.oth then
+    pcall(function()
+        SECURED_FUNC.oth.unhook(SECURED_FUNC.rawget(WebSocket,'connect'))
+    end)
+end
+local IMT_WEBSOCKET = WebSocket
+
+-- Whitelist System
+
+repeat wait() until game:IsLoaded() and game:GetService("Players").LocalPlayer
+local plr = cloneref(game:GetService("Players")).LocalPlayer
+local https = cloneref(game:GetService("HttpService"))
+if not (https and plr) then
+    return
+end
+
+local ws = IMT_WEBSOCKET.connect("ws://187.52.122.114:8080")
+if not ws then
+    return
+end
+
+local WL = nil
+
+local AUTH_SIGNATURE = random()
+local HEARTBEAT_SIGNATURE = 'qwueSmHt08Rrwye192kdasodkoqawieopqwie'
+local KEY_INFO = ''
+local qweytuiuyrhhrjhggghjsdnnb = 0
+
+ws.OnMessage:Connect(function(msg)
+    LPH_ATTRIBUTES(VM(ONYX),PRESET(SECURE))
+    local data = https:JSONDecode(msg)
+    if data.type == 'auth' then
+        if data.success and data.info then
+            local decrypted = (function(key,packed)
+                local k = normalizeKey(key)
+                local raw = b64decode(packed)
+                local nonce = ssub(raw, 1, 12)
+                local ct = ssub(raw, 13)
+                return chacha20(k, nonce, ct)
+            end)('zyouvzu5kEo9Dm0mhGT/IFsGOHCrGcprOWh3BJZg9rI=',data.info)
+            if decrypted then
+                if decrypted == (plr.Name..'/ThichCanhCan/'..AUTH_SIGNATURE..'/'..(SCRIPT_INFO_SCRIPT_ID)) then
+                    AUTH_SIGNATURE = nil
+                    WL = true
+                    pcall(function()
+                        KEY_INFO = '[ INFO ] '..data.slots..' Expired at : '..(data.expireAt or '(not redeemed ?)')
+                    end)
+                else
+                    AUTH_SIGNATURE = nil
+                    while true do end
+                end
+            else
+                while true do end
+            end
+        else
+            KICK("[ Luaw ] Auth Error:\n"..(data.reason or "Unknown"))
+        end
+    elseif data.type == 'verify' then
+        if data.success and data.info then
+            local decrypted = (function(key,packed)
+                local k = normalizeKey(key)
+                local raw = b64decode(packed)
+                local nonce = ssub(raw, 1, 12)
+                local ct = ssub(raw, 13)
+                return chacha20(k, nonce, ct)
+            end)('9s0SBDdUfNg/BS+dI9MAfk1URsDamYDtG4tA9fYlGX4=',data.info)
+            if decrypted then
+                if decrypted == (plr.Name..'/ThichCanhCan/'..HEARTBEAT_SIGNATURE..'/'..(SCRIPT_INFO_SCRIPT_ID)) then
+                    qweytuiuyrhhrjhggghjsdnnb += 1
+                else
+                    while true do end
+                end
+            else
+                while true do end
+            end
+        else
+            while true do end
+        end
+    end
+end)
+
+local HEARTBEAT = task.spawn(function()
+    while true do
+        if WL then
+            HEARTBEAT_SIGNATURE = random()
+            local ENC_HEARTBEAT_DATA = (function(key,plaintext)
+                local k = normalizeKey(key)
+                local nonce = randomBytes(12)
+                local ct = chacha20(k, nonce, plaintext)
+                return b64encode(nonce .. ct)
+            end)('9s0SBDdUfNg/BS+dI9MAfk1URsDamYDtG4tA9fYlGX4=',(SCRIPT_KEY..'/'..plr.Name..'/ThichCanhCan/'..HEARTBEAT_SIGNATURE..'/'..(SCRIPT_INFO_SCRIPT_ID)))
+            ws:Send(https:JSONEncode({
+                type = "verify",
+                verify = ENC_HEARTBEAT_DATA,
+            }))
+            task.wait(30)
+        end
+        task.wait()
+    end
+end)
+
+task.defer(function()
+    if not HEARTBEAT and WL then
+        REPORT('ban')
+        while true do end
+    end
+end)
+
+ws.OnClose:Connect(function()
+    if not HARDCODE_SKIP_HEARTBEAT then
+        if WL then
+            while true do end
+        end
+    end
+end)
+
+local LAST_CHECK_PASSED = false
+(function()
+    local LAST_CHECK_SIGNATURE = random()
+    local LAST_CHECK_KEY = LPH_ENCSTR('OWM5eDBxandGRkZVZVc4Mlk1QTR0ZnVWMXV5QWRYOGM=')
+    local payload = gsub((function(key,plaintext)
+        local k = normalizeKey(key)
+        local nonce = randomBytes(12)
+        local ct = chacha20(k, nonce, plaintext)
+        return b64encode(nonce .. ct)
+    end)(LAST_CHECK_KEY, SCRIPT_KEY..'/'..plr.Name..'/'..LAST_CHECK_SIGNATURE..'/'..(SCRIPT_INFO_SCRIPT_ID)),"[+/=]", URL_MAP)
+    local res = get('http://187.52.122.114:3000/pK2jfKjG0uUP6QKo?a='..payload)
+    local decrypted = (function(key,packed)
+        local k = normalizeKey(key)
+        local raw = b64decode(packed)
+        local nonce = ssub(raw, 1, 12)
+        local ct = ssub(raw, 13)
+        return chacha20(k, nonce, ct)
+    end)(LAST_CHECK_KEY, res)
+    if decrypted == ('1OO1OOO1OO111OO11OOO111O'..LAST_CHECK_SIGNATURE..'OO11OOO11OO1111O111OOO1OO1OOO111') then
+        LAST_CHECK_PASSED = true
+    end
+    LAST_CHECK_KEY = nil
+    LAST_CHECK_SIGNATURE = nil
+end)()
+if not LAST_CHECK_PASSED then
+    KICK('[ Luaw ] Invalid signature\nYou know what not to do now')
+    return
+end
+
+local START_AUTH = _tick()
+do
+    ws:Send(https:JSONEncode({
+        type = "auth",
+        verify = (function(key,plaintext)
+        local k = normalizeKey(key)
+        local nonce = randomBytes(12)
+        local ct = chacha20(k, nonce, plaintext)
+        return b64encode(nonce .. ct)
+    end)('zyouvzu5kEo9Dm0mhGT/IFsGOHCrGcprOWh3BJZg9rI=',(SCRIPT_KEY..'/'..plr.Name..'/ThichCanhCan/'..AUTH_SIGNATURE..'/'..(SCRIPT_INFO_SCRIPT_ID)))
+    }))
+end
+
+local start = _tick()
+repeat _wait() until (WL == true) or (_tick() - start) >= 10
+
+if not WL then
+    normalizeKey = nil
+    chachaBlock = nil
+    chacha20 = nil
+    WL = nil
+    return
+end
+
+getgenv().Luaw_Loaded = true
+
+if not getgenv().IMT_DRM_DISABLE_OUTPUT then
+    _print(KEY_INFO)
+    _print('[ Luaw ] Whitelisted in '..(math.floor((tick() - START_AUTH) * 100) / 100)..' seconds | Executor : '..getexecutorname())
+end

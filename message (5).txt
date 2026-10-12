@@ -1,0 +1,132 @@
+local v1 = false
+local v2 = iscustomcclosure or isnewcclosure or checkclosure or iscclosure or islclosure or isourclosure
+local v3 = false
+if restorefunction and v2 and v2(restorefunction) then
+    v1 = true
+end
+local v4 = {http_request = http_request, loadstring = loadstring, oth = oth, rawget = rawget}
+if v2 then
+    if restorefunction then pcall(restorefunction, v2) end
+    if v2(http_request) or v2(loadstring) then v1 = true end
+end
+local v5 = isfunctionhooked
+if restorefunction then
+    pcall(restorefunction, rawget)
+    v4.rawget = rawget
+end
+if v5 then
+    if restorefunction then
+        pcall(restorefunction, v5)
+        if oth then
+            pcall(restorefunction, v4.rawget(oth, 'hook'))
+            pcall(restorefunction, v4.rawget(oth, 'unhook'))
+            pcall(restorefunction, v4.rawget(oth, 'get_root_callback') or v4.rawget(oth, 'getrootcallback'))
+        end
+    end
+    if v5(http_request) or v5(loadstring) then v1 = true end
+end
+local v6 = typeof(oth) == 'table' and oth
+if v6 then
+    local v7 = v4.rawget(v6, 'hook')
+    local v8 = v4.rawget(v6, 'unhook')
+    local v9 = v4.rawget(v6, 'get_root_callback') or v4.rawget(v6, 'getrootcallback')
+    if not v7 or not v8 or not v9 then
+        v1 = true
+    end
+    if v9 and not v3 then
+        v7(http_request, function(...) return v9()(...) end)
+        v4.http_request = http_request
+        v7(loadstring, function(a, b) return v9()(a, b) end)
+        v4.loadstring = loadstring
+        v3 = true
+    end
+end
+v4.oth = v6
+
+local function v10(v11)
+    if v2 and type(v2) == "function" then
+        local v12, v13 = pcall(v2, v11)
+        if v12 and v13 then return true end
+    end
+    if v5 and type(v5) == "function" then
+        local v12, v13 = pcall(v5, v11)
+        if v12 and v13 then return true end
+    end
+    return false
+end
+
+if debug and debug.getinfo then
+    local function v14(v15, v16, v17)
+        local v18 = debug.getinfo(v15, "S")
+        if not v18 then return true end
+        if v16 and v18.name ~= v16 then return true end
+        if v17 and v18.source ~= v17 then return true end
+        return false
+    end
+    if v14(http_request, "http_request", "=[C]") then v1 = true end
+    if v14(loadstring, "loadstring", "=[C]") then v1 = true end
+end
+
+if getconstants then
+    local function v19(v20, v21)
+        local v22 = getconstants(v20)
+        for _, v23 in pairs(v21) do
+            local v24 = false
+            for _, v25 in pairs(v22) do
+                if v25 == v23 then
+                    v24 = true
+                    break
+                end
+            end
+            if not v24 then return true end
+        end
+        return false
+    end
+    if v19(http_request, {"HttpService", "RequestAsync"}) then v1 = true end
+    if v19(loadstring, {"loadstring"}) then v1 = true end
+end
+
+if getrawmetatable and hookmetamethod then
+    local v26 = {http_request, loadstring, game, workspace}
+    for _, v27 in pairs(v26) do
+        local v28 = getrawmetatable(v27)
+        if v28 then
+            for _, v29 in pairs({"__index", "__newindex", "__call", "__namecall"}) do
+                local v30 = hookmetamethod(v27, v29, function(...) return ... end)
+                if v30 ~= nil then v1 = true end
+                if restorefunction then pcall(restorefunction, v30) end
+            end
+        end
+    end
+end
+
+if getconnections then
+    local v31 = {
+        game:GetService("RunService").RenderStepped,
+        game:GetService("RunService").Heartbeat,
+        game:GetService("Players").LocalPlayer.Changed
+    }
+    for _, v32 in pairs(v31) do
+        for _, v33 in pairs(getconnections(v32)) do
+            if v10(v33.Function) then v1 = true end
+        end
+    end
+end
+
+if getgc then
+    for _, v34 in pairs(getgc()) do
+        if typeof(v34) == "Instance" and v34:IsA("LocalScript") then
+            if string.find(v34.Source, "hookfunction") or string.find(v34.Source, "detect") then
+                v1 = true
+            end
+        end
+    end
+end
+
+if getthreadidentity and getidentity then
+    if getthreadidentity() < 7 or getidentity() < 7 then v1 = true end
+end
+
+if v1 then
+    return LPH_CRASH()
+end

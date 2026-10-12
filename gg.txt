@@ -1,0 +1,72 @@
+sab config :
+script_key = "key here"
+getgenv().Config = {
+    ["Misc"] = {
+        ["Server Type"] = "Private", -- "Public" | "Private" | "Private (Dupe)"
+        ["Kick if Ping above"] = 750,
+        ["Kick if FPS below"] = 5,
+        ["FPS Cap"] = 10,
+        ["Optimization"] = true,
+    },
+    ["Rebirth"] = {
+        ["Enabled"] = true,
+        ["Max Rebirth"] = 3,
+    },
+    ["Farm"] = {
+        ["Collect Cash Cap"] = "10B",
+        ["Rare Animal Generation"] = "10M",
+        ["Ignore Secret"] = {},
+    },
+    ["Lucky Block"] = {
+        ["Buy Lucky Block"] = {},
+        ["Open Lucky Block"] = {},
+        ["Rare Lucky Block"] = {},
+    },
+    ["Webhook"] = {
+        ["Url"] = "",
+        ["Discord id"] = "",
+        ["Ignore Notify"] = {},
+    },
+}
+sae config :
+script_key = "key here"
+getgenv().Config = {
+    ["Misc"] = {
+        ["Server Type"] = "Private", -- "Public" | "Private" | "Private (Dupe)"
+        ["Kick if Ping above"] = 750,
+        ["Kick if FPS below"] = 5,
+        ["FPS Cap"] = 10,
+        ["Optimization"] = true,
+    },
+    ["Rebirth"] = {
+        ["Enabled"] = true,
+        ["Max Rebirth"] = 3,
+    },
+    ["Farm"] = {
+        ["Collect Cash Cap"] = "10B",
+        ["Rare Animal Generation"] = "10M",
+        ["Ignore Secret"] = {},
+    },
+    ["Lucky Block"] = {
+        ["Buy Lucky Block"] = {},
+        ["Open Lucky Block"] = {},
+        ["Rare Lucky Block"] = {},
+    },
+    ["Webhook"] = {
+        ["Url"] = "",
+        ["Discord id"] = "",
+        ["Ignore Notify"] = {},
+    },
+}
+gpo config :
+getgenv().NovaHub = {
+    DiscordWebHook = "", ---Url WebHook
+    PSCode = {
+        ["TenAcc1"] = "CODE_1",
+        ["TenAcc2"] = "CODE_2",
+        ["TenAcc23"] = "CODE_3",
+    },
+    Optimized = false,
+    LockFPS = true,
+    FpsCap = 60,
+}

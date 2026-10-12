@@ -1,0 +1,122 @@
+PHÂN TÍCH SOURCE SPEED HUB X 5.5.0 (decompile)
+File gốc: SpeedHubX_5.5.0.txt (6.469 dòng, 183.429 byte, syntax hợp lệ - chỉ có cú pháp Luau như continue/+= mà trình parse Lua 5.3 thuần không nhận)
+Nguồn paste: user gửi trong chat (bản decompile, loader ver 5.5.0)
+
+===========================================================
+1. THÔNG TIN CHUNG
+===========================================================
+- Tên: "Speed Hub X | Version 5.5.0 | discord.gg/speedhubx"
+- Loại: LOADER (script rỗng chỉ chứa loader) - phần giao diện/chức năng được TẢI TỪ GITHUB lúc chạy.
+- 3 URL tải động (HttpGet/load):
+  + https://raw.githubusercontent.com/AhmadV99/Main/refs/heads/main/Library/Lib_5.5.0.lua  (UI library)
+  + https://raw.githubusercontent.com/AhmadV99/Main/main/Library/Example/FuncsV3           (chức năng V3)
+  + https://raw.githubusercontent.com/AhmadV99/Main/main/Codes_BloxFruit                    (mã code gift)
+- 8 tab: Home, Main, Automatically, Sea Event, Teleport, Shop, Misc, Settings
+  (icon rbxassetid: 10734942198, 10723407389, 10734923549, 16175025368, 10734910680, 10734952273, 11447063791, 10734950309)
+- 37 section (Configuration, Local Player, Server Manager, Stat Manager, Stack Farming System,
+  Hop Boss, Level Farming, Nearest Enemy Farming, Mastery Farming, Collection Farming, Boss Farming,
+  Material Farming, Third World, Dragon Hunter, Tyrant of the Skies, Citizen Quest, Kitsune Island,
+  Sea Event, Leviathan Farming, Wood Planks, Prehistoric Island, Sea Items, Fruits, Shop,
+  Automation Fishing, Mirage Island, Upgrade Race, Raid, ESP, Anti-Cheat Bypass, Team, Menu UI,
+  Redeem, Water, Remove Effects, Automations, Reset Config)
+
+===========================================================
+2. ANTI-DEBUG / CHỐNG PHÂN TÍCH
+===========================================================
+- Đầu script: anti-debugger kiểm tra debug.info hook -> nếu bị hook thì LPH_CRASH() (đình crashed script).
+- Các stub LPH_* (Luraph compiler): LPH_CRASH, LPH_TEST_1, LPH_TEST_2, LPH_TEST_3... - bản này được
+  compile bằng Luraph rồi decompile, nên còn sót stub.
+- if IsStudio()/IsServer thì dùng cloneref - tránh bị dính instance clone khi chạy Studio.
+- HandleError(): log lỗi runtime ("State validation failed", ...) - không hardcode user nào trong bản này.
+
+===========================================================
+3. KEY SYSTEM (9 KEY)
+===========================================================
+Bảng config chứa SaveSystem = { Enable = true, File = "Blox Fruits" } và 9 key:
+  Key  = KZgN0t5pK6hBaqVLAMLg27aqXNDb8v
+  Key1 = c9RkyXAjNpJc9u1fexvw1cbxYTWvMy
+  Key2 = Xp8712WzbaRn8EtrLnXk8gDdzQB8jF
+  Key3 = wixUQtibEtmkTQ7WpSFGq4YfBuqJQy
+  Key4 = KbSf6UWZ6vndbgp8Vh9EHdM0dU8DFf
+  Key5 = mP3tTRKYwhNKLkpFCdVuj922xqTgJp
+  Key6 = heMGEmHXFUaiTaStAihwTfwgSJguUwQQxdE
+  Key7 = khEXYXSHSJpDabFqudKJWEWbEyzXYgLmgTF
+  Key8 = MLGkWCxxHaqhumMpSmpvJMuiUEpeqUAYvxN
+-> Bất kỳ key nào trong 9 cái này đều pass (kiểm tra trong CreateWindow).
+
+===========================================================
+4. HỆ THỐNG SAVE/LOAD
+===========================================================
+- File lưu: "SpeedHubX/BloxFruit_V5.json" (writefile/isfolder/makefolder, đọc lại bằng readfile + JSONDecode).
+- Có throttle ghi: chỉ ghi lại khi tick() vượt khoảng thời gian cho phép (~0.5s) - tránh spam writefile.
+- tbl16 = SetSave/SetLoad: mọi Toggle/Dropdown gọi tbl16:SetSave("tên", giá trị) -> tự lưu config.
+- Delete folder khi unload: có đoạn delfolder(x) dọn thư mục tạm.
+
+===========================================================
+5. CƠ CHẾ "LOOP" (CreateLoop)
+===========================================================
+- tbl18:CreateLoop(tên, fn): chạy fn lặp qua RenderStepped/Heartbeat, có __loops/__metadata,
+  bị GATED bởi tbl14 (settings): chỉ feature nào được bật mới chạy; mỗi loop có cờ enabled để StopTween(stop).
+- tbl18:StopTween(bool): dừng tween/tốc độ di chuyển khi toggle tắt.
+- CheckStackPriority(): hệ thống ưu tiên - chỉ feature có ưu tiên cao nhất trong các toggle đang bật mới chạy
+  (mỗi feature có Priority 1..15, chọn được trong "Stack Farming System").
+
+===========================================================
+6. CÁC REMOTE/PROTOCOL CHÍNH
+===========================================================
+- CommE:FireServer("ActivateAbility")  -> BẬT RACE V3 (khớp y hệt code hub mình từ source 3nn_main).
+- SendKeyPress("Y", 0.1)               -> Đánh thức V4 khi "RaceTransformed" == false
+  (source này ấn phím Y, KHÔNG dùng tool Awakening + InvokeServer(true) như 3nn/hub mình).
+- RE/RegisterAttack + RE/RegisterHit   -> "fast attack" (id đăng ký: UserId:sub(2,4) .. "078da").
+- ReplicatedStorage.__ServerBrowser:InvokeServer(...) -> server hop (lọc vùng "Singapore", ...).
+- RF/KitsuneStatuePray, RF/DragonHunter -> event Kitsune/Dragon.
+- BuyBoat / requestEntrance / StartQuest / EliteHunter / HornedMan / ColorsDealer / Bones / SweetChaliceNpc /
+  CakePrinceSpawner / TravelDungeon ... -> các remote BFS tiêu chuẩn.
+- Boss hop: GET https://prvf.onrender.com/data (API ngoài, tìm server có boss) - dùng request/http_request.
+
+===========================================================
+7. CƠ CHẾ DI CHUYỂN / COMBAT
+===========================================================
+- TweenController/ExecuteTween: di chuyển bằng BodyVelocity + TweenService, công thức speed =
+  max(0.05, dist/speed); StopTween để hủy. Có ExecuteBoatTween (tàu, tên object Speed_Hub_X_Boat_BodyVelocity).
+- Bring Mob: BodyVelocity + BodyGyro kéo quái về 1 điểm + sethiddenproperty(SimulationRadius, math.huge).
+- Aimbot: hook __namecall / __index / __newindex bắt property "Part_Aim" (aim vào part mục tiêu).
+- ESP: BoxHandleAdornment + BillboardGui (đúng kiểu ESP "tiêu chuẩn" các hub BFS dùng).
+- AttackMob/ExecuteAttack/ExecuteFruitM1/ExecuteBladeHits: đánh thường + skill theo list "Skill"/"Skill  " (Z,X,C,V,F).
+- Skill available check qua IsSkillAvailable (cooldown), equip qua EquipToolByTip/EquipSelectedTool.
+- No Fog: set FogEnd = 1e10, GlobalShadows = false, ClockTime = 14.
+- No Clip Rock: tắt CanCollide của thuyền/khối đá khi ngồi thuyền.
+
+===========================================================
+8. TÍNH NĂNG NỔI BẬT THEO NHÓM
+===========================================================
+- Farm: Level (quest qua GuideModule/GetQuestInfo, No Quest/Auto Take Quest), Nearest (bán kính 1000-3000/Infinite),
+  Mastery (chọn mode Level/Bone/Cake Prince/Neareast, ngưỡng HP 10-95% để dùng skill), Boss (list boss 3 đảo +
+  Auto Attack All Boss), Material (list vật tư), Chest/Berry collection, Bones/Soul Reaper/Cake Prince/Dough King,
+  Elite Hunter, Dragon Hunter (quest rồng + Ember), Citizen Quest, Rainbow Haki, shop Haki màu.
+- Sea Event: mua thuyền, Protect Boat (sửa thuyền + né), Auto Farm Sea (Terrorshark/Shark/Piranha/Fish Crew/
+  Ghost Ship/Sea Beast, né skill), No Fog, No Clip Rock,危险等级 1-6/infinite.
+- Leviathan/Prehistoric/Kitsune/Mirage: summon + tween tới đảo, thu Azure Ember, defend Prehistoric (đập đá).
+- Upgrade Race: Auto V2, Auto V3 (CommE ActivateAbility, có notification "Killed/Target/Blacklisted"),
+  Auto V4 (SendKeyPress Y khi chưa RaceTransformed), Auto Trial, Auto Kill Player After Trial.
+- Fishing (Automation Fishing): Auto Equip Rod, Auto Fishing...
+- Misc: Raid, ESP (Player/Island/Fruit/Boss), Anti-Cheat Bypass, Team, Menu UI, Redeem (Codes_BloxFruit
+  qua loadstring+HttpGet), Water (đi dưới nước?), Remove Effects, Automations, Reset Config.
+- Level farming có check executor: Solara/Xeno -> hiện cảnh báo "không hỗ trợ, dùng Auto Farm Nearest".
+- Server Manager: ServerHop, join theo region, hop boss theo dropdown World 1/2/3.
+
+===========================================================
+9. ĐIỂM KHÁC / GIỐNG VỚI HUB MÌNH (3nn_main)
+===========================================================
+- V3: GIỐNG - cả 2 đều CommE:FireServer("ActivateAbility").
+- V4: KHÁC - SpeedHubX ấn phím Y (SendKeyPress("Y",0.1) khi chưa RaceTransformed);
+  hub mình (theo 3nn) lấy tool "Awakening" rồi RemoteFunction:InvokeServer(true).
+- Source này KHÔNG có phím Y riêng trong menu - Y chỉ là key gửi đi khi tự đánh thức.
+- Cả 2 đều dùng RegisterAttack/RegisterHit fast attack + BodyVelocity bring mob (chuẩn Blox Fruits).
+
+===========================================================
+10. LƯU Ý
+===========================================================
+- Vì là LOADER, muốn xem code UI/chức năng đầy đủ phải tải 2 file GitHub (Lib_5.5.0.lua + FuncsV3).
+- File này chứa key system + API ngoài (prvf.onrender.com) - chỉ nên dùng để THAM KHẢO, không reup key.
+- Syntax: chỉ hợp lệ trên executor Roblox (Luau): có continue và += (compile bằng Luraph, decompile ra).

@@ -1,0 +1,380 @@
+-- Anti Hook
+local v1 = false
+local v2 = iscustomcclosure or isnewcclosure
+local v3 = false
+if restorefunction then
+    if v2(restorefunction) then
+        v1 = true
+    end
+end
+local v4 = {http_request = http_request,loadstring = loadstring,oth = oth,rawget = rawget}
+if v2 then
+    if restorefunction then
+        pcall(restorefunction,v2)
+    end
+    if v2(http_request) or v2(loadstring) then
+        v1 = true
+    end
+end
+local v5 = isfunctionhooked
+v4.rawget = rawget
+if restorefunction then
+    pcall(restorefunction,rawget)
+    v4.rawget = rawget
+end
+if v5 then
+    if restorefunction then
+        pcall(restorefunction,v5)
+if oth then
+pcall(restorefunction,v4.rawget(oth,'hook'))
+pcall(restorefunction,v4.rawget(oth,'unhook'))
+pcall(restorefunction,v4.rawget(oth,'get_root_callback') or v4.rawget(oth,'getrootcallback'))
+end
+    end
+    if v5(http_request) or v5(loadstring) then
+        v1 = true
+    end
+end
+local v6 = typeof(oth) == 'table' and oth
+if v6 then
+    local v7 = v4.rawget(v6,'hook')
+    local v8 = v4.rawget(v6,'unhook')
+    local v9 = v4.rawget(v6,'get_root_callback') or v4.rawget(v6,'getrootcallback')
+    if (not v7) or (not v8) or (not v9) then
+        v1 = true
+    end
+    if v9 and not v3 then
+        v7(http_request,function(...) return v9()(...) end)
+        v4.http_request = http_request
+        v7(loadstring,function(a,b) return v9()(a,b) end)
+        v4.loadstring = loadstring
+        v3 = true
+    end
+end
+v4.oth = v6
+if makeunhookable then
+    pcall(makeunhookable,v4.http_request or http_request)
+    pcall(makeunhookable,v4.loadstring or loadstring)
+end
+if v1 then
+    game:GetService("Players").LocalPlayer:Kick("Hook Detected")
+end
+
+-- Load Data / Game
+repeat
+    wait()
+until game:IsLoaded()
+repeat
+    wait()
+until game.Players.LocalPlayer
+repeat
+    wait()
+until game.Players.LocalPlayer:FindFirstChild("DataLoaded")
+repeat
+    wait()
+until game.Players.LocalPlayer.Character
+repeat
+    wait()
+until game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+repeat
+    wait()
+until not game.Players.LocalPlayer.PlayerGui:FindFirstChild("Main (minimal)")
+
+-- Place Sea
+local Place = {}
+Place.sea1 = function()
+    return workspace:GetAttribute("MAP") == "Sea1"
+end
+Place.sea2 = function()
+    return workspace:GetAttribute("MAP") == "Sea2"
+end
+Place.sea3 = function()
+    return workspace:GetAttribute("MAP") == "Sea3"
+end
+
+function Mirage()
+    if game:GetService("Workspace").Map:FindFirstChild("MysticIsland") then
+        return true
+    else
+        return false
+    end
+end
+
+function Mob(v)
+    local z = workspace.Enemies:FindFirstChild(v)
+    if z and z:FindFirstChild("Humanoid") and z:FindFirstChild("HumanoidRootPart") and z.Humanoid.Health > 0 then
+        return z
+    end
+    local x = game:GetService("ReplicatedStorage"):FindFirstChild(v)
+    if x and x:FindFirstChild("Humanoid") and x:FindFirstChild("HumanoidRootPart") and x.Humanoid.Health > 0 then
+        return x
+    end
+end
+
+function Fruits()
+    for _, v in pairs(workspace:GetChildren()) do
+        if string.find(v.Name, "Fruit") and (v:IsA("Tool") or v:IsA("Model")) and (v.Name ~= "Fruit") then
+            return v
+        end
+    end
+    return nil
+end
+
+local HakiColors = {
+    "Winter Sky",
+    "Pure Red",
+    "Snow White"
+}
+function Haki()
+    if game.ReplicatedStorage.Remotes.CommF_:InvokeServer("ColorsDealer", "1", true) then
+        local x = game.ReplicatedStorage.Remotes.CommF_:InvokeServer("ColorsDealer", "1", true):gsub("%d+", ""):gsub("%s+$", "")
+        if table.find(HakiColors, x) then
+            return x
+        end
+    end
+end
+
+local LegendarySwords = {
+    "Saishi",
+    "Oroshi",
+    "Shizu"
+}
+function Sword()
+    local result = game.ReplicatedStorage.Remotes.CommF_:InvokeServer("LegendarySwordDealer", "1")
+    if result then
+        local x = tostring(result):gsub("%d+", ""):gsub("%s+$", "")
+        if table.find(LegendarySwords, x) then
+            return x
+        end
+    end
+end
+
+local Berrys = {
+    "Red Cherry Berry",
+    "White Cloud Berry",
+    "Pink Pig Berry"
+}
+function Berry()
+    local x = game:GetService("CollectionService"):GetTagged("BerryBush")
+    for i = 1, #x do
+        local z = x[i]
+        for _, v in pairs(z:GetAttributes()) do
+            if table.find(Berrys, v) then
+                return v
+            end
+        end
+    end
+end
+
+function Castle()
+    for _, v in { workspace.Enemies, game.ReplicatedStorage } do
+        for _, v2 in next, v:GetChildren() do
+            if v2:GetAttribute("Level") and v2:GetAttribute("Level") <= 1500 and v2:IsA("Model") and (v2:GetPivot().Position - Vector3.new(-5000, 350, -3035)).Magnitude <= 1000 then
+                return true
+            end
+        end
+    end
+    return nil
+end
+
+local RareBoss = { 'rip_indra True Form', 'Dough King', 'Cake Prince', 'Soul Reaper', 'Cursed Captain' }
+local Elite = { 'Diablo', 'Urban', 'Deandre' }
+local Sea = "Unknown"
+if Place.sea1() then
+    Sea = "First Sea"
+elseif Place.sea2() then
+    Sea = "Second Sea"
+elseif Place.sea3() then
+    Sea = "Third Sea"
+end
+local url = "http://prem-eu4.bot-hosting.net:20364/api/post"
+
+task.spawn(function()
+    while wait() do
+        if game.Players.NumPlayers < game.Players.MaxPlayers then
+            -- RareBoss
+            for i, z in pairs(RareBoss) do
+                if Mob(z) then
+                    local rb = {
+                        ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                        ["RareBoss"] = z,
+                        ["JobId"] = tostring(game.JobId),
+                        ["Sea"] = Sea,
+                        ["PlaceID"] = game.PlaceId,
+                        ["Type"] = "RareBoss"
+                    }
+                    request({
+                        Url = url,
+                        Method = 'POST',
+                        Headers = { ["Content-Type"] = "application/json" },
+                        Body = game:GetService("HttpService"):JSONEncode(rb)
+                    })
+                end
+            end
+
+            -- Elite
+            for i, x in pairs(Elite) do
+                if Mob(x) then
+                    local e = {
+                        ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                        ["Elite"] = x,
+                        ["JobId"] = tostring(game.JobId),
+                        ["Sea"] = Sea,
+                        ["PlaceID"] = game.PlaceId,
+                        ["Type"] = "Elite"
+                    }
+                    request({
+                        Url = url,
+                        Method = 'POST',
+                        Headers = { ["Content-Type"] = "application/json" },
+                        Body = game:GetService("HttpService"):JSONEncode(e)
+                    })
+                end
+            end
+
+            -- Mirage
+            if Mirage() then
+                local m = {
+                    ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                    ["Mirage"] = true,
+                    ["JobId"] = tostring(game.JobId),
+                    ["Sea"] = Sea,
+                    ["PlaceId"] = game.PlaceId,
+                    ["Type"] = "Mirage"
+                }
+                request({
+                    Url = url,
+                    Method = 'POST',
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = game:GetService("HttpService"):JSONEncode(m)
+                })
+            end
+
+            -- Fruits
+            if Fruits() then
+                local f = {
+                    ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                    ["Fruits"] = tostring(Fruits()),
+                    ["JobId"] = tostring(game.JobId),
+                    ["Sea"] = Sea,
+                    ["PlaceId"] = game.PlaceId,
+                    ["Type"] = "Fruits"
+                }
+                request({
+                    Url = url,
+                    Method = 'POST',
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = game:GetService("HttpService"):JSONEncode(f)
+                })
+            end
+
+            -- Haki
+            if Haki() then
+                local h = {
+                    ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                    ["Haki"] = Haki(),
+                    ["JobId"] = tostring(game.JobId),
+                    ["Sea"] = Sea,
+                    ["PlaceId"] = game.PlaceId,
+                    ["Type"] = "Haki"
+                }
+                request({
+                    Url = url,
+                    Method = 'POST',
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = game:GetService("HttpService"):JSONEncode(h)
+                })
+            end
+
+            -- Sword
+            if Sword() then
+                local s = {
+                    ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                    ["Sword"] = Sword(),
+                    ["JobId"] = tostring(game.JobId),
+                    ["Sea"] = Sea,
+                    ["PlaceId"] = game.PlaceId,
+                    ["Type"] = "Sword"
+                }
+                request({
+                    Url = url,
+                    Method = 'POST',
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = game:GetService("HttpService"):JSONEncode(s)
+                })
+            end
+
+            -- Berry
+            if Berry() then
+                local b = {
+                    ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                    ["Berry"] = Berry(),
+                    ["JobId"] = tostring(game.JobId),
+                    ["Sea"] = Sea,
+                    ["PlaceId"] = game.PlaceId,
+                    ["Type"] = "Berry"
+                }
+                request({
+                    Url = url,
+                    Method = 'POST',
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = game:GetService("HttpService"):JSONEncode(b)
+                })
+            end
+
+            -- Full Moon
+            if game:GetService("Lighting"):GetAttribute("MoonPhase") == 5 then
+                local fm = {
+                    ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                    ["Moon"] = "Full Moon",
+                    ["JobId"] = tostring(game.JobId),
+                    ["Sea"] = Sea,
+                    ["PlaceId"] = game.PlaceId,
+                    ["Type"] = "FullMoon"
+                }
+                request({
+                    Url = url,
+                    Method = 'POST',
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = game:GetService("HttpService"):JSONEncode(fm)
+                })
+            end
+
+            -- Near Moon
+            if game:GetService("Lighting"):GetAttribute("MoonPhase") == 4 then
+                local nm = {
+                    ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                    ["Moon"] = "Near Moon",
+                    ["JobId"] = tostring(game.JobId),
+                    ["Sea"] = Sea,
+                    ["PlaceId"] = game.PlaceId,
+                    ["Type"] = "NearMoon"
+                }
+                request({
+                    Url = url,
+                    Method = 'POST',
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = game:GetService("HttpService"):JSONEncode(nm)
+                })
+            end
+
+            -- Castle
+            if Castle() then
+                local c = {
+                    ["Players"] = game.Players.NumPlayers .. "/" .. game.Players.MaxPlayers,
+                    ["Raid"] = "Castle",
+                    ["JobId"] = tostring(game.JobId),
+                    ["Sea"] = Sea,
+                    ["PlaceId"] = game.PlaceId,
+                    ["Type"] = "Castle"
+                }
+                request({
+                    Url = url,
+                    Method = 'POST',
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = game:GetService("HttpService"):JSONEncode(c)
+                })
+            end
+        end
+    end
+end)

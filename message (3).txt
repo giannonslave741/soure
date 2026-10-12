@@ -1,0 +1,2467 @@
+repeat wait() until game:IsLoaded()
+
+getgenv().Hide_UI = true
+getgenv().LowCPU = false
+getgenv().Studio = {
+	["Sailor Piece"] = {
+		["Use Skill"] = true,
+		["Lock Fps"] = 60,
+		["Farming Drops"] = true,
+		["Change Account"] = false,
+		["Hop Server"] = false,
+		["Rejoin Time"] = 15,
+		["Items"] = {
+			["Yuji Melee"] = true,
+			["Sukuna Melee"] = true,
+			["Gojo Melee"] = true,
+			["Qin Shi Melee"] = true,
+			["Vampire King Melee"] = true,
+			["Gilgamesh Melee"] = true,
+			["Saber Alter Melee"] = true,
+			["Demon King Melee"] = true,
+			["Blessed Maiden Melee"] = true,
+			["Shinobi Melee"] = true,
+			["Moon Slayer Melee"] = true,
+			["Aizen Sword"] = true,
+			["Ichigo Sword"] = true,
+			["Shadow Sword"] = true,
+			["Slime Sword"] = true,
+			["Yamato Sword"] = true,
+			["Ice Queen Sword"] = true,
+		},
+		["If Max Level"] = {
+			["Get Full Title"] = true,
+			["Upgrade Max Rank"] = true,
+			["Upgrade Luck"] = true,
+			["Storage Race"] = true,
+			["Storage Clan"] = true,
+		},
+		["Reroll"] = {
+			["Clan"] = { "Monarch", "Eminence" },
+			["Race"] = { "Kitsune" },
+			["Trail"] = { "Emperor" },
+			["Power"] = { "Colossus", "Cursebrand" },
+			["Rune"] = { "Fortune Rune" },
+		},
+	},
+}
+
+loadstring([[
+function LPH_JIT(f) return f end
+function LPH_NO_VIRTUALIZE(f) return f end
+function LPH_JIT_MAX(f) return f end
+]])()
+
+if not getgenv().Studio then
+	getgenv().Studio = {
+		["Sailor Piece"] = {
+			["Use Skill"] = true,
+			["Lock Fps"] = 60,
+			["Farming Drops"] = true,
+			["Change Account"] = false,
+			["Hop Server"] = false,
+			["Rejoin Time"] = 15,
+			["Items"] = {
+				["Yuji Melee"] = true,
+				["Sukuna Melee"] = true,
+				["Gojo Melee"] = true,
+				["Qin Shi Melee"] = true,
+				["Vampire King Melee"] = true,
+				["Gilgamesh Melee"] = true,
+				["Saber Alter Melee"] = true,
+				["Demon King Melee"] = true,
+				["Blessed Maiden Melee"] = true,
+				["Shinobi Melee"] = true,
+				["Moon Slayer Melee"] = true,
+				["Aizen Sword"] = true,
+				["Ichigo Sword"] = true,
+				["Shadow Sword"] = true,
+				["Slime Sword"] = true,
+				["Yamato Sword"] = true,
+				["Ice Queen Sword"] = true,
+			},
+			["If Max Level"] = {
+				["Get Full Title"] = true,
+				["Upgrade Max Rank"] = true,
+				["Upgrade Luck"] = true,
+				["Storage Race"] = true,
+				["Storage Clan"] = true,
+			},
+			["Reroll"] = {
+				["Clan"] = { "Monarch", "Eminence" },
+				["Race"] = { "Kitsune" },
+				["Trail"] = { "Emperor" },
+				["Power"] = { "Colossus", "Cursebrand" },
+				["Rune"] = { "Fortune Rune" },
+			},
+		},
+	}
+end
+
+if not getgenv().Hide_UI then
+	local Players = game:GetService("Players")
+	local TweenService = game:GetService("TweenService")
+	local Lighting = game:GetService("Lighting")
+	local player = Players.LocalPlayer
+	local blur = Instance.new("BlurEffect", Lighting)
+	blur.Size = 0
+	TweenService:Create(blur, TweenInfo.new(0.5), { Size = 40 }):Play()
+	task.delay(2, function()
+		if blur then blur:Destroy() end
+	end)
+
+	local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+	screenGui.Name = "VxezeLoader"
+	screenGui.ResetOnSpawn = false
+	screenGui.IgnoreGuiInset = true
+
+	local frame = Instance.new("Frame", screenGui)
+	frame.Size = UDim2.new(1, 0, 1, 0)
+	frame.BackgroundTransparency = 1
+
+	local bg = Instance.new("Frame", frame)
+	bg.Size = UDim2.new(1, 0, 1, 0)
+	bg.BackgroundColor3 = Color3.fromRGB(5, 5, 10)
+	bg.BackgroundTransparency = 1
+	TweenService:Create(bg, TweenInfo.new(0.5), { BackgroundTransparency = 0.2 }):Play()
+
+	local gradColor = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 191, 255)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 200, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 200)),
+	})
+
+	local makeLabel = function(parent, pos, size)
+		local t = Instance.new("TextLabel", parent)
+		t.Font = Enum.Font.FredokaOne
+		t.TextColor3 = Color3.fromRGB(255, 255, 255)
+		t.TextStrokeColor3 = Color3.fromRGB(0, 100, 150)
+		t.TextStrokeTransparency = 0.3
+		t.TextTransparency = 1
+		t.BackgroundTransparency = 1
+		t.Position = pos
+		t.Size = size
+		t.TextScaled = true
+		local g = Instance.new("UIGradient", t)
+		g.Color = gradColor
+		g.Rotation = 90
+		return t
+	end
+
+	local getScale = function()
+		local s = workspace.CurrentCamera.ViewportSize
+		return math.clamp(math.min(s.X, s.Y) / 650, 0.28, 0.42)
+	end
+
+	local formatNumber = function(num)
+		if num == nil then return "0" end
+		if type(num) ~= "number" then num = tonumber(num) or 0 end
+		if num >= 1e9 then
+			local bil = num / 1e9
+			return string.format(bil == math.floor(bil) and "%.0fB" or "%.1fB", bil)
+		elseif num >= 1e6 then
+			local mil = num / 1e6
+			return string.format(mil == math.floor(mil) and "%.0fM" or "%.1fM", mil)
+		elseif num >= 1e3 then
+			local thou = num / 1e3
+			return string.format(thou == math.floor(thou) and "%.0fK" or "%.1fK", thou)
+		else
+			return tostring(num)
+		end
+	end
+
+	local logo = Instance.new("ImageLabel", frame)
+	logo.Image = "rbxassetid://104363488394469"
+	logo.BackgroundTransparency = 1
+	logo.AnchorPoint = Vector2.new(0.5, 0.5)
+	logo.Position = UDim2.new(0.5, 0, 0.4, 0)
+	logo.Size = UDim2.new(getScale(), 0, getScale(), 0)
+	logo.ImageTransparency = 1
+	Instance.new("UIAspectRatioConstraint", logo).AspectRatio = 1
+	TweenService:Create(logo, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { ImageTransparency = 0 }):Play()
+
+	local text = makeLabel(frame, UDim2.new(0.5, 0, 0.66, 0), UDim2.new(0.55, 0, 0.1, 0))
+	text.Text = "Vxeze Hub"
+	text.AnchorPoint = Vector2.new(0.5, 0.5)
+	TweenService:Create(text, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0 }):Play()
+
+	local statsContainer = Instance.new("Frame", frame)
+	statsContainer.Size = UDim2.new(0.7, 0, 0.05, 0)
+	statsContainer.Position = UDim2.new(0.5, 0, 0.8, 0)
+	statsContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+	statsContainer.BackgroundTransparency = 1
+
+	local levelText = makeLabel(statsContainer, UDim2.new(0, 0, 0, 0), UDim2.new(0.33, 0, 1, 0))
+	local gemsText = makeLabel(statsContainer, UDim2.new(0.335, 0, 0, 0), UDim2.new(0.33, 0, 1, 0))
+	local moneyText = makeLabel(statsContainer, UDim2.new(0.67, 0, 0, 0), UDim2.new(0.33, 0, 1, 0))
+
+	local lastGems, lastMoney, lastLevel
+	local updateStats = function()
+		local d = player:FindFirstChild("Data")
+		if not d then return end
+		local levelVal = d.Level.Value
+		local gemsVal = d.Gems.Value
+		local moneyVal = d.Money.Value
+		if levelVal ~= lastLevel then
+			levelText.Text = "Level: " .. tostring(levelVal)
+			lastLevel = levelVal
+		end
+		if gemsVal ~= lastGems then
+			gemsText.Text = "Gems: " .. formatNumber(gemsVal)
+			lastGems = gemsVal
+		end
+		if moneyVal ~= lastMoney then
+			moneyText.Text = "Money: " .. formatNumber(moneyVal)
+			lastMoney = moneyVal
+		end
+	end
+
+	local playerData = player:FindFirstChild("Data")
+	if playerData then
+		playerData.Level:GetPropertyChangedSignal("Value"):Connect(updateStats)
+		playerData.Gems:GetPropertyChangedSignal("Value"):Connect(updateStats)
+		playerData.Money:GetPropertyChangedSignal("Value"):Connect(updateStats)
+	end
+
+	updateStats()
+
+	local updateLoop = task.spawn(function()
+		while true do
+			task.wait(5)
+			pcall(updateStats)
+		end
+	end)
+
+	task.wait(0.2)
+	TweenService:Create(levelText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0 }):Play()
+	task.wait(0.1)
+	TweenService:Create(gemsText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0 }):Play()
+	task.wait(0.1)
+	TweenService:Create(moneyText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0 }):Play()
+
+	local discordText = Instance.new("TextLabel", frame)
+	discordText.Text = "discord.gg/ggcmEa925C"
+	discordText.Font = Enum.Font.GothamMedium
+	discordText.TextColor3 = Color3.fromRGB(150, 150, 170)
+	discordText.TextSize = 14
+	discordText.TextTransparency = 0.3
+	discordText.BackgroundTransparency = 1
+	discordText.AnchorPoint = Vector2.new(0, 1)
+	discordText.Position = UDim2.new(0.02, 0, 0.98, 0)
+	discordText.Size = UDim2.new(0.3, 0, 0.05, 0)
+	discordText.TextXAlignment = Enum.TextXAlignment.Left
+	discordText.TextScaled = true
+	task.wait(0.8)
+	TweenService:Create(discordText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0 }):Play()
+
+	if setclipboard then
+		setclipboard("discord.gg/ggcmEa925C")
+	elseif toclipboard then
+		toclipboard("discord.gg/ggcmEa925C")
+	end
+
+	screenGui.Destroying:Connect(function()
+		if updateLoop then task.cancel(updateLoop) end
+	end)
+end
+
+repeat task.wait() until game.Players.LocalPlayer
+
+if getgenv().LowCPU then
+	loadstring([[
+		local g = game
+		local l = g:GetService("Lighting")
+
+		pcall(function()
+			settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+			settings():GetService("RenderSettings").EagerBulkExecution = false
+		end)
+
+		g.DescendantAdded:Connect(function(o)
+			local c = o.ClassName
+			if c == "ParticleEmitter" or c == "Trail" then
+				o.Enabled = false
+			elseif c == "Explosion" then
+				o.BlastPressure = 0
+				o.BlastRadius = 0
+			elseif c == "Decal" or c == "Texture" then
+				o:Destroy()
+			end
+		end)
+
+		l.GlobalShadows = false
+		l.FogEnd = 9e9
+		l.Brightness = 0
+		l.EnvironmentDiffuseScale = 0
+		l.EnvironmentSpecularScale = 0
+
+		for _, v in ipairs(l:GetChildren()) do
+			if v:IsA("PostEffect") then v.Enabled = false end
+		end
+
+		workspace.ClientAnimatorThrottling = Enum.ClientAnimatorThrottlingMode.Enabled
+		workspace.InterpolationThrottling = Enum.InterpolationThrottlingMode.Enabled
+
+		local r = g.ReplicatedStorage.RemoteEvents.SettingsToggle
+		for _, v in ipairs({"DisableVFX","DisableCutscene","DisableOtherVFX","DisableScreenShake","RemoveTexture","RemoveShadows","MuteSFX","MuteMusic","DisablePvP"}) do
+			r:FireServer(v, true)
+		end
+
+		local decalsyeeted = true
+		for i, v in pairs(g:GetDescendants()) do
+			if v:IsA("Part") or v:IsA("Union") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+				v.Material = "Plastic"
+				v.Reflectance = 0
+			elseif v:IsA("Decal") or v:IsA("Texture") and decalsyeeted then
+				v.Transparency = 1
+			elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+				v.Lifetime = NumberRange.new(0)
+			elseif v:IsA("Explosion") then
+				v.BlastPressure = 1
+				v.BlastRadius = 1
+			elseif v:IsA("Fire") or v:IsA("SpotLight") or v:IsA("Smoke") then
+				v.Enabled = false
+			end
+		end
+
+		pcall(function() g.Lighting.LightingLayers:Destroy() end)
+		pcall(function() g.Lighting.Sky:Destroy() end)
+		g.Lighting.FogEnd = 9e9
+
+		for i, v in next, workspace:GetDescendants() do
+			pcall(function() v.Transparency = 1 end)
+		end
+
+		for i, v in next, getnilinstances() do
+			pcall(function()
+				v.Transparency = 1
+				for i1, v1 in next, v:GetDescendants() do
+					v1.Transparency = 1
+				end
+			end)
+		end
+
+		workspace.DescendantAdded:Connect(function(v)
+			pcall(function() v.Transparency = 1 end)
+		end)
+	]])()
+end
+
+setfpscap(getgenv().Studio["Sailor Piece"]["Lock Fps"])
+
+LPH_JIT_MAX(function()
+	local Players = game:GetService("Players")
+	local TweenService = game:GetService("TweenService")
+	local TeleportService = game:GetService("TeleportService")
+	local RS = game:GetService("ReplicatedStorage")
+	local CoreGui = game:GetService("CoreGui")
+	local Workspace = game:GetService("Workspace")
+
+	if typeof(cloneref) == "function" then
+		Players = cloneref(Players)
+		TweenService = cloneref(TweenService)
+		TeleportService = cloneref(TeleportService)
+		RS = cloneref(RS)
+		CoreGui = cloneref(CoreGui)
+		Workspace = cloneref(Workspace)
+	end
+
+	local plr = Players.LocalPlayer
+	local character = plr.Character or plr.CharacterAdded:Wait()
+	local RemoteEvents = RS:WaitForChild("RemoteEvents")
+	local Remotes = RS:WaitForChild("Remotes")
+	local AbilityRemotes = RS:WaitForChild("AbilitySystem"):WaitForChild("Remotes")
+	local CombatRemotes = RS:WaitForChild("CombatSystem"):WaitForChild("Remotes")
+	local Config = getgenv().Studio["Sailor Piece"]
+	local Hop = Config["Hop Server"]
+	local Change = Config["Change Account"]
+	local Items = Config["Items"]
+	local Maxlvl = Config["If Max Level"]
+	local Reroll = Config["Reroll"]
+	local Drops = Config["Farming Drops"]
+	local Use = Config["Use Skill"]
+
+	local tw = nil
+	local CACHED_WEAPON = nil
+	local CAN_UPSTAT = true
+	local SPAWN_POINT = nil
+	local INVENTORY_LOADED = false
+	local targetPos = nil
+	local tweens = TweenService
+	local nguoitinhcuae_Status = "Unknown"
+	local Yummytool = false
+	local lastInventoryRefresh = 0
+
+	local StatusCache = { Buso = false, Obs = false, Hogyoku = false, Slime = false, Dungeon = false, LastUpdate = 0 }
+	local nguoitinhcuae = {
+		Inventory = {
+			["Items"] = {}, ["Melee"] = {}, ["Sword"] = {}, ["Power"] = {},
+			["Accessories"] = {}, ["Runes"] = {}, ["Auras"] = {}, ["Cosmetics"] = {},
+		},
+	}
+
+	local QuestData = {
+		Thief        = { "Starter",      Vector3.new(181, 31, -155),   1  },
+		Monkey       = { "Jungle",       Vector3.new(-569, 23, 400),   3  },
+		DesertBandit = { "Desert",       Vector3.new(-795, 24, -434),  5  },
+		FrostRogue   = { "Snow",         Vector3.new(-412, 18, -991),  7  },
+		Sorcerer     = { "Shibuya",      Vector3.new(1422, 9, 376),    9  },
+		Hollow       = { "HollowIsland", Vector3.new(-354, 32, 1071),  11 },
+		Curse        = { "Shinjuku",     Vector3.new(-41, 38, -1926),  13 },
+		Slime        = { "Slime",        Vector3.new(-1182, 18, 339),  14 },
+		AcademyTeacher = { "Academy",   Vector3.new(1029, 1, 1246),   15 },
+		Swordsman    = { "Judgement",    Vector3.new(-1166, 3, -1193), 16 },
+		Quincy       = { "SoulDominion", Vector3.new(-1346, 1604, 1591), 17 },
+		Ninja        = { "Ninja",        Vector3.new(-1879, 9, -740),  18 },
+		ArenaFighter = { "Lawless",      Vector3.new(49, 0, 1809),     19 },
+	}
+
+	local BossData = {
+		YujiBoss                  = { "Shibuya",      Vector3.new(1529, 8, 198)    },
+		SukunaBoss                = { "Shibuya",      Vector3.new(1529, 8, 198)    },
+		GojoBoss                  = { "Shibuya",      Vector3.new(1529, 8, 198)    },
+		AizenBoss                 = { "HollowIsland", Vector3.new(-546, -1, 1215)  },
+		JinwooBoss                = { "Sailor",       Vector3.new(241, 8, 886)     },
+		AlucardBoss               = { "Sailor",       Vector3.new(241, 8, 886)     },
+		QuiShiBoss                = { "Boss",         Vector3.new(825, 24, -1088)  },
+		SaberBoss                 = { "Boss",         Vector3.new(825, 24, -1088)  },
+		IchigoBoss                = { "Boss",         Vector3.new(825, 24, -1088)  },
+		GilgameshBoss             = { "Boss",         Vector3.new(825, 24, -1088)  },
+		SaberAlterBoss            = { "Boss",         Vector3.new(825, 24, -1088)  },
+		BlessedMaidenBoss         = { "Boss",         Vector3.new(825, 24, -1088)  },
+		RimuruBoss_Normal         = { "Slime",        Vector3.new(391, 4, -2382)   },
+		StrongestofTodayBoss_Normal   = { "Shinjuku", Vector3.new(140, 3, -2436)   },
+		StrongestinHistoryBoss_Normal = { "Shinjuku", Vector3.new(615, 3, -2317)   },
+		AnosBoss                  = { "Academy",      Vector3.new(935, 1, 1333)    },
+		TrueAizenBoss_Normal      = { "SoulDominion", Vector3.new(-1204, 1604, 1766) },
+		StrongestShinobiBoss      = { "Ninja",        Vector3.new(-2105, 13, -596) },
+		AtomicBoss_Normal         = { "Lawless",      Vector3.new(71, 3, 1946)     },
+		YamatoBoss                = { "Judgement",    Vector3.new(-1166, 3, -1193) },
+		MoonSlayerBoss_Normal     = { "Boss",         Vector3.new(825, 24, -1088)  },
+		IceQueenBoss              = { "Boss",         Vector3.new(825, 24, -1088)  },
+	}
+
+	local swordC = { "Atomic", "Shadow Monarch", "True Aizen", "Yamato", "Escanor", "Rimuru", "Shadow", "Ichigo", "Aizen", "Ragna", "Jinwoo", "Gryphon", "Saber", "Dark Blade", "Katana" }
+	local swordN = { "Atomic", "Shadow Monarch", "True Manipulator", "Yamato", "Escanor", "Slime", "Shadow", "Soul Reaper", "Manipulator", "Ragna", "Solo Hunter", "Gryphon", "Excalibur", "Dark Blade", "Katana" }
+
+	local codes = {
+		"1MMEMBERSTYSMGUYS", "800KLIKESTYSM", "700MVISITSWOWW", "700KLIKESTYSM", "SORRYFORTHESEISSUES",
+		"SORRYFORTRADELOCK", "FREECODE", "500MVISITSWOAHH", "ICEQUEEN", "600KLIKESTY", "400MVISITSWOAHH",
+		"500KLIKESTY", "605KCCUINSANEMILESTONE", "590KCCUTYSMGUYS", "575KCCUWOWWWW", "560KCCUWEREINSANEE",
+		"545KCCULETSGO", "SORRYFORRESTARTONLYONETONIGHTT", "THEHUGE500KCCU", "TYFOR515KCCU",
+		"INSANE530KCCUTYSM", "200MVISITS", "425KCCUYAY", "SEA2NEXTUPDATE", "TYFOR115KFOLLOW",
+		"SEA2SOON", "INFINITETOWER",
+	}
+
+	local DebugPrint = LPH_JIT(function(...) print("[DEBUG]", ...) end)
+
+	local isAlive = LPH_JIT(function()
+		local char = plr.Character
+		if not char then return false end
+		local hrp = char:FindFirstChild("HumanoidRootPart")
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		return hrp and hum and hum.Health > 0
+	end)
+
+	local cancel = LPH_JIT(function()
+		if tw then
+			pcall(function() tw:Cancel() end)
+			tw = nil
+		end
+	end)
+
+	local tween = LPH_JIT_MAX(function(v, speed, high)
+		if not isAlive() then cancel(); return nil end
+		cancel()
+		local char = plr.Character
+		if not char then return nil end
+		local rootPart = char:FindFirstChild("HumanoidRootPart")
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if not rootPart or not hum then return nil end
+		hum.Sit = false
+		hum.AutoRotate = false
+		local pos
+		if typeof(v) == "Vector3" then
+			pos = Vector3.new(v.X, (high or v.Y), v.Z)
+			v = CFrame.new(pos)
+		elseif typeof(v) == "CFrame" then
+			pos = Vector3.new(v.Position.X, (high or v.Position.Y), v.Position.Z)
+			v = CFrame.new(pos) * (v - v.Position)
+		end
+		local rot = rootPart.CFrame - rootPart.Position
+		local finalCFrame = CFrame.new(pos) * rot
+		local distance = (rootPart.Position - pos).Magnitude
+		local timeCalc = distance / ((typeof(getgenv().Speed) == "number" and speed < math.huge and speed < 200) and getgenv().Speed or speed)
+		local tweeninfo = TweenInfo.new(timeCalc, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+		if targetPos then
+			tw = tweens:Create(rootPart, tweeninfo, { CFrame = CFrame.new(pos, targetPos) })
+		else
+			tw = tweens:Create(rootPart, tweeninfo, { CFrame = finalCFrame })
+		end
+		tw:Play()
+		return tw
+	end)
+
+	local Teleport = LPH_JIT(function(v)
+		pcall(function() Remotes:WaitForChild("TeleportToPortal"):FireServer(v) end)
+	end)
+
+	local UseSkill = LPH_JIT(function(a, b)
+		pcall(function()
+			AbilityRemotes:WaitForChild("RequestAbility"):FireServer(1, a)
+			AbilityRemotes:WaitForChild("RequestAbility"):FireServer(2, a)
+			if b then
+				AbilityRemotes:WaitForChild("RequestAbility"):FireServer(3, a)
+				AbilityRemotes:WaitForChild("RequestAbility"):FireServer(4, a)
+				AbilityRemotes:WaitForChild("RequestAbility"):FireServer(5, a)
+			end
+		end)
+	end)
+
+	local CheckB = LPH_JIT(function(v)
+		return workspace:FindFirstChild("NPCs") and workspace.NPCs:FindFirstChild(v) ~= nil
+	end)
+
+	local refreshInventory = LPH_JIT(function()
+		local t = os.clock()
+		if t - lastInventoryRefresh < 1.5 then return end
+		INVENTORY_LOADED = false
+		local attempts = 0
+		repeat
+			pcall(function()
+				Remotes:WaitForChild("RequestInventory"):FireServer()
+				RS:WaitForChild("Remotes"):WaitForChild("GetAccessoryEquipped"):InvokeServer()
+			end)
+			attempts = attempts + 1
+			task.wait(0.1)
+		until INVENTORY_LOADED or attempts > 30
+		if INVENTORY_LOADED then lastInventoryRefresh = os.clock() end
+	end)
+
+	local getItem = LPH_JIT(function(item_type, item_name)
+		local cat = nguoitinhcuae.Inventory[item_type]
+		if not cat then return 0 end
+		for _, v in ipairs(cat) do
+			if v.name == item_name then return v.quantity end
+		end
+		return 0
+	end)
+
+	local getItemNumber = LPH_JIT(function(item_type, item_name)
+		refreshInventory()
+		return getItem(item_type, item_name)
+	end)
+
+	local getBestWeapon = LPH_JIT(function()
+		for i = 1, #swordC do
+			local vC = swordC[i]
+			local vN = swordN[i]
+			if not character:FindFirstChild(vN) then
+				if getItem("Sword", vC) >= 1 then
+					if not plr.Backpack:FindFirstChild(vN) then
+						pcall(function() Remotes:WaitForChild("EquipWeapon"):FireServer("Equip", vC) end)
+					end
+					return vC
+				end
+			else
+				return vC
+			end
+		end
+		return "Combat"
+	end)
+
+	local EquipSword = LPH_JIT(function()
+		if not CACHED_WEAPON then CACHED_WEAPON = getBestWeapon() end
+		local idx = table.find(swordC, CACHED_WEAPON)
+		local nameN = idx and swordN[idx] or CACHED_WEAPON
+		if not character:FindFirstChild(nameN) then
+			local wp = getBestWeapon()
+			local wpIdx = table.find(swordC, wp)
+			local wpN = wpIdx and swordN[wpIdx] or wp
+			local tool = plr.Backpack:FindFirstChild(wpN)
+			if tool then
+				local hum = character:FindFirstChildOfClass("Humanoid")
+				if hum then
+					hum:EquipTool(tool)
+					CACHED_WEAPON = wp
+				end
+			end
+		end
+	end)
+
+	local getQuest = LPH_JIT_MAX(function()
+		local q = {}
+		local level = plr.Data.Level.Value
+		if level <= 249 then
+			q.QuestName = "Thief"; q.MonsterName = "Thief"; q.MonsterCFrame = Vector3.new(170, 16, -215); q.QuestId = 1; q.Teleport = "Starter"
+		elseif level <= 749 then
+			q.QuestName = "Monkey"; q.MonsterName = "Monkey"; q.MonsterCFrame = Vector3.new(-518, -1, 433); q.QuestId = 3; q.Teleport = "Jungle"
+		elseif level <= 1499 then
+			q.QuestName = "Desert Bandit"; q.MonsterName = "DesertBandit"; q.MonsterCFrame = Vector3.new(-688, -2, -458); q.QuestId = 5; q.Teleport = "Desert"
+		elseif level <= 2999 then
+			q.QuestName = "Frost Rogue"; q.MonsterName = "FrostRogue"; q.MonsterCFrame = Vector3.new(-389, -2, -946); q.QuestId = 7; q.Teleport = "Snow"
+		elseif level <= 5000 then
+			q.QuestName = "Sorcerer"; q.MonsterName = "Sorcerer"; q.MonsterCFrame = Vector3.new(1421, 9, 373); q.QuestId = 9; q.Teleport = "Shibuya"
+		elseif level <= 6250 then
+			q.QuestName = "Hollow"; q.MonsterName = "Hollow"; q.MonsterCFrame = Vector3.new(-287, -3, 1038); q.QuestId = 11; q.Teleport = "HollowIsland"
+		elseif level <= 7000 then
+			q.QuestName = "Strong Sorcerer"; q.MonsterName = "StrongSorcerer"; q.MonsterCFrame = Vector3.new(624, 2, -1613); q.QuestId = 12; q.Teleport = "Shinjuku"
+		elseif level <= 8000 then
+			q.QuestName = "Curse"; q.MonsterName = "Curse"; q.MonsterCFrame = Vector3.new(-18, 2, -1984); q.QuestId = 13; q.Teleport = "Shinjuku"
+		elseif level <= 9000 then
+			q.QuestName = "Slime Warrior"; q.MonsterName = "Slime"; q.MonsterCFrame = Vector3.new(-1185, 18, 338); q.QuestId = 14; q.Teleport = "Slime"
+		elseif level <= 10000 then
+			q.QuestName = "Academy Challenge"; q.MonsterName = "AcademyTeacher"; q.MonsterCFrame = Vector3.new(1028, 1, 1244); q.QuestId = 15; q.Teleport = "Academy"
+		elseif level <= 10750 then
+			q.QuestName = "Blade Master"; q.MonsterName = "Swordsman"; q.MonsterCFrame = Vector3.new(-1166, 3, -1191); q.QuestId = 16; q.Teleport = "Judgement"
+		elseif level <= 11500 then
+			q.QuestName = "Quincy Purge"; q.MonsterName = "Quincy"; q.MonsterCFrame = Vector3.new(-1407, 1603, 1644); q.QuestId = 17; q.Teleport = "SoulDominion"
+		elseif level <= 12000 then
+			q.QuestName = "Ninja Slayer"; q.MonsterName = "Ninja"; q.MonsterCFrame = Vector3.new(-1787, 7, -742); q.QuestId = 18; q.Teleport = "Ninja"
+		elseif level <= 99999 then
+			q.QuestName = "Arena Takedown"; q.MonsterName = "ArenaFighter"; q.MonsterCFrame = Vector3.new(67, -1, 1761); q.QuestId = 19; q.Teleport = "Lawless"
+		end
+		return q
+	end)
+
+	local takeQuest = LPH_JIT(function(a)
+		if not a then return end
+		local questUI = plr.PlayerGui:WaitForChild("QuestUI"):WaitForChild("Quest")
+		if questUI.Visible then
+			pcall(function() RemoteEvents:WaitForChild("QuestAbandon"):FireServer("repeatable") end)
+		end
+		pcall(function() RemoteEvents:WaitForChild("QuestAccept"):FireServer("QuestNPC" .. a) end)
+	end)
+
+	local GetQ = LPH_JIT(function()
+		local questUI = plr.PlayerGui:WaitForChild("QuestUI"):WaitForChild("Quest")
+		if questUI.Visible then return questUI.Quest.Holder.Content.QuestInfo.QuestTitle.QuestTitle.Text end
+		return ""
+	end)
+
+	local GetT = LPH_JIT(function()
+		local questUI = plr.PlayerGui:WaitForChild("QuestUI"):WaitForChild("Quest")
+		if questUI.Visible then return questUI.Quest.Holder.Content.QuestInfo.QuestRequirement.Text end
+		return ""
+	end)
+
+	local Clear = LPH_JIT_MAX(function(a, b)
+		for _, v in next, workspace.NPCs:GetChildren() do
+			if v.Name:find(a) and (not v.Name:find("Boss") or b) and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 and not v.Name:find("Dummy") then
+				if not v.PrimaryPart and v.Humanoid and b then
+					repeat task.wait(); tween(v:GetPivot(), 150) until v.PrimaryPart
+				end
+						repeat
+					task.wait()
+					if not v or not v.PrimaryPart or not v:FindFirstChild("Humanoid") then break end
+					targetPos = v.PrimaryPart.CFrame.Position
+					if v.PrimaryPart.Anchored == false then v.PrimaryPart.Anchored = true end
+					EquipSword()
+					pcall(function()
+						if StatusCache.Buso and character:FindFirstChild("Right Arm") and character["Right Arm"].Color ~= Color3.new(0, 0, 0) then
+							RemoteEvents:WaitForChild("HakiRemote"):FireServer("Toggle")
+						end
+					end)
+					if not v or not v.PrimaryPart then break end
+					tween(v.PrimaryPart.CFrame * CFrame.new(0, 20, 0), 170)
+					if not v or not v.PrimaryPart then break end
+					if plr:DistanceFromCharacter(v.PrimaryPart.Position) <= 50 then
+						if not b then
+							for _, v2 in next, workspace.NPCs:GetChildren() do
+								if v2.Name:find(a) and v2.PrimaryPart and plr:DistanceFromCharacter(v2.PrimaryPart.Position) <= 60 and v2.Humanoid.Health > 0 then
+									pcall(function() CombatRemotes:WaitForChild("RequestHit"):FireServer(v2.PrimaryPart.CFrame.Position) end)
+									if Use then UseSkill(v2.PrimaryPart.CFrame.Position) end
+									pcall(function() CombatRemotes:WaitForChild("RequestHit"):FireServer(v2.PrimaryPart.CFrame.Position) end)
+								end
+							end
+						else
+							if v and v.PrimaryPart then
+								pcall(function() CombatRemotes:WaitForChild("RequestHit"):FireServer(v.PrimaryPart.CFrame.Position) end)
+								if Use then UseSkill(v.PrimaryPart.CFrame.Position, true) end
+								pcall(function() CombatRemotes:WaitForChild("RequestHit"):FireServer(v.PrimaryPart.CFrame.Position) end)
+							end
+						end
+					end
+				until not v or not v.PrimaryPart or not v.Humanoid or v.Humanoid.Health == 0 or (not plr.PlayerGui.QuestUI.Quest.Visible and not b)
+			end
+		end
+	end)
+
+	local NearMob = LPH_JIT(function(Mob)
+		local d = QuestData[Mob]
+		if not d then return end
+		if plr:DistanceFromCharacter(d[2]) >= 320 then Teleport(d[1]) end
+		local questUI = plr.PlayerGui:WaitForChild("QuestUI"):WaitForChild("Quest")
+		if not questUI.Visible then
+			takeQuest(d[3])
+			task.wait(1)
+		end
+		Clear(Mob)
+	end)
+
+	local NearBoss = LPH_JIT(function(Boss)
+		local d = BossData[Boss]
+		if not d then return end
+		if plr:DistanceFromCharacter(d[2]) >= 300 then Teleport(d[1]) end
+		Clear(Boss, true)
+	end)
+
+	local FarmItem = LPH_JIT(function(a, b)
+		pcall(function() RemoteEvents:WaitForChild("QuestAbandon"):FireServer("repeatable") end)
+		local attempts = 0
+		repeat
+			task.wait(0.5)
+			NearMob("ArenaFighter")
+			attempts = attempts + 1
+		until getItem("Items", a) >= b or attempts > 1000
+	end)
+
+	local FarmCurrency = LPH_JIT(function(a, b)
+		pcall(function() RemoteEvents:WaitForChild("QuestAbandon"):FireServer("repeatable") end)
+		local attempts = 0
+		repeat
+			task.wait(0.5)
+			NearMob("ArenaFighter")
+			attempts = attempts + 1
+		until plr.Data[a].Value >= b or attempts > 1000
+	end)
+
+	local UpdateBusoStatus = LPH_JIT(function()
+		local StatusBuso = nil
+		local connection = nil
+		pcall(function()
+			connection = RemoteEvents:WaitForChild("HakiRemote").OnClientEvent:Once(function(a, b)
+				if a == "Status" then StatusBuso = b end
+			end)
+			RemoteEvents:WaitForChild("HakiRemote"):FireServer("GetStatus")
+		end)
+		local startTime = os.clock()
+		while os.clock() - startTime < 2 do
+			if StatusBuso ~= nil then break end
+			task.wait(0.05)
+		end
+		if connection then connection:Disconnect() end
+		StatusCache.Buso = StatusBuso and StatusBuso.hasHaki
+		return StatusCache.Buso
+	end)
+
+	local UpdateObsStatus = LPH_JIT(function()
+		local StatusObs = nil
+		local connection = nil
+		pcall(function()
+			connection = RemoteEvents:WaitForChild("ObservationHakiRemote").OnClientEvent:Once(function(s, d)
+				if s == "Status" then StatusObs = d end
+			end)
+			RemoteEvents:WaitForChild("ObservationHakiRemote"):FireServer("GetStatus")
+		end)
+		local startTime = os.clock()
+		while os.clock() - startTime < 2 do
+			if StatusObs ~= nil then break end
+			task.wait(0.05)
+		end
+		if connection then connection:Disconnect() end
+		StatusCache.Obs = StatusObs and StatusObs.hasObsHaki
+		return StatusCache.Obs
+	end)
+
+	local UpdateHogyokuStatus = LPH_JIT(function()
+		local checkRemote = Remotes:FindFirstChild("CheckPortalUnlock")
+		if not checkRemote then StatusCache.Hogyoku = false; return false end
+		local success, result = pcall(function() return checkRemote:InvokeServer("SoulDominion") end)
+		StatusCache.Hogyoku = success and result == true
+		return StatusCache.Hogyoku
+	end)
+
+	local UpdateSlimeStatus = LPH_JIT(function()
+		pcall(function() Remotes:WaitForChild("RequestSlimeCraft"):InvokeServer("SlimeKey", 1) end)
+		task.wait(0.3)
+		local playerGui = plr:WaitForChild("PlayerGui")
+		for _, v in ipairs(playerGui:GetDescendants()) do
+			if v:IsA("TextLabel") or v:IsA("TextButton") then
+				local text = string.lower(v.Text)
+				if text:find("obtained") or (text:find("missing") and text:find("slime")) then
+					StatusCache.Slime = true
+					return true
+				end
+			end
+		end
+		StatusCache.Slime = false
+		return false
+	end)
+
+	local UpdateDungeonStatus = LPH_JIT(function()
+		pcall(function() Remotes:WaitForChild("RequestDungeonPortal"):FireServer("RuneDungeon") end)
+		task.wait(0.3)
+		local playerGui = plr:WaitForChild("PlayerGui")
+		for _, v in ipairs(playerGui:GetDescendants()) do
+			if v:IsA("TextLabel") or v:IsA("TextButton") then
+				local text = string.lower(v.Text)
+				if text:find("haven't unlocked dungeons") or text:find("have not unlocked dungeons") or text:find("you need level") then
+					pcall(function() Remotes:WaitForChild("LeaveDungeonPortal"):FireServer() end)
+					StatusCache.Dungeon = false
+					return false
+				end
+			end
+		end
+		pcall(function() Remotes:WaitForChild("LeaveDungeonPortal"):FireServer() end)
+		StatusCache.Dungeon = true
+		return true
+	end)
+
+	local UpdateAllStatus = LPH_JIT(function()
+		local currentTime = os.clock()
+		if currentTime - StatusCache.LastUpdate < 5 then return end
+		StatusCache.LastUpdate = currentTime
+		UpdateBusoStatus(); task.wait(0.1)
+		UpdateObsStatus(); task.wait(0.1)
+		UpdateHogyokuStatus(); task.wait(0.1)
+		UpdateSlimeStatus(); task.wait(0.1)
+		UpdateDungeonStatus()
+	end)
+
+	local checkStorageNeedsSlot = function(prefix, count)
+		local ok, sd = pcall(function() return RS.Remotes.GetStorageData:InvokeServer() end)
+		if not ok or not sd then return false end
+		local us = sd.UnlockedSlots or {}
+		for i = 1, count do
+			if not us[prefix .. i] then return true end
+		end
+		return false
+	end
+
+	local tryBuyStorageSlots = function(prefix, gems, slots)
+		if plr.Data.Gems.Value < gems then return false end
+		local ok, sd = pcall(function() return RS.Remotes.GetStorageData:InvokeServer() end)
+		if not ok or not sd then return false end
+		local bought = false
+		for i = 1, slots do
+			local key = prefix .. i
+			if not sd.UnlockedSlots[key] then
+				RS.Remotes.StorageBuySlot:FireServer(key)
+				task.wait(1)
+				bought = true
+			end
+		end
+		return bought
+	end
+
+	local tryStoreItem = function(prefix, slots)
+		local ok, sd = pcall(function() return RS.Remotes.GetStorageData:InvokeServer() end)
+		if not ok or not sd then return end
+		for i = 1, slots do
+			local key = prefix .. i
+			if not sd.StoredItems[key] then
+				RS.Remotes.StorageStoreItem:FireServer(key)
+				return
+			end
+		end
+	end
+
+	local BossFarm = LPH_JIT_MAX(function()
+		for v, _ in pairs(BossData) do
+			if CheckB(v) then
+				NearBoss(v)
+				return
+			end
+		end
+		local boss_key = getItem("Items", "Boss Key")
+		if boss_key > 0 then
+			if plr.Data.Money.Value >= 100000 then
+				if plr.Data.Gems.Value >= 175 then
+					if plr:DistanceFromCharacter(Vector3.new(825, 24, -1088)) >= 300 then Teleport("Boss") end
+					pcall(function() Remotes:WaitForChild("RequestSummonBoss"):FireServer("SaberBoss") end)
+				else
+					FarmCurrency("Gems", 350)
+				end
+			else
+				FarmCurrency("Money", 200000)
+			end
+		else
+			local success, stock = pcall(function()
+				return Remotes:WaitForChild("MerchantRemotes"):WaitForChild("GetMerchantStock"):InvokeServer()
+			end)
+			if success and stock then
+				for i, v in pairs(stock) do
+					if i == "Boss Key" or i == "Race Reroll" or i == "Passive Shard" or i == "Trait Reroll" or i == "Clan Reroll" then
+						local amount = math.floor(plr.Data.Gems.Value / v.price)
+						if amount > 0 then
+							pcall(function() Remotes:WaitForChild("MerchantRemotes"):WaitForChild("PurchaseMerchantItem"):InvokeServer(i, amount) end)
+						end
+						break
+					end
+				end
+			end
+			NearMob("ArenaFighter")
+		end
+	end)
+
+	local QuestGojov1 = LPH_JIT_MAX(function()
+		if getItem("Melee", "Gojo") >= 1 then return end
+		local currentQ = GetQ()
+		if currentQ == "Limitless Sorcerer Training 1" then
+			NearMob("Thief")
+		elseif currentQ == "Limitless Sorcerer Training 2" then
+				EquipSword()
+			pcall(function()
+				AbilityRemotes:WaitForChild("RequestAbility"):FireServer(1)
+				AbilityRemotes:WaitForChild("RequestAbility"):FireServer(2)
+				AbilityRemotes:WaitForChild("RequestAbility"):FireServer(3)
+			end)
+		elseif currentQ == "Limitless Sorcerer Training Final" then
+				if CheckB("GojoBoss") then
+				NearBoss("GojoBoss")
+			elseif Hop then
+				pcall(function() TeleportService:Teleport(77747658251236) end)
+			else
+				NearMob("ArenaFighter")
+			end
+			if not plr.PlayerGui.QuestUI.Quest.Visible then
+						tween(Vector3.new(1740, 157, 516), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.GojoMovesetNPC.HumanoidRootPart.QuestPrompt)
+			end
+		else
+				tween(Vector3.new(1740, 157, 516), 150).Completed:Wait()
+			fireproximityprompt(workspace.ServiceNPCs.GojoMovesetNPC.HumanoidRootPart.QuestPrompt)
+		end
+	end)
+
+	local Aizenv1 = LPH_JIT_MAX(function()
+		if getItem("Sword", "Aizen") >= 1 then return end
+		local currentQ = GetQ()
+		if currentQ == "Manipulator Training 1" then
+			NearMob("Hollow")
+		elseif currentQ == "Manipulator Training 2" then
+				BossFarm()
+		elseif currentQ == "Manipulator Training 3" then
+			local wf = getItem("Items", "Worthiness Fragment")
+				if wf > 0 then
+				pcall(function() Remotes:WaitForChild("UseItem"):FireServer("Use", "Worthiness Fragment", 1, true) end)
+			else
+				NearMob("Hollow")
+			end
+		elseif currentQ == "Manipulator Training 4" then
+				BossFarm()
+		elseif currentQ == "Manipulator Training Final" then
+				if CheckB("AizenBoss") then
+				NearBoss("AizenBoss")
+			elseif Hop then
+				pcall(function() TeleportService:Teleport(77747658251236) end)
+			else
+				NearMob("ArenaFighter")
+			end
+			if not plr.PlayerGui.QuestUI.Quest.Visible then
+						tween(Vector3.new(-344, 13, 1403), 150).Completed:Wait()
+				task.wait(0.5)
+				fireproximityprompt(workspace.ServiceNPCs.AizenMovesetNPC.HumanoidRootPart.QuestPrompt)
+			end
+		else
+				tween(Vector3.new(-344, 13, 1403), 150).Completed:Wait()
+			task.wait(0.5)
+			fireproximityprompt(workspace.ServiceNPCs.AizenMovesetNPC.HumanoidRootPart.QuestPrompt)
+		end
+	end)
+
+	local Aizenv2 = LPH_JIT_MAX(function()
+		if getItem("Sword", "True Aizen") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local TranscendentBeing = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Transcendent Being" then TranscendentBeing = true; break end
+			end
+		end
+		local ItemsAizen = getItem("Items","Fusion Ring") >= 15 and getItem("Items","Divinity Essence") >= 8 and getItem("Items","Transcendent Core") >= 3 and getItem("Items","Evolution Fragment") >= 1
+		if TranscendentBeing and ItemsAizen then
+			RS.RemoteEvents.TitleEquip:FireServer("Transcendent Being")
+			if getItem("Items","Chrysalis Sigil") >= 70 then
+				if plr.Data.Gems.Value >= 35000 then
+								if plr:DistanceFromCharacter(Vector3.new(-1463, 1604, 1853)) >= 300 then Teleport("SoulDominion") end
+					tween(Vector3.new(-1463, 1604, 1853), 150).Completed:Wait()
+					fireproximityprompt(workspace.ServiceNPCs.TrueAizenBuyerNPC.HumanoidRootPart.BuyerPrompt)
+				else
+								BossFarm()
+				end
+			else
+						NearMob("Quincy")
+			end
+		else
+				if CheckB("TrueAizenBoss_Normal") then
+				NearBoss("TrueAizenBoss_Normal")
+			else
+				if getItem("Items","Chrysalis Sigil") >= 1 then
+					RS:WaitForChild("RemoteEvents"):WaitForChild("RequestSpawnTrueAizen"):FireServer("Normal")
+				else
+					NearMob("Quincy")
+				end
+			end
+		end
+	end)
+
+	local Anos = LPH_JIT_MAX(function()
+		if getItem("Melee", "Anos") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local DemonKing = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Demon King" then DemonKing = true; break end
+			end
+		end
+		local ItemsDemonKing = getItem("Items","Demonic Fragments") >= 12 and getItem("Items","Demonic Shard") >= 6 and getItem("Items","Destruction Eye") >= 2 and getItem("Items","Imperial Mask") >= 1
+		if DemonKing and ItemsDemonKing then
+			RS.RemoteEvents.TitleEquip:FireServer("Demon King")
+			if getItem("Items","Calamity Seal") >= 65 then
+						if plr:DistanceFromCharacter(Vector3.new(973, 75, 1511)) >= 300 then Teleport("Academy") end
+				tween(Vector3.new(973, 75, 1511), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.AnosBuyerNPC.HumanoidRootPart.BuyerPrompt)
+			else
+						NearMob("AcademyTeacher")
+			end
+		else
+				if CheckB("AnosBoss") then
+				NearBoss("AnosBoss")
+			else
+				if getItem("Items","Calamity Seal") >= 1 then
+					RS:WaitForChild("Remotes"):WaitForChild("RequestSpawnAnosBoss"):FireServer("Anos", "Normal")
+				else
+					NearMob("AcademyTeacher")
+				end
+			end
+		end
+	end)
+
+	local ShinobiMelee = LPH_JIT_MAX(function()
+		if getItem("Melee", "Strongest Shinobi") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local BattlefieldWarlord = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Battlefield Warlord" then BattlefieldWarlord = true; break end
+			end
+		end
+		local ItemsShinobi = getItem("Items","Battle Sigil") >= 8 and getItem("Items","Power Remnant") >= 15 and getItem("Items","Eternal Core") >= 3 and getItem("Items","Path Fragment") >= 1
+		if BattlefieldWarlord and ItemsShinobi then
+			RS.RemoteEvents.TitleEquip:FireServer("Battlefield Warlord")
+			if plr.Data.Gems.Value >= 40000 then
+						if plr:DistanceFromCharacter(Vector3.new(-1774, 6, -386)) >= 300 then Teleport("Ninja") end
+				tween(Vector3.new(-1774, 6, -386), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.StrongestShinobiBuyerNPC.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if CheckB("StrongestShinobiBoss") then
+				NearBoss("StrongestShinobiBoss")
+			elseif Hop then
+				pcall(function() TeleportService:Teleport(77747658251236) end)
+			else
+				NearMob("Ninja")
+			end
+		end
+	end)
+
+	local SaberMelee = LPH_JIT_MAX(function()
+		if getItem("Melee", "Saber Alter") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local CorruptTyrant = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Corrupt Tyrant" then CorruptTyrant = true; break end
+			end
+		end
+		local ItemsSaber = getItem("Items","Alter Essence") >= 8 and getItem("Items","Morgan Remnant") >= 15 and getItem("Items","Corruption Core") >= 3 and getItem("Items","Corrupt Crown") >= 1
+		if CorruptTyrant and ItemsSaber then
+			RS.RemoteEvents.TitleEquip:FireServer("Corrupt Tyrant")
+			if getItem("Items","Dark Grail") >= 25 and plr.Data.Gems.Value >= 35000 then
+						if plr:DistanceFromCharacter(Vector3.new(857, 61, -1015)) >= 300 then Teleport("Boss") end
+				tween(Vector3.new(857, 61, -1015), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.SaberAlterBuyerNPC.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if CheckB("SaberAlterBoss") then
+				NearBoss("SaberAlterBoss")
+			else
+				if getItem("Items","Dark Grail") >= 1 and plr.Data.Money.Value >= 650000 and plr.Data.Gems.Value >= 650 then
+					pcall(function() RS:WaitForChild("Remotes"):WaitForChild("RequestSummonBoss"):FireServer("SaberAlterBoss", "Normal") end)
+				else
+					NearMob("ArenaFighter")
+				end
+			end
+		end
+	end)
+
+	local BlessedMelee = LPH_JIT_MAX(function()
+		if getItem("Melee", "Blessed Maiden") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local AstralEmpress = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Astral Empress" then AstralEmpress = true; break end
+			end
+		end
+		local ItemsAstral = getItem("Items","Gale Essence") >= 8 and getItem("Items","Tide Remnant") >= 14 and getItem("Items","Aero Core") >= 3 and getItem("Items","Celestial Mark") >= 1
+		if AstralEmpress and ItemsAstral then
+			RS.RemoteEvents.TitleEquip:FireServer("Astral Empress")
+			if getItem("Items","Tempest Relic") >= 25 and plr.Data.Gems.Value >= 32500 then
+						if plr:DistanceFromCharacter(Vector3.new(909, 9, -1184)) >= 300 then Teleport("Boss") end
+				tween(Vector3.new(909, 9, -1184), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.BlessedMaidenBuyerNPC.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if CheckB("BlessedMaidenBoss") then
+				NearBoss("BlessedMaidenBoss")
+			else
+				if getItem("Items","Tempest Relic") >= 1 and plr.Data.Money.Value >= 600000 and plr.Data.Gems.Value >= 600 then
+					pcall(function() RS:WaitForChild("Remotes"):WaitForChild("RequestSummonBoss"):FireServer("BlessedMaidenBoss", "Normal") end)
+				else
+					NearMob("ArenaFighter")
+				end
+			end
+		end
+	end)
+
+	local IceQueenSword = LPH_JIT_MAX(function()
+		if getItem("Sword", "Ice Queen") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local FrostEmpress = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Frost Empress" then FrostEmpress = true; break end
+			end
+		end
+		local ItemsFrost = getItem("Items","Glacier Essence") >= 9 and getItem("Items","Battle Shard") >= 17 and getItem("Items","Frozen Brand") >= 4 and getItem("Items","Ice Core") >= 1
+		if FrostEmpress and ItemsFrost then
+			RS.RemoteEvents.TitleEquip:FireServer("Frost Empress")
+			if getItem("Items","Frost Relic") >= 25 and plr.Data.Gems.Value >= 40000 then
+						if plr:DistanceFromCharacter(Vector3.new(928, 11, -1138)) >= 300 then Teleport("Boss") end
+				tween(Vector3.new(928, 11, -1138), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.IceQueenSeller.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if CheckB("IceQueenBoss") then
+				NearBoss("IceQueenBoss")
+			else
+				if getItem("Items","Frost Relic") >= 1 and plr.Data.Money.Value >= 750000 and plr.Data.Gems.Value >= 750 then
+					pcall(function() RS:WaitForChild("Remotes"):WaitForChild("RequestSummonBoss"):FireServer("IceQueenBoss", "Normal") end)
+				else
+					NearMob("ArenaFighter")
+				end
+			end
+		end
+	end)
+
+	local GilgameshMelee = LPH_JIT_MAX(function()
+		if getItem("Melee", "Gilgamesh") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local GoldenKing = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Golden King" then GoldenKing = true; break end
+			end
+		end
+		local ItemsGolden = getItem("Items","Ancient Shard") >= 6 and getItem("Items","Throne Remnant") >= 12 and getItem("Items","Golden Essence") >= 3 and getItem("Items","Phantasm Core") >= 1
+		if GoldenKing and ItemsGolden then
+			RS.RemoteEvents.TitleEquip:FireServer("Golden King")
+			if plr.Data.Money.Value >= 25000000 and plr.Data.Gems.Value >= 22500 then
+						if plr:DistanceFromCharacter(Vector3.new(843, 65, -1005)) >= 300 then Teleport("Boss") end
+				tween(Vector3.new(843, 65, -1005), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.GilgameshBuyerNPC.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if CheckB("GilgameshBoss") then
+				NearBoss("GilgameshBoss")
+			else
+				if getItem("Items","Divine Grail") >= 1 and plr.Data.Money.Value >= 500000 and plr.Data.Gems.Value >= 500 then
+					RS.Remotes.RequestSummonBoss:FireServer("GilgameshBoss", "Normal")
+				else
+					local broken_sword = getItem("Items","Broken Sword")
+					if broken_sword >= 3 then
+						RS.Remotes.RequestGrailCraft:InvokeServer("DivineGrail", 1)
+					else
+						NearMob("ArenaFighter")
+					end
+				end
+			end
+		end
+	end)
+
+	local MoonSlayer = LPH_JIT_MAX(function()
+		if getItem("Melee", "Moon Slayer") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local SixEyedDemon = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Six Eyed Demon" then SixEyedDemon = true; break end
+			end
+		end
+		local ItemsSixEyedDemon = getItem("Items","Upper Seals") >= 25 and getItem("Items","Lunar Essence") >= 9 and getItem("Items","Demon Remnants") >= 16 and getItem("Items","Crescent Shards") >= 4 and getItem("Items","Moon Crest") >= 1
+		if SixEyedDemon and ItemsSixEyedDemon then
+			RS.RemoteEvents.TitleEquip:FireServer("Six Eyed Demon")
+			if plr.Data.Gems.Value >= 37500 then
+						if plr:DistanceFromCharacter(Vector3.new(823, 10, -1244)) >= 300 then Teleport("Boss") end
+				tween(Vector3.new(823, 10, -1244), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.MoonSlayerSeller.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if CheckB("MoonSlayerBoss_Normal") then
+				NearBoss("MoonSlayerBoss_Normal")
+			else
+				if getItem("Items","Upper Seal") >= 1 and plr.Data.Money.Value >= 700000 and plr.Data.Gems.Value >= 700 then
+					pcall(function() RS:WaitForChild("Remotes"):WaitForChild("RequestSummonBoss"):FireServer("MoonSlayerBoss", "Normal") end)
+				else
+					NearMob("ArenaFighter")
+				end
+			end
+		end
+	end)
+
+	local Alucard = LPH_JIT_MAX(function()
+		if getItem("Melee", "Alucard") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local VampireKing = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Vampire King" then VampireKing = true; break end
+			end
+		end
+		local ItemsVampireKing = getItem("Items","Soul Amulet") >= 5 and getItem("Items","Blood Ring") >= 1 and getItem("Items","Casull") >= 1
+		if VampireKing and ItemsVampireKing then
+			RS.RemoteEvents.TitleEquip:FireServer("Vampire King")
+			if plr.Data.Gems.Value >= 10000 and plr.Data.Money.Value >= 6500000 then
+						if plr:DistanceFromCharacter(Vector3.new(473, 3, 1038)) >= 300 then Teleport("Sailor") end
+				tween(Vector3.new(473, 3, 1038), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.AlucardBuyer.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if CheckB("AlucardBoss") then
+				NearBoss("AlucardBoss")
+			elseif Hop then
+				pcall(function() TeleportService:Teleport(77747658251236) end)
+			else
+				NearMob("AcademyTeacher")
+			end
+		end
+	end)
+
+	local QuestShadowCidv1 = LPH_JIT_MAX(function()
+		if getItem("Sword", "Shadow") >= 1 then return end
+		local playerRace = nil
+		pcall(function()
+			local statsData = RemoteEvents:WaitForChild("GetPlayerStats"):InvokeServer()
+			if statsData and statsData.Inventory and statsData.Inventory.Equipped then
+				playerRace = statsData.Inventory.Equipped.Race
+			end
+		end)
+		local ItemsShadow = getItem("Items","Shadow Essence") >= 4 and getItem("Items","Atomic Core") >= 1 and getItem("Items","Umbral Capsule") >= 20 and getItem("Items","Void Seed") >= 8
+		if ItemsShadow and playerRace ~= "Shadowborn" then
+			if plr.Data.Gems.Value >= 15000 and plr.Data.Money.Value >= 10000000 then
+						if plr:DistanceFromCharacter(Vector3.new(1425, 49, -974)) >= 300 then Teleport("Dungeon") end
+				tween(Vector3.new(1425, 49, -974), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.CidBuyer.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if getItem("Items","Dungeon Key") >= 1 then
+				if plr:DistanceFromCharacter(Vector3.new(1417, 2, -924)) >= 300 then Teleport("Dungeon") end
+				pcall(function()
+					if typeof(writefile) == "function" then writefile(plr.Name .. "Dungeon_Diff.txt", "Hard") end
+					Remotes:WaitForChild("RequestDungeonPortal"):FireServer("CidDungeon")
+				end)
+				task.wait(60)
+			else
+				NearMob("ArenaFighter")
+			end
+		end
+	end)
+
+	local QuestShadowCidv2 = LPH_JIT_MAX(function()
+		if getItem("Sword", "Atomic") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local EminenceIncarnate = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Eminence Incarnate" then EminenceIncarnate = true; break end
+			end
+		end
+		local ItemsEminenceIncarnate = getItem("Items","Magic Shard") >= 16 and getItem("Items","Shadow Remnant") >= 9 and getItem("Items","Eminence Essence") >= 3 and getItem("Items","Atomic Omen") >= 1
+		if EminenceIncarnate and ItemsEminenceIncarnate then
+			RS.RemoteEvents.TitleEquip:FireServer("Eminence Incarnate")
+			if getItem("Items","Abyss Sigil") >= 80 then
+				if plr.Data.Gems.Value >= 45000 then
+								if plr:DistanceFromCharacter(Vector3.new(-173, 4, 1973)) >= 300 then Teleport("Lawless") end
+					tween(Vector3.new(-173, 4, 1973), 150).Completed:Wait()
+					fireproximityprompt(workspace.ServiceNPCs.AtomicBuyer.HumanoidRootPart.BuyerPrompt)
+				else
+								BossFarm()
+				end
+			else
+						NearMob("ArenaFighter")
+			end
+		else
+				if CheckB("AtomicBoss_Normal") then
+				NearBoss("AtomicBoss_Normal")
+			else
+				if getItem("Items","Abyss Sigil") >= 1 then
+					pcall(function() RemoteEvents:WaitForChild("RequestSpawnAtomic"):FireServer("Normal") end)
+				else
+					NearMob("ArenaFighter")
+				end
+			end
+		end
+	end)
+
+	local QuestGojov2 = LPH_JIT_MAX(function()
+		if getItem("Melee", "Strongest Of Today") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local StrongestSorcerer = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Strongest Sorcerer" then StrongestSorcerer = true; break end
+			end
+		end
+		local ItemsGojo = getItem("Items","Reversal Pulse") >= 9 and getItem("Items","Blue Singularity") >= 3 and getItem("Items","Infinity Essence") >= 1 and getItem("Items","Six Eye") >= 6
+		if StrongestSorcerer and ItemsGojo then
+			RS.RemoteEvents.TitleEquip:FireServer("Strongest Sorcerer")
+			RS:WaitForChild("Remotes"):WaitForChild("UseItem"):FireServer("Use", "Six Eye", 6, true)
+				if plr:DistanceFromCharacter(Vector3.new(95, 152, -2634)) >= 300 then Teleport("Shinjuku") end
+			tween(Vector3.new(95, 152, -2634), 150).Completed:Wait()
+			fireproximityprompt(workspace.ServiceNPCs.StrongestofTodayBuyerNPC.HumanoidRootPart.BuyerPrompt)
+		else
+				if CheckB("StrongestofTodayBoss_Normal") then
+				NearBoss("StrongestofTodayBoss_Normal")
+			else
+				if getItem("Items","Limitless Key") >= 1 then
+					pcall(function() Remotes:WaitForChild("RequestSpawnStrongestBoss"):FireServer("StrongestToday", "Normal") end)
+				elseif CheckB("GojoBoss") then
+					NearBoss("GojoBoss")
+				elseif Hop then
+					pcall(function() TeleportService:Teleport(77747658251236) end)
+				else
+					NearMob("ArenaFighter")
+				end
+			end
+		end
+	end)
+
+	local QuestSukunav2 = LPH_JIT_MAX(function()
+		if getItem("Melee", "Strongest In History") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local DisgracedOne = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Disgraced One" then DisgracedOne = true; break end
+			end
+		end
+		local ItemsSukuna = getItem("Items","Vessel Ring") >= 7 and getItem("Items","Malevolent Soul") >= 3 and getItem("Items","Cursed Flesh") >= 1 and getItem("Items","Awakened Cursed Finger") >= 20
+		if DisgracedOne and ItemsSukuna then
+			RS.RemoteEvents.TitleEquip:FireServer("Disgraced One")
+			RS:WaitForChild("Remotes"):WaitForChild("UseItem"):FireServer("Use", "Awakened Cursed Finger", 20, true)
+				if plr:DistanceFromCharacter(Vector3.new(757, 90, -1957)) >= 300 then Teleport("Shinjuku") end
+			tween(Vector3.new(757, 90, -1957), 150).Completed:Wait()
+			fireproximityprompt(workspace.ServiceNPCs.StrongestinHistoryBuyerNPC.HumanoidRootPart.BuyerPrompt)
+		else
+				if CheckB("StrongestinHistoryBoss_Normal") then
+				NearBoss("StrongestinHistoryBoss_Normal")
+			else
+				if getItem("Items","Malevolent Key") >= 1 then
+					pcall(function() Remotes:WaitForChild("RequestSpawnStrongestBoss"):FireServer("StrongestHistory", "Normal") end)
+				elseif CheckB("SukunaBoss") then
+					NearBoss("SukunaBoss")
+				elseif Hop then
+					pcall(function() TeleportService:Teleport(77747658251236) end)
+				else
+					NearMob("ArenaFighter")
+				end
+			end
+		end
+	end)
+
+	local Slime = LPH_JIT_MAX(function()
+		if getItem("Sword", "Rimuru") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local DemonLord = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Demon Lord" then DemonLord = true; break end
+			end
+		end
+		local ItemsDemonLord = getItem("Items","Sage Pulse") >= 9 and getItem("Items","Tempest Seal") >= 6 and getItem("Items","Slime Remnant") >= 3 and getItem("Items","Slime Core") >= 1
+		if DemonLord and ItemsDemonLord then
+			RS.RemoteEvents.TitleEquip:FireServer("Demon Lord")
+			if plr.Data.Money.Value >= 30000000 and plr.Data.Gems.Value >= 20000 then
+						if plr:DistanceFromCharacter(Vector3.new(-1539, 4, 67)) >= 300 then Teleport("Slime") end
+				tween(Vector3.new(-1539, 4, 67), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.RimuruBuyer.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if CheckB("RimuruBoss_Normal") then
+				NearBoss("RimuruBoss_Normal")
+			else
+				if getItem("Items","Slime Key") >= 1 then
+					RS.RemoteEvents.RequestSpawnRimuru:FireServer("Normal")
+				else
+					local slime_shard = getItem("Items","Slime Shard")
+					if slime_shard >= 2 then
+						RS.Remotes.RequestSlimeCraft:InvokeServer("SlimeKey", 1)
+					else
+						NearMob("Slime")
+					end
+				end
+			end
+		end
+	end)
+
+	local Yamato = LPH_JIT_MAX(function()
+		if getItem("Sword", "Yamato") >= 1 then return end
+		local titleData = nil
+		pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+		local BladeSovereign = false
+		if titleData and titleData.unlocked then
+			for _, title in ipairs(titleData.unlocked) do
+				if title == "Blade Sovereign" then BladeSovereign = true; break end
+			end
+		end
+		local ItemsBladeSovereign = getItem("Items","Frozen Will") >= 14 and getItem("Items","Yamato Essence") >= 7 and getItem("Items","Silent Storm") >= 3 and getItem("Items","Azure Heart") >= 1
+		if BladeSovereign and ItemsBladeSovereign then
+			RS.RemoteEvents.TitleEquip:FireServer("Blade Sovereign")
+			if plr.Data.Gems.Value >= 30000 then
+						if plr:DistanceFromCharacter(Vector3.new(-1285, 92, -1000)) >= 300 then Teleport("Judgement") end
+				tween(Vector3.new(-1285, 92, -1000), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.YamatoBuyerNPC.HumanoidRootPart.BuyerPrompt)
+			else
+						BossFarm()
+			end
+		else
+				if CheckB("YamatoBoss") then
+				NearBoss("YamatoBoss")
+			elseif Hop then
+				pcall(function() TeleportService:Teleport(77747658251236) end)
+			else
+				NearMob("Swordsman")
+			end
+		end
+	end)
+
+	local QuestItems = LPH_JIT_MAX(function(v)
+		if v == "Katana" then
+			if getItem("Sword","Katana") >= 1 then return true end
+				tween(Vector3.new(105, 10, -263), 150).Completed:Wait()
+			fireproximityprompt(workspace.ServiceNPCs.Katana.HumanoidRootPart.BuyerPrompt)
+			return getItem("Sword","Katana") >= 1
+		elseif v == "Dark Blade" then
+			if getItem("Sword","Dark Blade") >= 1 then return true end
+				tween(Vector3.new(-133, 13, -1089), 150).Completed:Wait()
+			fireproximityprompt(workspace.ServiceNPCs.DarkBladeNPC.HumanoidRootPart.BuyerPrompt)
+			return getItem("Sword","Dark Blade") >= 1
+		elseif v == "Gryphon" then
+			if getItem("Sword","Gryphon") >= 1 then return true end
+				if plr:DistanceFromCharacter(Vector3.new(1529, 8, 198)) >= 300 then Teleport("Shibuya") end
+			tween(Vector3.new(1427, 9, 275), 150).Completed:Wait()
+			fireproximityprompt(workspace.ServiceNPCs.GryphonBuyerNPC.HumanoidRootPart.BuyerPrompt)
+			return getItem("Sword","Gryphon") >= 1
+		elseif v == "Observation" then
+			UpdateObsStatus()
+			if StatusCache.Obs then return true end
+				tween(Vector3.new(-715, 12, -525), 160).Completed:Wait()
+			fireproximityprompt(workspace.ServiceNPCs.ObservationBuyer.HumanoidRootPart.ObservationHakiPrompt)
+			task.wait(1)
+			UpdateObsStatus()
+			return StatusCache.Obs
+		elseif v == "Yuji" then
+			if getItem("Melee","Yuji") >= 1 then return true end
+				if getItem("Items","Energy Core") >= 7 and getItem("Items","Flash Impact") >= 3 and getItem("Items","Divergent Pulse") >= 1 then
+				if plr:DistanceFromCharacter(Vector3.new(1529, 8, 198)) >= 300 then Teleport("Shibuya") end
+				tween(Vector3.new(1244, 137, 406), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.YujiBuyerNPC.HumanoidRootPart.BuyerPrompt)
+				return getItem("Melee","Yuji") >= 1
+			else
+				BossFarm()
+				return false
+			end
+		elseif v == "Qin Shi" then
+			if getItem("Melee","Qin Shi") >= 1 then return true end
+				if getItem("Items","Boss Ticket") >= 250 then
+				pcall(function() RS:WaitForChild("Remotes"):WaitForChild("ExchangeItem"):InvokeServer("Qin Shi") end)
+				return getItem("Melee","Qin Shi") >= 1
+			else
+				BossFarm()
+				return false
+			end
+		elseif v == "Ichigo" then
+			if getItem("Sword","Ichigo") >= 1 then return true end
+				if getItem("Items","Boss Ticket") >= 500 then
+				pcall(function() RS:WaitForChild("Remotes"):WaitForChild("ExchangeItem"):InvokeServer("Ichigo") end)
+				return getItem("Sword","Ichigo") >= 1
+			else
+				BossFarm()
+				return false
+			end
+		elseif v == "Gojo v1" then
+				if getItem("Items","Limitless Ring") >= 3 and getItem("Items","Infinity Core") >= 1 and getItem("Items","Void Fragment") >= 6 then
+				if plr.Data.Gems.Value >= 4000 and plr.Data.Money.Value >= 750000 then
+					QuestGojov1()
+					return true
+				else
+					BossFarm()
+					return false
+				end
+			else
+				if CheckB("GojoBoss") then
+					NearBoss("GojoBoss")
+				elseif Hop then
+					pcall(function() TeleportService:Teleport(77747658251236) end)
+				else
+					NearMob("ArenaFighter")
+				end
+				return false
+			end
+		elseif v == "Aizen v1" then
+				if getItem("Items","Mirage Pendant") >= 10 and getItem("Items","Illusion Prism") >= 6 and getItem("Items","Reiatsu Core") >= 3 and getItem("Items","Hōgyoku Fragment") >= 1 then
+				if plr.Data.Money.Value >= 6000000 and plr.Data.Gems.Value >= 10000 then
+					Aizenv1()
+				else
+					NearMob("Quincy")
+				end
+			else
+				if CheckB("AizenBoss") then
+					NearBoss("AizenBoss")
+				elseif Hop then
+					pcall(function() TeleportService:Teleport(77747658251236) end)
+				else
+					NearMob("Quincy")
+				end
+			end
+			return false
+		elseif v == "Upgrading Ichigo" then
+				local ichigo = nil
+			pcall(function() ichigo = Remotes:WaitForChild("GetBlessingData"):InvokeServer("Ichigo") end)
+			if ichigo then
+				if ichigo.canBless then
+					pcall(function() Remotes:WaitForChild("BlessWeapon"):FireServer("Ichigo") end)
+					return true
+				else
+					for _, req in ipairs(ichigo.requirements) do
+						if req.have < req.need then FarmItem(req.name, req.need) end
+					end
+					return true
+				end
+			end
+			return false
+		elseif v == "Title" then
+				local titleData = nil
+			pcall(function() titleData = RS.Remotes.GetTitlesData:InvokeServer() end)
+			local DestinyMarked = titleData and titleData.unlocked and table.find(titleData.unlocked, "Destiny Marked") ~= nil
+			if DestinyMarked then
+				pcall(function() RemoteEvents:WaitForChild("TitleEquip"):FireServer("Destiny Marked") end)
+				return true
+			else
+				BossFarm()
+				return false
+			end
+		elseif v == "Upgrading Luck" then
+				local tree_data = RS.RemoteEvents.GetSkillTreeData:InvokeServer()
+			local points = { 15, 25, 50, 75, 100 }
+			for i, point in next, points do
+				if not tree_data.Nodes["Luck_" .. i] then
+					if tree_data.SkillPoints >= point then
+						RS.RemoteEvents.SkillTreeUpgrade:FireServer("Luck_" .. i)
+						break
+					end
+				end
+			end
+		elseif v == "Rank" then
+				local requirements = RS.RemoteEvents.GetAscendData:InvokeServer().requirements
+			for _, req in ipairs(requirements) do
+				if not req.completed then
+								if req.display:find("Cid Dungeon") or req.display:find("Atomic Core") then
+						if getItem("Items","Dungeon Key") > 0 then
+							Teleport("Dungeon")
+							local diff = "Hard"
+							for _, z in next, { "Easy", "Medium", "Hard", "Extreme" } do
+								if req.display:find(z) then diff = z; break end
+							end
+							if typeof(writefile) == "function" then writefile(plr.Name .. "_Dungeon_Diff.txt", diff) end
+							RS.Remotes.RequestDungeonPortal:FireServer("CidDungeon")
+							task.wait(1)
+							RS.Remotes.StartDungeonPortal:FireServer()
+							task.wait(60)
+						else
+							FarmItem("Dungeon Key", 1)
+						end
+					elseif req.display:find("Rune Dungeon") then
+						if getItem("Items","Dungeon Key") > 0 then
+							Teleport("Dungeon")
+							local diff = "Hard"
+							for _, z in next, { "Easy", "Medium", "Hard", "Extreme" } do
+								if req.display:find(z) then diff = z; break end
+							end
+							if typeof(writefile) == "function" then writefile(plr.Name .. "_Dungeon_Diff.txt", diff) end
+							RS.Remotes.RequestDungeonPortal:FireServer("RuneDungeon")
+							task.wait(1)
+							RS.Remotes.StartDungeonPortal:FireServer()
+							task.wait(60)
+						else
+							FarmItem("Dungeon Key", 1)
+						end
+					elseif req.display:find("Soul Flame") then
+						if CheckB("IchigoBoss") then
+							NearBoss("IchigoBoss")
+						else
+							local boss_key = getItem("Items","Boss Key")
+							if boss_key > 4 then
+								if plr.Data.Money.Value >= 350000 then
+									if plr.Data.Gems.Value >= 600 then
+										if plr:DistanceFromCharacter(Vector3.new(825, 24, -1088)) >= 300 then Teleport("Boss") end
+										RS.Remotes.RequestSummonBoss:FireServer("IchigoBoss")
+									else
+										FarmCurrency("Gems", 600)
+									end
+								else
+									FarmCurrency("Money", 350000)
+								end
+							else
+								local success, stock = pcall(function()
+									return RS.Remotes.MerchantRemotes.GetMerchantStock:InvokeServer().stock
+								end)
+								if success and stock then
+									for itemName, itemInfo in pairs(stock) do
+										if itemName == "Boss Key" or itemName == "Race Reroll" or itemName == "Passive Shard" or itemName == "Trait Reroll" or itemName == "Clan Reroll" then
+											pcall(function()
+												RS.Remotes.MerchantRemotes.PurchaseMerchantItem:InvokeServer(itemName, math.floor(plr.Data.Gems.Value / itemInfo.price))
+											end)
+										end
+									end
+								end
+								NearMob("Slime")
+							end
+						end
+					elseif req.display:find("Limitless Ring") or req.display:find("Void Fragment") then
+						if CheckB("GojoBoss") then NearBoss("GojoBoss")
+						elseif Hop then pcall(function() TeleportService:Teleport(77747658251236) end) end
+					elseif req.display:find("Dismantle Fang") then
+						if CheckB("SukunaBoss") then NearBoss("SukunaBoss")
+						elseif Hop then pcall(function() TeleportService:Teleport(77747658251236) end) end
+					elseif req.display:find("Dark Ring") or req.display:find("Blood Ring") then
+						if CheckB("JinwooBoss") then NearBoss("JinwooBoss")
+						elseif CheckB("AlucardBoss") then NearBoss("AlucardBoss")
+						elseif Hop then pcall(function() TeleportService:Teleport(77747658251236) end) end
+					elseif req.display:find("Infinity Essence") then
+						if CheckB("StrongestofTodayBoss_Normal") then
+							NearBoss("StrongestofTodayBoss_Normal")
+						else
+							if getItem("Items","Limitless Key") >= 1 then
+								RS.Remotes.RequestSpawnStrongestBoss:FireServer("StrongestToday", "Normal")
+							elseif CheckB("GojoBoss") then
+								NearBoss("GojoBoss")
+							elseif Hop then
+								pcall(function() TeleportService:Teleport(77747658251236) end)
+							end
+						end
+					elseif req.display:find("Hōgyoku Fragment") or req.display:find("Reiatsu Core") then
+						if CheckB("AizenBoss") then NearBoss("AizenBoss")
+						elseif Hop then pcall(function() TeleportService:Teleport(77747658251236) end) end
+					elseif req.display:find("Cursed Flesh") then
+						if CheckB("StrongestinHistoryBoss_Normal") then
+							NearBoss("StrongestinHistoryBoss_Normal")
+						else
+							if getItem("Items","Malevolent Key") >= 1 then
+								RS.Remotes.RequestSpawnStrongestBoss:FireServer("StrongestHistory", "Normal")
+							elseif CheckB("SukunaBoss") then
+								NearBoss("SukunaBoss")
+							elseif Hop then
+								pcall(function() TeleportService:Teleport(77747658251236) end)
+							end
+						end
+					elseif req.display:find("Deal") or req.display:find("Use abi") then
+						NearMob("Slime")
+					elseif req.display:find("Phantasm Core") then
+						if CheckB("GilgameshBoss") then
+							NearBoss("GilgameshBoss")
+						else
+							if getItem("Items","Divine Grail") >= 1 then
+								RS.Remotes.RequestSummonBoss:FireServer("GilgameshBoss", "Normal")
+							else
+								local broken_sword = getItem("Items","Broken Sword")
+								if broken_sword >= 3 then
+									RS.Remotes.RequestGrailCraft:InvokeServer("DivineGrail", 1)
+								else
+									NearMob("Slime")
+								end
+							end
+						end
+					elseif req.display:find("Slime Core") then
+						if CheckB("RimuruBoss_Normal") then
+							NearBoss("RimuruBoss_Normal")
+						else
+							if getItem("Items","Slime Key") >= 1 then
+								RS.RemoteEvents.RequestSpawnRimuru:FireServer("Normal")
+							else
+								local slime_shard = getItem("Items","Slime Shard")
+								if slime_shard >= 2 then
+									RS.Remotes.RequestSlimeCraft:InvokeServer("SlimeKey", 1)
+								else
+									NearMob("Slime")
+								end
+							end
+						end
+					end
+					break
+				end
+			end
+			RS.RemoteEvents.RequestAscend:FireServer()
+		elseif v == "Farming Drops" then
+				for Y, _ in pairs(QuestData) do
+				NearMob(Y)
+			end
+		end
+	end)
+
+	local QuestBusoHaki = LPH_JIT_MAX(function()
+		UpdateBusoStatus()
+		if StatusCache.Buso then
+			return true
+		end
+		CAN_UPSTAT = false
+		local currentQ = GetQ()
+		if currentQ == "Path to Haki 1" then
+			pcall(function() RemoteEvents:WaitForChild("ResetStats"):FireServer() end)
+			task.wait(1)
+			pcall(function() RemoteEvents:WaitForChild("AllocateStat"):FireServer("Melee", 500) end)
+			task.wait(0.5)
+			pcall(function() RemoteEvents:WaitForChild("AllocateStat"):FireServer("Defense", plr.Data.StatPoints.Value) end)
+			Teleport("Starter")
+			for _, v in next, workspace.NPCs:GetChildren() do
+				if v.Name:find("Thief") and v.PrimaryPart and not v:FindFirstChild("Boss") then
+					repeat
+						targetPos = v.PrimaryPart.CFrame.Position
+						task.wait()
+						if plr.Backpack:FindFirstChild("Combat") then
+							character.Humanoid:EquipTool(plr.Backpack:FindFirstChild("Combat"))
+						end
+						tween(v.PrimaryPart.CFrame * CFrame.new(0, 30, 0), 170)
+						if plr:DistanceFromCharacter(v.PrimaryPart.Position) <= 60 then
+							pcall(function() CombatRemotes:WaitForChild("RequestHit"):FireServer(v.PrimaryPart.CFrame.Position) end)
+						end
+					until not v or not v.PrimaryPart or not v.Humanoid or v.Humanoid.Health == 0 or not plr.PlayerGui.QuestUI.Quest.Visible
+					pcall(function() if v then v:Destroy() end end)
+				end
+			end
+		elseif currentQ == "Path to Haki 2" then
+			if plr.Backpack:FindFirstChild("Combat") then
+				character.Humanoid:EquipTool(plr.Backpack:FindFirstChild("Combat"))
+			end
+			pcall(function() AbilityRemotes:WaitForChild("RequestAbility"):FireServer(1) end)
+		elseif currentQ == "Path to Haki Final" then
+			if plr.Backpack:FindFirstChild("Combat") then
+				character.Humanoid:EquipTool(plr.Backpack:FindFirstChild("Combat"))
+			end
+			pcall(function() CombatRemotes:WaitForChild("RequestHit"):FireServer() end)
+			task.wait(0.3)
+			if not plr.PlayerGui.QuestUI.Quest.Visible then
+						tween(Vector3.new(-494, 24, -1255), 150).Completed:Wait()
+				fireproximityprompt(workspace.ServiceNPCs.HakiQuestNPC.HumanoidRootPart.HakiQuestPrompt)
+				pcall(function() RemoteEvents:WaitForChild("ResetStats"):FireServer() end)
+				CAN_UPSTAT = true
+				UpdateBusoStatus()
+				return StatusCache.Buso
+			end
+		else
+				tween(Vector3.new(-494, 24, -1255), 150).Completed:Wait()
+			fireproximityprompt(workspace.ServiceNPCs.HakiQuestNPC.HumanoidRootPart.HakiQuestPrompt)
+		end
+		return false
+	end)
+
+	local DungeonDiscovery = LPH_JIT_MAX(function()
+		UpdateDungeonStatus()
+		if StatusCache.Dungeon then
+			return true
+		end
+		local currentQ = GetQ()
+		local currentT = GetT()
+		if currentQ:find("Dungeon Discovery") then
+			local puzzlePieces = {
+				["0/6 Completed"] = function() tween(Vector3.new(89, 9, -138), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.StarterIsland.DungeonPuzzlePiece.PuzzlePrompt) end,
+				["1/6 Completed"] = function() tween(Vector3.new(-396, 1, 510), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.JungleIsland.DungeonPuzzlePiece.PuzzlePrompt) end,
+				["2/6 Completed"] = function() tween(Vector3.new(-1057, 6, -307), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.DesertIsland.DungeonPuzzlePiece.PuzzlePrompt) end,
+				["3/6 Completed"] = function() tween(Vector3.new(-314, -3, -1188), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.SnowIsland.DungeonPuzzlePiece.PuzzlePrompt) end,
+				["4/6 Completed"] = function() tween(Vector3.new(1717, 139, -26), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.ShibuyaStation.DungeonPuzzlePiece.PuzzlePrompt) end,
+				["5/6 Completed"] = function() tween(Vector3.new(-684, 99, 1335), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.HollowIsland.DungeonPuzzlePiece.PuzzlePrompt) end,
+			}
+			if puzzlePieces[currentT] then
+						puzzlePieces[currentT]()
+			end
+		elseif currentQ:find("Prove") then
+			local foundBoss = false
+			for v, _ in pairs(BossData) do
+				if CheckB(v) then
+								NearBoss(v)
+					foundBoss = true
+					break
+				end
+			end
+			if not foundBoss then
+				if CheckB("SaberBoss") then
+					NearBoss("SaberBoss")
+				elseif Hop then
+					pcall(function() TeleportService:Teleport(77747658251236) end)
+				else
+					local boss_key = getItem("Items","Boss Key")
+					if boss_key > 0 then
+						if plr.Data.Money.Value >= 100000 then
+							if plr.Data.Gems.Value >= 175 then
+								if plr:DistanceFromCharacter(Vector3.new(825, 24, -1088)) >= 300 then Teleport("Boss") end
+								Remotes:WaitForChild("RequestSummonBoss"):FireServer("SaberBoss")
+							else
+								FarmCurrency("Gems", 350)
+							end
+						else
+							FarmCurrency("Money", 200000)
+						end
+					else
+						local success, stock = pcall(function()
+							return Remotes:WaitForChild("MerchantRemotes"):WaitForChild("GetMerchantStock"):InvokeServer()
+						end)
+						if success and stock then
+							for i, v in pairs(stock) do
+								if i == "Boss Key" then
+									local amount = math.floor(plr.Data.Gems.Value / v.price)
+									if amount > 0 then
+										pcall(function() Remotes:WaitForChild("MerchantRemotes"):WaitForChild("PurchaseMerchantItem"):InvokeServer("Boss Key", amount) end)
+									end
+									break
+								end
+							end
+						end
+						NearMob("Slime")
+					end
+				end
+			end
+			RS.RemoteEvents.QuestAbandon:FireServer("DungeonUnlock")
+		else
+				pcall(function() Remotes:WaitForChild("DungeonQuestAccept"):FireServer() end)
+		end
+		return false
+	end)
+
+	local SlimePuzzle = LPH_JIT_MAX(function()
+		UpdateSlimeStatus()
+		if StatusCache.Slime then
+			return true
+		end
+		local currentQ = GetQ()
+		local currentT = GetT()
+		if currentQ:find("Slime Collection") then
+			local slimePieces = {
+				["0/7 Completed"] = function() tween(Vector3.new(-852, 1, -322), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.DesertIsland.SlimePuzzlePiece.ProximityPrompt) end,
+				["1/7 Completed"] = function() tween(Vector3.new(-433, 23, -1186), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.SnowIsland.SlimePuzzlePiece.ProximityPrompt) end,
+				["2/7 Completed"] = function() tween(Vector3.new(65, 35, -145), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.StarterIsland.SlimePuzzlePiece.ProximityPrompt) end,
+				["3/7 Completed"] = function() tween(Vector3.new(-584, 57, 318), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.JungleIsland.SlimePuzzlePiece.ProximityPrompt) end,
+				["4/7 Completed"] = function() tween(Vector3.new(1748, 9, 495), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.ShibuyaStation.SlimePuzzlePiece.ProximityPrompt) end,
+				["5/7 Completed"] = function() tween(Vector3.new(-434, 24, 1400), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.HollowIsland.SlimePuzzlePiece.ProximityPrompt) end,
+				["6/7 Completed"] = function()
+					tween(Vector3.new(788, 68, -2309), 150).Completed:Wait()
+					task.wait(0.5)
+					fireproximityprompt(workspace.ShinjukuIsland.SlimePuzzlePiece.ProximityPrompt)
+					pcall(function() Remotes:WaitForChild("RequestSlimeCraft"):InvokeServer("SlimeKey", 1) end)
+				end,
+			}
+			if slimePieces[currentT] then
+						slimePieces[currentT]()
+			end
+		else
+				pcall(function() RemoteEvents:WaitForChild("QuestAccept"):FireServer("SlimeCraftNPC") end)
+		end
+		return false
+	end)
+
+	local HogyokuQuest = LPH_JIT_MAX(function()
+		UpdateHogyokuStatus()
+		if StatusCache.Hogyoku then
+			return true
+		end
+		local currentQ = GetQ()
+		local currentT = GetT()
+		if currentQ:find("Hogyoku Fragments") then
+			local fragments = {
+				["0/6 Completed"] = function() tween(Vector3.new(-425, 60, -1236), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.HogyokuFragment1.HogyokuCollectPrompt) end,
+				["1/6 Completed"] = function() tween(Vector3.new(1637, 90, 246), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.HogyokuFragment2.HogyokuCollectPrompt) end,
+				["2/6 Completed"] = function() tween(Vector3.new(-636, 26, 1205), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.HogyokuFragment3.HogyokuCollectPrompt) end,
+				["3/6 Completed"] = function() tween(Vector3.new(649, 138, -2071), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.HogyokuFragment4.HogyokuCollectPrompt) end,
+				["4/6 Completed"] = function() tween(Vector3.new(-1206, 35, 463), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.HogyokuFragment5.HogyokuCollectPrompt) end,
+				["5/6 Completed"] = function() tween(Vector3.new(-907, 19, -1260), 150).Completed:Wait(); task.wait(0.5); fireproximityprompt(workspace.HogyokuFragment6.HogyokuCollectPrompt) end,
+			}
+			if fragments[currentT] then
+						fragments[currentT]()
+			end
+		else
+				pcall(function() RemoteEvents:WaitForChild("QuestAccept"):FireServer("HogyokuQuestNPC") end)
+		end
+		return false
+	end)
+
+	local Level = LPH_JIT_MAX(function()
+		local quest = getQuest()
+		if not quest or not quest.QuestName then
+				return
+		end
+		DebugPrint('[Status] Leveling | Lv.' .. plr.Data.Level.Value .. ' | ' .. quest.QuestName .. ' @ ' .. quest.Teleport)
+		local questUI = plr.PlayerGui:WaitForChild("QuestUI").Quest
+		if questUI.Visible and questUI.Quest.Holder.Content.QuestInfo.QuestTitle.QuestTitle.Text:find(quest.QuestName) then
+			local hasMobs = false
+			for _, v in next, workspace.NPCs:GetChildren() do
+				if v.Name:find(quest.MonsterName) and v.PrimaryPart then hasMobs = true; break end
+			end
+			if hasMobs then
+				Clear(quest.MonsterName)
+			else
+				if plr:DistanceFromCharacter(quest.MonsterCFrame) >= 320 then
+					Teleport(quest.Teleport)
+				else
+					tween(quest.MonsterCFrame, 150).Completed:Wait()
+				end
+				if SPAWN_POINT ~= quest.MonsterName then
+					local crystal = nil
+					local maxDist = math.huge
+					for _, v in next, workspace:GetDescendants() do
+						if v:IsA("Model") and v.Name:find("Crystal") and plr:DistanceFromCharacter(v:GetPivot().Position) < maxDist then
+							crystal = v
+							maxDist = plr:DistanceFromCharacter(v:GetPivot().Position)
+						end
+					end
+					if crystal then
+						if plr:DistanceFromCharacter(quest.MonsterCFrame) >= 320 then
+							Teleport(quest.Teleport)
+						else
+							tween(crystal:GetPivot(), 150).Completed:Wait()
+						end
+						task.wait(1)
+						for _, v in next, crystal:GetDescendants() do
+							if v.Name:find("Prompt") and typeof(fireproximityprompt) == "function" then
+								fireproximityprompt(v)
+								SPAWN_POINT = quest.MonsterName
+								break
+							end
+						end
+					end
+				end
+			end
+		else
+			takeQuest(quest.QuestId)
+		end
+	end)
+
+	local DungeonQuest = LPH_JIT_MAX(function()
+		task.spawn(function()
+			local diff = "Easy"
+			pcall(function()
+				if typeof(isfile) == "function" and typeof(readfile) == "function" then
+					local path = plr.Name .. "_Dungeon_Diff.txt"
+					if isfile(path) then diff = readfile(path) end
+				end
+			end)
+			pcall(function() Remotes:WaitForChild("DungeonWaveVote"):FireServer(diff) end)
+			local success, ui = pcall(function()
+				return plr.PlayerGui:WaitForChild("DungeonUI"):WaitForChild("ContentFrame"):WaitForChild("InfoFrame"):WaitForChild("KillsFrame"):WaitForChild("CurrentAmountOfEnemiesAliveThisWave")
+			end)
+			if success and ui and ui.Text:find("Victory") then
+				DebugPrint('[Status] Dungeon Victory | Teleport back')
+				pcall(function() TeleportService:Teleport(77747658251236) end)
+			end
+		end)
+		task.spawn(function()
+			for _, v in next, workspace.NPCs:GetChildren() do
+				if v.Humanoid and v.Humanoid.Health > 0 then
+					if not v.PrimaryPart and v.Humanoid then
+						repeat task.wait(); tween(v:GetPivot(), 150) until v.PrimaryPart
+					end
+					repeat
+						task.wait()
+						targetPos = v.PrimaryPart.CFrame.Position
+						EquipSword()
+						pcall(function()
+							if StatusCache.Buso and character:FindFirstChild("Right Arm") and character["Right Arm"].Color ~= Color3.new(0, 0, 0) then
+								RemoteEvents:WaitForChild("HakiRemote"):FireServer("Toggle")
+							end
+						end)
+						if not v.PrimaryPart then break end
+						tween(v.PrimaryPart.CFrame * CFrame.new(0, -17, 0), 100)
+						if plr:DistanceFromCharacter(v.PrimaryPart.Position) <= 50 then
+							pcall(function() CombatRemotes:WaitForChild("RequestHit"):FireServer(v.PrimaryPart.CFrame.Position) end)
+							UseSkill(v.PrimaryPart.CFrame.Position, true)
+							pcall(function() CombatRemotes:WaitForChild("RequestHit"):FireServer(v.PrimaryPart.CFrame.Position) end)
+						end
+					until not v or not v.PrimaryPart or not v.Humanoid or v.Humanoid.Health == 0
+					break
+				end
+			end
+		end)
+	end)
+
+	pcall(function()
+		Remotes:WaitForChild("UpdateInventory").OnClientEvent:Connect(function(items, data)
+			nguoitinhcuae.Inventory[items] = data
+			INVENTORY_LOADED = true
+			lastInventoryRefresh = os.clock()
+		end)
+		Remotes:WaitForChild("RequestInventory"):FireServer()
+	end)
+
+	plr.CharacterAdded:Connect(function(v) character = v end)
+
+	if typeof(getconnections) == "function" then
+		pcall(function()
+			for _, v in pairs(getconnections(plr.Idled)) do
+				if v.Disable then v.Disable() elseif v.Disconnect then v.Disconnect() end
+			end
+		end)
+	end
+
+	game.NetworkClient.ChildRemoved:Connect(function()
+		task.wait(5)
+		pcall(function() TeleportService:Teleport(77747658251236) end)
+	end)
+
+	local promptOverlay = CoreGui:WaitForChild("RobloxPromptGui"):WaitForChild("promptOverlay")
+	promptOverlay.ChildAdded:Connect(function(v)
+		if v.Name == "ErrorPrompt" and v:FindFirstChild("MessageArea") and v.MessageArea:FindFirstChild("ErrorFrame") then
+			pcall(function() TeleportService:Teleport(77747658251236) end)
+		end
+	end)
+
+	local NoClip = LPH_JIT(function(obj)
+		if obj:IsA("BasePart") then obj.CanCollide = false end
+	end)
+	local noclipConnection = nil
+	local setupNoClip = function()
+		if noclipConnection then noclipConnection:Disconnect(); noclipConnection = nil end
+		if character then
+			for _, v in ipairs(character:GetDescendants()) do NoClip(v) end
+			noclipConnection = character.DescendantAdded:Connect(NoClip)
+		end
+	end
+	setupNoClip()
+	plr.CharacterAdded:Connect(function(c)
+		character = c
+		setupNoClip()
+	end)
+
+	task.spawn(LPH_JIT_MAX(function()
+		while task.wait(0.5) do
+			if game.PlaceId ~= 77747658251236 then
+				DungeonQuest()
+			else
+				SPAWN_POINT = nil
+				refreshInventory()
+				local level = plr.Data.Level.Value
+				local gem   = plr.Data.Gems.Value
+				local money = plr.Data.Money.Value
+				UpdateAllStatus()
+
+				if level < 16000 then
+					if getItem("Sword","Katana") == 0 and money >= 2500 then
+						DebugPrint('[Status] Getting Katana')
+						QuestItems("Katana")
+					elseif getItem("Sword","Dark Blade") == 0 and money >= 250000 and gem >= 150 then
+						DebugPrint('[Status] Getting Dark Blade')
+						QuestItems("Dark Blade")
+					elseif getItem("Sword","Gryphon") == 0 and money >= 650000 and gem >= 650 then
+						DebugPrint('[Status] Getting Gryphon')
+						QuestItems("Gryphon")
+					elseif not StatusCache.Buso and level >= 500 and money >= 250000 and gem >= 250 then
+						DebugPrint('[Status] Getting Buso Haki')
+                        RS:WaitForChild("RemoteEvents"):WaitForChild("QuestAbandon"):FireServer("repeatable")
+						QuestBusoHaki()
+					elseif not StatusCache.Obs and gem >= 300 and money >= 250000 then
+						DebugPrint('[Status] Getting Observation Haki')
+						QuestItems("Observation")
+					elseif not StatusCache.Dungeon and level >= 5000 then
+						DebugPrint('[Status] Dungeon Discovery')
+						RS:WaitForChild("RemoteEvents"):WaitForChild("QuestAbandon"):FireServer("repeatable")
+						DungeonDiscovery()
+					elseif not StatusCache.Slime and level >= 8000 then
+						DebugPrint('[Status] Slime Puzzle')
+						RS:WaitForChild("RemoteEvents"):WaitForChild("QuestAbandon"):FireServer("repeatable")
+						SlimePuzzle()
+					elseif not StatusCache.Hogyoku and level >= 8500 then
+						DebugPrint('[Status] Hogyoku Quest')
+						RS:WaitForChild("RemoteEvents"):WaitForChild("QuestAbandon"):FireServer("repeatable")
+						HogyokuQuest()
+					else
+						Level()
+					end
+				else
+					local skillTreeData = nil
+					local powerData     = nil
+					local blessingData  = nil
+					local ascendData    = nil
+					local titleData     = nil
+					pcall(function() skillTreeData = RemoteEvents:WaitForChild("GetSkillTreeData"):InvokeServer() end)
+					pcall(function() powerData     = RemoteEvents:WaitForChild("PowerGetData"):InvokeServer() end)
+					pcall(function() blessingData  = Remotes:WaitForChild("GetBlessingData"):InvokeServer("Ichigo") end)
+					pcall(function() ascendData    = RemoteEvents:WaitForChild("GetAscendData"):InvokeServer() end)
+					pcall(function() titleData     = RS.Remotes.GetTitlesData:InvokeServer() end)
+
+					local skillTreeUnlocked = skillTreeData and skillTreeData.Unlocked
+					local powerUnlocked     = powerData and powerData.Unlocked
+					local Ichigay           = blessingData and blessingData.currentLevel or 10
+					local ascendMaxed       = ascendData and ascendData.isMaxed
+
+					if not skillTreeUnlocked and gem >= 1000 then
+						DebugPrint('[Status] Unlocking Skill Tree')
+						pcall(function() RemoteEvents:WaitForChild("SkillTreeUnlock"):FireServer() end)
+					elseif not powerUnlocked and level >= 11500 and gem >= 5500 then
+						DebugPrint('[Status] Unlocking Power')
+						pcall(function() RemoteEvents:WaitForChild("PowerUnlock"):FireServer() end)
+					elseif Maxlvl["Storage Race"] and gem >= 10000 and checkStorageNeedsSlot("RaceStorage", 4) then
+						DebugPrint('[Status] Buying Race Storage Slots')
+						tryBuyStorageSlots("RaceStorage", 10000, 4)
+					elseif Maxlvl["Storage Clan"] and gem >= 50000 and checkStorageNeedsSlot("ClanStorage", 4) then
+						DebugPrint('[Status] Buying Clan Storage Slots')
+						tryBuyStorageSlots("ClanStorage", 50000, 4)
+					elseif getItem("Melee","Yuji") == 0 and Items["Yuji Melee"] then
+						DebugPrint('[Status] Getting Yuji Melee')
+						QuestItems("Yuji")
+					elseif getItem("Melee","Qin Shi") == 0 and Items["Qin Shi Melee"] then
+						DebugPrint('[Status] Getting Qin Shi Melee')
+						QuestItems("Qin Shi")
+					elseif getItem("Sword","Ichigo") == 0 and Items["Ichigo Sword"] then
+						DebugPrint('[Status] Getting Ichigo Sword')
+						QuestItems("Ichigo")
+					elseif Ichigay < 10 and Items["Ichigo Sword"] then
+						DebugPrint('[Status] Upgrading Ichigo Sword Lv.' .. Ichigay)
+						QuestItems("Upgrading Ichigo")
+						pcall(function() blessingData = Remotes:WaitForChild("GetBlessingData"):InvokeServer("Ichigo") end)
+					elseif titleData and titleData.equipped ~= "Destiny Marked" and Maxlvl["Get Full Title"] then
+						DebugPrint('[Status] Getting Title Destiny Marked')
+						QuestItems("Title")
+					elseif not ascendMaxed and Maxlvl["Upgrade Max Rank"] then
+						DebugPrint('[Status] Rank Up')
+						QuestItems("Rank")
+					elseif getItem("Melee","Gojo") == 0 and Items["Gojo Melee"] then
+						DebugPrint('[Status] Getting Gojo Melee V1')
+						QuestItems("Gojo v1")
+					elseif getItem("Melee","Strongest Of Today") == 0 and getItem("Melee","Gojo") >= 1 and Items["Gojo Melee"] then
+						DebugPrint('[Status] Getting Gojo Melee V2')
+						QuestGojov2()
+					elseif getItem("Melee","Strongest In History") == 0 and Items["Sukuna Melee"] then
+						DebugPrint('[Status] Getting Sukuna Melee V2')
+						QuestSukunav2()
+					elseif getItem("Sword","Aizen") == 0 and Items["Aizen Sword"] then
+						DebugPrint('[Status] Getting Aizen Sword V1')
+						QuestItems("Aizen v1")
+					elseif getItem("Sword","True Aizen") == 0 and getItem("Sword","Aizen") >= 1 and Items["Aizen Sword"] then
+						DebugPrint('[Status] Getting Aizen Sword V2')
+						Aizenv2()
+					elseif getItem("Sword","Shadow") == 0 and Items["Shadow Sword"] and StatusCache.Dungeon then
+						DebugPrint('[Status] Getting Shadow Sword')
+						QuestShadowCidv1()
+					elseif getItem("Sword","Atomic") == 0 and getItem("Sword","Shadow") >= 1 and Items["Shadow Sword"] then
+						DebugPrint('[Status] Getting Atomic Sword')
+						QuestShadowCidv2()
+					elseif getItem("Melee","Strongest Shinobi") == 0 and Items["Shinobi Melee"] then
+						DebugPrint('[Status] Getting Shinobi Melee')
+						ShinobiMelee()
+					elseif getItem("Melee","Saber Alter") == 0 and Items["Saber Alter Melee"] then
+						DebugPrint('[Status] Getting Saber Alter Melee')
+						SaberMelee()
+					elseif getItem("Melee","Blessed Maiden") == 0 and Items["Blessed Maiden Melee"] then
+						DebugPrint('[Status] Getting Blessed Maiden Melee')
+						BlessedMelee()
+					elseif getItem("Melee","Gilgamesh") == 0 and Items["Gilgamesh Melee"] then
+						DebugPrint('[Status] Getting Gilgamesh Melee')
+						GilgameshMelee()
+					elseif getItem("Melee","Moon Slayer") == 0 and Items["Moon Slayer Melee"] then
+						DebugPrint('[Status] Getting Moon Slayer Melee')
+						MoonSlayer()
+					elseif getItem("Sword","Ice Queen") == 0 and Items["Ice Queen Sword"] then
+						DebugPrint('[Status] Getting Ice Queen Sword')
+						IceQueenSword()
+					elseif getItem("Melee","Alucard") == 0 and Items["Vampire King Melee"] then
+						DebugPrint('[Status] Getting Vampire King Melee')
+						Alucard()
+					elseif getItem("Melee","Anos") == 0 and Items["Demon King Melee"] then
+						DebugPrint('[Status] Getting Demon King Melee')
+						Anos()
+					elseif getItem("Sword","Rimuru") == 0 and Items["Slime Sword"] then
+						DebugPrint('[Status] Getting Slime Sword')
+						Slime()
+					elseif getItem("Sword","Yamato") == 0 and Items["Yamato Sword"] then
+						DebugPrint('[Status] Getting Yamato Sword')
+						Yamato()
+					else
+						if Drops then
+							nguoitinhcuae_Status = "Start Farming Drops"
+							DebugPrint('[Status] Farming Drops')
+							QuestItems("Upgrading Luck")
+							QuestItems("Farming Drops")
+						else
+							Yummytool = Change
+						end
+					end
+				end
+			end
+		end
+	end))
+
+	task.spawn(LPH_JIT(function()
+		while task.wait(1) do
+			local trait_data = nil
+			pcall(function() trait_data = RS.RemoteEvents.TraitGetData:InvokeServer() end)
+			if trait_data and trait_data.RerollCount > 0 and not table.find(Reroll["Trail"] or {}, trait_data.Trait) then
+				RS.RemoteEvents.TraitReroll:FireServer()
+				task.wait(0.5)
+				RS.RemoteEvents.TraitConfirm:FireServer(true)
+				task.wait(1)
+			end
+			local power_data = nil
+			pcall(function() power_data = RS.RemoteEvents.PowerGetData:InvokeServer() end)
+			if power_data and power_data.RollCount > 0 and not table.find(Reroll["Power"] or {}, power_data.Current and power_data.Current.Name) then
+				RS.RemoteEvents.PowerReroll:FireServer()
+				task.wait(0.3)
+				RS.RemoteEvents.PowerConfirm:FireServer(true)
+				task.wait(0.5)
+			end
+			local playerStats2 = nil
+			pcall(function() playerStats2 = RS.RemoteEvents.GetPlayerStats:InvokeServer() end)
+			if playerStats2 then
+				local current_rune = playerStats2.RuneEquipped
+				local cached_rune  = Reroll["Rune"] and Reroll["Rune"][1]
+				if cached_rune and current_rune ~= cached_rune then
+					if getItem("Runes", cached_rune) > 0 then
+						RS.Remotes.EquipRune:FireServer("Equip", cached_rune)
+					end
+				end
+			end
+		end
+	end))
+
+	task.spawn(LPH_JIT_MAX(function()
+		while task.wait(1) do
+			local plr_data    = nil
+			local stat_data   = nil
+			local passive_data = nil
+			CACHED_WEAPON = getBestWeapon()
+			pcall(function()
+				plr_data     = RemoteEvents:WaitForChild("GetPlayerStats"):InvokeServer()
+				stat_data    = Remotes:WaitForChild("GetStatRerollData"):InvokeServer()
+				passive_data = RemoteEvents:WaitForChild("SpecPassiveGetData"):InvokeServer()
+			end)
+			if not (plr_data and stat_data and passive_data) then
+				task.wait(1)
+			else
+				local equipped = plr_data.Inventory and plr_data.Inventory.Equipped
+
+				local storeOrRerollRace = function()
+					if Maxlvl["Storage Race"] and not table.find(Reroll["Race"] or {}, equipped.Race) then
+						tryStoreItem("RaceStorage", 4)
+					else
+						pcall(function() Remotes:WaitForChild("UseItem"):FireServer("Use", "Race Reroll", 1, true) end)
+						task.wait(0.5)
+					end
+				end
+
+				local storeOrRerollClan = function()
+					if Maxlvl["Storage Clan"] and not table.find(Reroll["Clan"] or {}, equipped.Clan) then
+						tryStoreItem("ClanStorage", 4)
+					else
+						pcall(function() Remotes:WaitForChild("UseItem"):FireServer("Use", "Clan Reroll", 1, true) end)
+						task.wait(0.5)
+					end
+				end
+
+				if equipped then
+					if Items["Aizen Sword"] and getItem("Sword","Aizen") == 0 then
+						if equipped.Race ~= "Shinigami" and getItem("Items","Race Reroll") > 0 then storeOrRerollRace() end
+					elseif Items["Shadow Sword"] and getItem("Sword","Shadow") == 0 then
+						if equipped.Race ~= "Shadowborn" and getItem("Items","Race Reroll") > 0 then storeOrRerollRace() end
+					elseif Items["Vampire King Melee"] and getItem("Melee","Alucard") == 0 then
+						if equipped.Race ~= "Vampire" and getItem("Items","Race Reroll") > 0 then storeOrRerollRace() end
+					elseif Items["Yamato Sword"] and getItem("Sword","Yamato") == 0 then
+						if equipped.Race ~= "Swordblessed" and getItem("Items","Race Reroll") > 0 then storeOrRerollRace() end
+					elseif not table.find(Reroll["Race"] or {}, equipped.Race) and getItem("Items","Race Reroll") > 0 then
+						pcall(function() Remotes:WaitForChild("UseItem"):FireServer("Use", "Race Reroll", 1, true) end)
+						task.wait(0.5)
+					end
+
+					if Items["Demon King Melee"] and getItem("Melee","Anos") == 0 then
+						if equipped.Clan ~= "Voldigoat" and getItem("Items","Clan Reroll") > 0 then storeOrRerollClan() end
+					elseif not table.find(Reroll["Clan"] or {}, equipped.Clan) and getItem("Items","Clan Reroll") > 0 then
+						pcall(function() Remotes:WaitForChild("UseItem"):FireServer("Use", "Clan Reroll", 1, true) end)
+						task.wait(0.5)
+					end
+				end
+
+				if not passive_data.Unlocked then
+					if plr.Data.Gems.Value >= 5000 and plr.Data.Level.Value >= 10000 then
+						pcall(function() RemoteEvents:WaitForChild("SpecPassiveUnlock"):FireServer() end)
+					end
+				elseif (not passive_data.Passives[CACHED_WEAPON] or passive_data.Passives[CACHED_WEAPON].Name ~= "Fortune Chosen") and getItem("Items","Passive Shard") > 0 then
+					pcall(function() RemoteEvents:WaitForChild("SpecPassiveReroll"):FireServer(CACHED_WEAPON) end)
+					task.wait(0.5)
+					pcall(function() RemoteEvents:WaitForChild("SpecPassiveConfirm"):FireServer(true) end)
+				end
+
+				if Maxlvl["Upgrade Luck"] and passive_data.Unlocked then
+					if stat_data.Stats and stat_data.Stats.Luck and stat_data.Stats.Luck.Value < 8 and plr_data.Gems and plr_data.Gems.Value >= 1000 then
+						pcall(function() Remotes:WaitForChild("RerollSingleStat"):InvokeServer("Luck") end)
+						task.wait(1.5)
+					end
+				end
+
+				if passive_data.Unlocked and plr.Data.Gems.Value >= 1000 and stat_data.Stats then
+					local statPriority = {
+						{ "Luck", 10 }, { "Damage", 20 }, { "Defense", 20 },
+						{ "CooldownReduction", 8 }, { "CritDamage", 15 }, { "DamageReduction", 7 },
+					}
+					for _, sp in ipairs(statPriority) do
+						local sName = sp[1]
+						local sMax  = sp[2]
+						if stat_data.Stats[sName] and stat_data.Stats[sName].Value < sMax then
+							pcall(function() RS.Remotes.RerollSingleStat:InvokeServer(sName) end)
+							task.wait(1)
+							break
+						end
+					end
+				end
+			end
+		end
+	end))
+
+	task.spawn(LPH_JIT(function()
+		while task.wait(1.5) do
+			local currentStats = nil
+			pcall(function() currentStats = RemoteEvents:WaitForChild("GetPlayerStats"):InvokeServer().Stats end)
+			if currentStats then
+				if (currentStats.Melee > 0 or currentStats.Sword == 0) and CAN_UPSTAT then
+					pcall(function() RemoteEvents:WaitForChild("ResetStats"):FireServer() end)
+					task.wait(1)
+				end
+				if plr.Data.StatPoints.Value > 0 and CAN_UPSTAT then
+					if character:FindFirstChild("Combat") then
+						pcall(function() RemoteEvents:WaitForChild("AllocateStat"):FireServer("Melee", plr.Data.StatPoints.Value) end)
+					elseif character:FindFirstChildOfClass("Tool") then
+						local sword = math.floor(plr.Data.StatPoints.Value / 3 * 2)
+						pcall(function() RemoteEvents:WaitForChild("AllocateStat"):FireServer("Sword", sword) end)
+						task.wait(0.5)
+						pcall(function() RemoteEvents:WaitForChild("AllocateStat"):FireServer("Defense", plr.Data.StatPoints.Value) end)
+					end
+				end
+			end
+		end
+	end))
+
+	task.spawn(LPH_JIT(function()
+		while task.wait(1) do
+			pcall(function()
+				local hrp = character:FindFirstChild("HumanoidRootPart")
+				if hrp and not hrp:FindFirstChild("NoFall") then
+					local bv = Instance.new("BodyVelocity")
+					bv.Name = "NoFall"
+					bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+					bv.Velocity = Vector3.new(0, 0, 0)
+					bv.P = 1000
+					bv.Parent = hrp
+				end
+			end)
+		end
+	end))
+
+	task.spawn(LPH_JIT(function()
+		while task.wait(30) do
+			for _, v in ipairs({ "Common", "Rare", "Legendary", "Epic" }) do
+				pcall(function() Remotes:WaitForChild("UseItem"):FireServer("Use", v .. " Chest", 1000000, false) end)
+				task.wait(1)
+			end
+		end
+	end))
+
+	task.spawn(LPH_JIT(function()
+		while task.wait(1) do
+			if character then
+				for _, child in ipairs(character:GetDescendants()) do
+					if child:IsA("BasePart") and child.CanCollide then child.CanCollide = false end
+				end
+			end
+		end
+	end))
+
+	CACHED_WEAPON = getBestWeapon()
+	task.spawn(LPH_JIT(function()
+		while task.wait(10) do
+			CACHED_WEAPON = getBestWeapon()
+		end
+	end))
+
+	task.spawn(LPH_JIT(function()
+		while task.wait(5) do
+			pcall(function() Remotes:WaitForChild("BlessWeapon"):FireServer(CACHED_WEAPON) end)
+		end
+	end))
+
+	local codeRemote = RS:WaitForChild("RemoteEvents"):WaitForChild("CodeRedeem")
+	task.spawn(LPH_JIT(function()
+		while task.wait(30) do
+			for _, code in ipairs(codes) do
+				pcall(function() codeRemote:InvokeServer(code) end)
+				task.wait(2)
+			end
+		end
+	end))
+
+	task.spawn(LPH_JIT(function()
+		while task.wait(1) do
+			if Change then
+				if typeof(writefile) == "function" then
+					if plr.Data.Level.Value >= 13000 and Yummytool then
+						writefile(plr.Name .. ".txt", "Completed-" .. plr.Name)
+					else
+						writefile(plr.Name .. ".txt", "Yummytool")
+					end
+				end
+			end
+		end
+	end))
+
+	task.spawn(LPH_JIT(function()
+		while task.wait(1) do
+			local oldPos = character.HumanoidRootPart.Position
+			task.wait(Config["Rejoin Time"] * 60)
+			if character and character.HumanoidRootPart and character.HumanoidRootPart.Position == oldPos then
+				DebugPrint('[Status] Auto Rejoin - Position stuck, teleporting')
+				TeleportService:Teleport(75159314259063)
+				task.wait(10)
+			end
+		end
+	end))
+
+	DebugPrint('[Status] Script Loaded | Lv.' .. plr.Data.Level.Value)
+	
+end)()

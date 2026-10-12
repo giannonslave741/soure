@@ -1,0 +1,519 @@
+repeat wait() until game:IsLoaded()
+getgenv().Key = "Y4MUFUHxkffPOqEbLnIDsxgONxm2QwZT425"
+
+if not LPH_OBFUSCATED then
+	LPH_CRASH         = function() end
+	LPH_ENCSTR        = function(v) return v end
+	LPH_ENCNUM        = function(v) return v end
+	LPH_JIT           = function(v) return v end
+	LPH_NO_VIRTUALIZE = function(v) return v end
+end
+
+local v1 = "sailor"
+
+;(function()
+	local v2  = tick
+	local v3  = v2()
+	local v4  = tostring
+	local v5  = pairs
+	local v6  = ipairs
+	local v7  = type
+	local v8  = pcall
+	local v9  = table.sort
+	local v10 = table.concat
+	local v11 = table.insert
+	local v12 = string.char
+	local v13 = string.byte
+	local v14 = string.sub
+	local v15 = string.format
+	local v16 = string.find
+	local v17 = string.lower
+	local v18 = math.floor
+	local v19 = math.random
+	local v20 = tonumber
+	local v21 = os.time
+	local v22 = os.clock
+	local v23 = os.date
+	local v24 = bit32.bxor
+	local v25 = bit32.band
+	local v26 = bit32.lrotate
+	local v27 = game:GetService("Players")
+	local v28 = game:GetService("HttpService")
+	local v29 = game:GetService("RunService")
+	local v30 = v27.LocalPlayer
+
+	local v31 = LPH_ENCSTR("Cr4ckthibucakt")
+	local v32 = LPH_ENCSTR("Tkbachanhamngunhucho")
+	local v33 = LPH_ENCSTR("_nguoitinhcuaeZ")
+	local v34 = LPH_ENCSTR("1.0.0")
+	local v35 = LPH_ENCSTR("_nguoitinhcuae-auth/") .. v1 .. LPH_ENCSTR(".log")
+	local v36 = LPH_ENCSTR("_nguoitinhcuae-auth/") .. v1 .. LPH_ENCSTR("-error.log")
+	local v37 = {
+		LPH_ENCSTR("http"), LPH_ENCSTR("curl"),    LPH_ENCSTR("python"),
+		LPH_ENCSTR("requests"), LPH_ENCSTR("postman"), LPH_ENCSTR("wget"),
+		LPH_ENCSTR("insomnia"), LPH_ENCSTR("httpie"), LPH_ENCSTR("node"),
+		LPH_ENCSTR("java"),  LPH_ENCSTR("ruby"),   LPH_ENCSTR("php"),
+		LPH_ENCSTR("perl"),
+	}
+	local v38 = LPH_ENCNUM(5)
+	local v39 = LPH_ENCNUM(999)
+	local v40 = LPH_ENCNUM(3)
+	local v41 = {
+		sailor     = LPH_ENCSTR("WL Sailor"),
+		aotr       = LPH_ENCSTR("WL Aotr"),
+		aotr_trade = LPH_ENCSTR("WL AotrTrade"),
+		bridgerz   = LPH_ENCSTR("WL Bridgerz"),
+	}
+	local v42 = v41[v1]
+	if not v42 then
+		print("Invalid v1: " .. v4(v1) .. ". Use: sailor/aotr/aotr_trade/bridgerz")
+		return
+	end
+
+	local v43 = function(v43a, v43b, v43c)
+		v8(function()
+			if v7(writefile) ~= "function" then return end
+			local v43d = v4(v21()) .. " [" .. v43a .. "] " .. v4(v43b) .. "\n"
+			writefile(v35, v43d)
+			if v43c then writefile(v36, v43d) end
+		end)
+	end
+
+	local v44 = function(v44a)
+		v43("KICK", v44a, true)
+		v8(function()
+			local v44b = loadstring([[
+				local r = ...
+				task.spawn(function()
+					while task.wait(0.04) do
+						pcall(function()
+							local cg = game:GetService("CoreGui")
+							local rp = cg:FindFirstChild("RobloxPromptGui")
+							if not rp then return end
+							local ov = rp:FindFirstChild("promptOverlay")
+							if not ov then return end
+							local ep = ov:FindFirstChild("ErrorPrompt")
+							if not ep then return end
+							local ma = ep:FindFirstChild("MessageArea")
+							if not ma then return end
+							local ef = ma:FindFirstChild("ErrorFrame")
+							if not ef then return end
+							local em = ef:FindFirstChild("ErrorMessage")
+							if not em then return end
+							if em.Text:find("_nguoitinhcuaeZ") then
+								local s = string.find(em.Text, "\n\n")
+								em.Text = s and string.sub(em.Text, s + 2) or string.sub(em.Text, 81)
+							end
+						end)
+					end
+				end)
+				game:GetService("Players").LocalPlayer:Kick(r)
+			]])
+			if v44b then v44b(v44a) end
+		end)
+		v30:Kick(v44a)
+		while true do v8(function() v29.Heartbeat:Wait() end) end
+	end
+
+	local v45 = {
+		{ n = "WebSocket.connect", f = function() return v7(WebSocket) == "table" and v7(WebSocket.connect) == "function" end },
+		{ n = "newcclosure",       f = function() return v7(newcclosure) == "function" end },
+		{ n = "identifyexecutor",  f = function() return v7(identifyexecutor) == "function" end },
+	}
+	local v46 = {}
+	for _, v46a in v6(v45) do
+		local v46b, v46c = v8(v46a.f)
+		if not (v46b and v46c == true) then v11(v46, v46a.n) end
+	end
+	if #v46 > 0 then v44("Executor not supported.\nMissing: " .. v10(v46, ", ")); return end
+
+	local v47 = identifyexecutor and identifyexecutor() or "Unknown"
+	for _, v47a in v6(v37) do
+		if v16(v17(v47), v47a, 1, true) then v44("Executor not supported."); return end
+	end
+
+	local v48 = LPH_JIT(function(v48a, v48b)
+		local v48c, v48d = {}, 0
+		for v48e = 0, 255 do v48c[v48e] = v48e end
+		for v48e = 0, 255 do
+			v48d = (v48d + v48c[v48e] + v13(v48b, (v48e % #v48b) + 1)) % 256
+			v48c[v48e], v48c[v48d] = v48c[v48d], v48c[v48e]
+		end
+		local v48f, v48g, v48h = {}, 0, 0
+		for v48e = 1, #v48a do
+			v48g = (v48g + 1) % 256
+			v48h = (v48h + v48c[v48g]) % 256
+			v48c[v48g], v48c[v48h] = v48c[v48h], v48c[v48g]
+			v48f[v48e] = v12(v24(v13(v48a, v48e), v48c[(v48c[v48g] + v48c[v48h]) % 256]))
+		end
+		local v48i = {}
+		for v48e = 1, #v48f do v48i[v48e] = v48f[v48e] end
+		return v10(v48i)
+	end)
+
+	local v49 = function(v49a)
+		local v49b = {}
+		for v49e = 1, #v49a do v49b[v49e] = v15("%02x", v13(v49a, v49e)) end
+		return v10(v49b)
+	end
+
+	local v50 = function(v50a) return v4(v18(v50a / 30)) end
+
+	local v51 = newcclosure and newcclosure(function() return identifyexecutor() end) or function() return identifyexecutor() end
+	local v52 = newcclosure and newcclosure(function() return v21() end) or function() return v21() end
+
+	local v53 = LPH_JIT(function(v53a, v53b)
+		local v53c = v53b .. v53a .. v53b
+		local v53d, v53e = 0, 0
+		for v53f = 1, #v53c do
+			v53d = v24(v26(v53d, 5), v13(v53c, v53f))
+			v53d = v25(v53d + 0x6B43A9, 0xFFFFFFFF)
+		end
+		for v53f = #v53c, 1, -1 do
+			v53e = v24(v26(v53e, 7), v13(v53c, v53f))
+			v53e = v25(v53e + 0x9E3779B9, 0xFFFFFFFF)
+		end
+		return v15("%08x%08x", v53d, v53e)
+	end)
+
+	local v54 = v14(v32, 1, 8) .. v14(v31, 1, 8)
+
+	local v55 = function(v55a, v55b)
+		if v7(v55a._h) ~= "string" then return false end
+		return v55a._h == v14(v53("true|" .. v4(v55a.session or "") .. "|" .. v50(v55b), v54), 1, 8)
+	end
+
+	local v56 = function(v56a)
+		local v56b = {}
+		for v56c in v5(v56a) do if v56c ~= "sig" then v56b[#v56b+1] = v56c end end
+		v9(v56b)
+		local v56d = ""
+		for v56e, v56f in v6(v56b) do
+			if v56e > 1 then v56d = v56d .. "&" end
+			v56d = v56d .. v56f .. "=" .. v4(v56a[v56f])
+		end
+		return v53(v56d, v32)
+	end
+
+	local v57 = function(v57a, v57b)
+		local v57c, v57d = v8(function() return v28:JSONEncode(v57a) end)
+		if not v57c then return "" end
+		return v49(v48(v57d, v31 .. v33 .. "ws" .. v50(v57b)))
+	end
+
+	local v58 = function(v58a, v58b)
+		local v58c = v48(v58a, v31)
+		local v58d = {}
+		for v58e = 1, v18(v58b / 2) do v58d[v58e] = v15("%02x", v13(v58c, v58e)) end
+		return v14(v10(v58d), 1, v58b)
+	end
+
+	local v59 = v12(LPH_ENCNUM(119),LPH_ENCNUM(115),LPH_ENCNUM(58),LPH_ENCNUM(47),LPH_ENCNUM(47))
+		.. v12(LPH_ENCNUM(117),LPH_ENCNUM(115),LPH_ENCNUM(51),LPH_ENCNUM(46),LPH_ENCNUM(98),LPH_ENCNUM(111),LPH_ENCNUM(116),LPH_ENCNUM(45),LPH_ENCNUM(104),LPH_ENCNUM(111),LPH_ENCNUM(115),LPH_ENCNUM(116),LPH_ENCNUM(105),LPH_ENCNUM(110),LPH_ENCNUM(103),LPH_ENCNUM(46),LPH_ENCNUM(110),LPH_ENCNUM(101),LPH_ENCNUM(116))
+		.. v12(LPH_ENCNUM(58),LPH_ENCNUM(50),LPH_ENCNUM(49),LPH_ENCNUM(50),LPH_ENCNUM(57),LPH_ENCNUM(49))
+		.. "/" .. v58(LPH_ENCSTR("vx9_ws_unified_v2"), 10)
+
+	local v60 = {}
+	local v61 = function()
+		local v61a = v52()
+		local v61b = v24(v18(v2() * 1e6) % 0xFFFFFFFF, v61a)
+		local v61c = v24(v18(v19() * 0xFFFF), v18(v2() * 999) % 0xFFFF)
+		return v15("%08x%04x", v61b % 0xFFFFFFFF, v61c % 0xFFFF)
+	end
+
+	local v62 = function()
+		local v62a = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+		local v62b = ""
+		for _ = 1, 5 do
+			local v62c = v18(v19() * #v62a) + 1
+			v62b = v62b .. v14(v62a, v62c, v62c)
+		end
+		return v62b
+	end
+
+	local v63 = function()
+		local v63a = v21()
+		local v63b = v23("*t",  v63a)
+		local v63c = v23("!*t", v63a)
+		local v63d = (v63b.hour - v63c.hour) * 60 + (v63b.min - v63c.min)
+		if v63d >  720 then v63d = v63d - 1440 end
+		if v63d < -720 then v63d = v63d + 1440 end
+		local v63e = v18(v63d / 60)
+		local v63f = math.abs(v63d % 60)
+		local v63g = v63e >= 0 and "+" or ""
+		local v63h = v63f ~= 0
+			and v15("UTC%s%d:%02d", v63g, v63e, v63f)
+			or  v15("UTC%s%d",      v63g, v63e)
+		local v63i = "Unknown"
+		v8(function()
+			v63i = game:GetService("LocalizationService"):GetCountryRegionForPlayerAsync(v30)
+		end)
+		local v63j = {
+			VN="Vietnam",JP="Japan",KR="South Korea",CN="China",
+			TW="Taiwan",TH="Thailand",SG="Singapore",MY="Malaysia",
+			ID="Indonesia",PH="Philippines",IN="India",HK="Hong Kong",
+			MO="Macao",MM="Myanmar",KH="Cambodia",LA="Laos",
+			AU="Australia",NZ="New Zealand",US="United States",CA="Canada",
+			BR="Brazil",MX="Mexico",AR="Argentina",CL="Chile",
+			CO="Colombia",PE="Peru",VE="Venezuela",EC="Ecuador",
+			GB="United Kingdom",DE="Germany",FR="France",NL="Netherlands",
+			ES="Spain",IT="Italy",PL="Poland",SE="Sweden",
+			NO="Norway",FI="Finland",DK="Denmark",CH="Switzerland",
+			AT="Austria",BE="Belgium",PT="Portugal",RO="Romania",
+			CZ="Czech Republic",HU="Hungary",GR="Greece",RU="Russia",
+			UA="Ukraine",TR="Turkey",SA="Saudi Arabia",AE="UAE",
+			EG="Egypt",ZA="South Africa",NG="Nigeria",KE="Kenya",
+			IL="Israel",PK="Pakistan",BD="Bangladesh",LK="Sri Lanka",
+		}
+		local v63k = v63j[v63i] or (v63i ~= "" and v63i or "Unknown")
+		return v63h .. " (" .. v63k .. ")"
+	end
+
+	getgenv = getgenv or function() return _G end
+	if not getgenv().Key or getgenv().Key == "" then
+		v44("No key provided.\nSet: getgenv().Key = \"YOUR_KEY\"")
+		return
+	end
+
+	local v64  = v4(getgenv().Key)
+	local v65  = {
+		executor = v51(),
+		user_id  = v4(v30.UserId),
+		username = v30.Name,
+		place_id = v4(game.PlaceId),
+		job_id   = v4(game.JobId),
+	}
+	local v66  = v1 .. "_" .. v64 .. "_" .. v65.user_id
+	do
+		local v66_t = getgenv().__WL_WS_SESSIONS
+		if not v66_t then v66_t = {}; getgenv().__WL_WS_SESSIONS = v66_t end
+		if v66_t[v66] then
+			print("🔹 Authenticated | Key already connected — duplicate execution blocked.")
+			return
+		end
+		v66_t[v66] = true
+	end
+
+	local v67 = v63()
+
+	local v68  = v62()
+	local v69  = nil
+	local v70  = false
+	local v71  = false
+	local v72  = 0
+	local v73  = 100
+	local v74  = 0
+	local v75  = nil
+	local v76  = nil
+	local v77  = false
+
+	local v78 = function(v78a, v78b)
+		if v77 then return end
+		v77 = true; v71 = false
+		if getgenv().__WL_WS_SESSIONS then getgenv().__WL_WS_SESSIONS[v66] = nil end
+		getgenv().__AUTHENTICATED = false
+		v43("KICK", v78a .. " | type=" .. v4(v78b or v1), true)
+		v44(v78a)
+	end
+
+	local v79
+	v79 = function(v79a)
+		if v76 then v8(task.cancel, v76); v76 = nil end
+		local v79b = 0
+		v76 = task.spawn(LPH_NO_VIRTUALIZE(function()
+			local v79c = 0
+			while v71 and not v77 do
+				task.wait(v38)
+				if not v71 or v77 then break end
+				v79c = v79c + 1; v79b = 0
+				local v79d = v8(function()
+					v79a:Send(v28:JSONEncode({
+						type = "heartbeat", session = v69,
+						tab_token = v68, tick = v79c,
+					}))
+				end)
+				if not v79d then
+					v79b = v79b + 1
+					if v79b >= 3 then v71 = false; break end
+				end
+			end
+		end))
+	end
+
+	local v80
+	local v81 = function()
+		v71 = false
+		if v77 then return end
+		v74 = v74 + 1
+		if v74 > v39 then
+			getgenv().__AUTHENTICATED = false
+			if getgenv().__WL_WS_SESSIONS then getgenv().__WL_WS_SESSIONS[v66] = nil end
+			return
+		end
+		local v81a = math.min(v40 * v74, 15)
+		v43("NET", "Disconnected — retry #" .. v74 .. " in " .. v81a .. "s")
+		task.spawn(function()
+			task.wait(v81a)
+			if v77 or not v30 or not v30.Parent then return end
+			local v81b, v81c = v80()
+			if not v81b then
+				v43("NET", "Reconnect #" .. v74 .. " failed: " .. v4(v81c), true)
+				task.wait(math.min(v40 * v74, 30))
+				if not v77 then v81() end
+				return
+			end
+			v70 = true; v71 = true
+			v69 = v81c.session or v69; v74 = 0
+			if v7(v81c.hb_interval) == "number" then v38 = v81c.hb_interval end
+			v72 = v81c.slots or v72; v73 = v81c.max_slots or v73
+			v79(v75)
+			local v81d = (v73 == 0) and "inf" or v4(v73)
+			v43("AUTH", "Reconnected " .. v42 .. " user=" .. v65.username)
+			print(v15("🔹 Authenticated | User: %s | Token: %s | Tabs: %s/%s | Reconnected | %s",
+				v65.username, v68, v4(v72), v81d, v67))
+		end)
+	end
+
+	v80 = function()
+		local v80a = nil
+		local v80b = false
+		local v80c = false
+		local v80d = false
+
+		task.spawn(function()
+			local v80e, v80f = v8(WebSocket.connect, v59)
+			v75 = v80f; v80c = v80e; v80d = true
+		end)
+		local v80g = v21()
+		while not v80d and v21() < v80g + 8 do task.wait(0.05) end
+		if not v80d or not v80c then
+			v43("NET", "WS connect failed: " .. v4(v75), true)
+			return false, "connect_fail"
+		end
+		v80b = true
+
+		v75.OnMessage:Connect(function(v80h)
+			local v80i, v80j = v8(function() return v28:JSONDecode(v80h) end)
+			if not v80i or v7(v80j) ~= "table" then return end
+			if not v70 then v80a = v80j; return end
+			local v80k = v80j.type or ""
+			if v80k == "hb_ack" or v80k == "pong" then return end
+			if v80k == "ping" then
+				v8(function() v75:Send(v28:JSONEncode({ type = "pong", session = v69 })) end); return
+			end
+			if v80k == "tab_update" then
+				v72 = v80j.slots or v72; v73 = v80j.max_slots or v73; return
+			end
+			if v80k == "force_kick" or v80k == "kick" then
+				v71 = false
+				v43("SERVER", "Kick: " .. v4(v80j.reason or ""), true)
+				v78(v80j.reason or "Session terminated by server.", v80k)
+			end
+		end)
+
+		local v80_closed = false
+		v75.OnClose:Connect(function()
+			v80_closed = true
+			task.spawn(function()
+				task.wait(0.2)
+				v80b = false
+				if v77 then return end
+				if not v70 then return end
+				v81()
+			end)
+		end)
+
+		local v80l = v52()
+		local v80m = v61()
+		while v60[v80m] do v80m = v61() end
+		v60[v80m] = true
+		local v80n = {
+			key      = v64,   ws_type  = v1,
+			user_id  = v65.user_id,   username = v65.username,
+			place_id = v65.place_id,  job_id   = v65.job_id,
+			executor = v65.executor,  tab_token = v68,
+			timezone = v67,           nonce    = v80m,
+		}
+		v80n.sig = v56(v80n)
+		local v80o = v8(function()
+			v75:Send(v28:JSONEncode({ type = "auth", d = v57(v80n, v80l), t = v80l }))
+		end)
+		if not v80o then v43("NET", "Send auth failed", true); return false, "connect_fail" end
+
+		local v80p = 0
+		while not v80a and v80p < 30 do
+			task.wait(0.05); v80p = v80p + 0.05
+			if not v30 or not v30.Parent then return false, "player_left" end
+			if v80_closed and v80p > 0.5 then break end
+		end
+
+		if not v80a then
+			if v80_closed then return false, "closed_before_auth" end
+			return false, "auth_timeout"
+		end
+		if not v80a.ok then return false, "auth_rejected", v80a.reason or "" end
+		if not v55(v80a, v80l) then
+			LPH_CRASH()
+			v78("Security violation: Auth response tampered.")
+			return false, "tampered"
+		end
+
+		return true, v80a
+	end
+
+	local v82, v83, v84 = v80()
+
+	if not v82 then
+		local v82a = v83 or ""; local v82b = v84 or ""
+		if v82a == "auth_rejected" then
+			if     v16(v82b, "expired")                      then v78("Your key has expired.\nPlease renew your subscription in our Discord.",          "expired")
+			elseif v16(v82b, "limit") or v16(v82b, "Tab")   then v78("Tab limit reached.\nClose another tab to connect.",                              "tab_limit")
+			elseif v16(v82b, "blacklist")                    then v78("Your key has been blacklisted.\nContact support in our Discord.",                 "blacklist")
+			elseif v16(v82b, "Invalid")                      then v78("Invalid key.\nPlease check your key and try again.",                              "invalid_key")
+			elseif v16(v82b, "executor")                     then v78("Executor not supported: " .. v47,                                                "executor")
+			elseif v16(v82b, "type") or v16(v82b, "Wrong")  then v78("Wrong key type for " .. v42 .. ".\nGet the correct script from our Discord.",    "wrong_type")
+			else                                                  v78("Authentication failed: " .. v82b,                                                "auth_fail") end
+		elseif v82a == "player_left"       then if getgenv().__WL_WS_SESSIONS then getgenv().__WL_WS_SESSIONS[v66] = nil end
+		elseif v82a == "tampered"          then return
+		elseif v82a == "auth_timeout"      then v78("Server did not respond.\nPlease rejoin and try again.",          "timeout")
+		elseif v82a == "closed_before_auth" then v78("Connection closed before authentication.\nPlease rejoin.",      "connect_fail")
+		else                                    v78("Cannot connect to server.\nPlease check your connection and rejoin.", "connect_fail") end
+		return
+	end
+
+	local v85   = v83
+	v70         = true
+	v71         = true
+	v69         = v85.session
+	v72         = v85.slots     or 1
+	v73         = v85.max_slots or 100
+	if v7(v85.hb_interval) == "number" then v38 = v85.hb_interval end
+
+	local v86   = (v73 == 0) and "inf" or v4(v73)
+	local v87   = v2() - v3
+
+	getgenv().__AUTHENTICATED = true
+	getgenv().__SESSION_ID    = v69
+	getgenv().__TAB_TOKEN     = v68
+
+	v43("AUTH", "OK " .. v42 .. " | user=" .. v65.username .. " | token=" .. v68
+		.. " | tabs=" .. v4(v72) .. "/" .. v86 .. " | exec=" .. v47 .. " | tz=" .. v67)
+	print(v15("🔹 Authenticated | User: %s | Token: %s | Tabs: %s/%s | Exec: %s | %.6fs | %s",
+		v65.username, v68, v4(v72), v86, v47, v87, v67))
+
+	v79(v75)
+
+	task.spawn(LPH_NO_VIRTUALIZE(function()
+		local v88 = v22()
+		while v71 and not v77 do
+			v8(function() v29.Heartbeat:Wait() end)
+			local v88a = v22()
+			if v88a ~= v88 and v88a - v88 > 8 then
+				v71 = false; v78("Security violation: game stall detected.", "stall"); break
+			end
+			if v88a ~= v88 then v88 = v88a end
+		end
+	end))
+end)()
+
+print("🔹_nguoitinhcuae")
